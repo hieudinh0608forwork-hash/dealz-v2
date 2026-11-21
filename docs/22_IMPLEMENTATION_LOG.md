@@ -85,3 +85,15 @@
 - Finance interface is connected to the authenticated finance REST endpoints.
 - PHP, JavaScript and OpenAPI checks are running in GitHub Actions; WordPress integration tests are also running after the first test-suite corrections.
 - Browser-level interaction and responsive visual checks remain outstanding.
+
+## 2026-11-22 – First passing integration verification
+
+### Result
+- GitHub Actions WordPress integration run passed on commit `e43610cb45ecac70e2842cacdc14cc4a5667bbef`.
+- Environment: PHP 8.2.36, PHPUnit 9.6.39, WordPress 6.8 test library and MySQL 8.0.46.
+- Result: **14 tests, 51 assertions, all passing**.
+- PHP syntax, JavaScript syntax and OpenAPI YAML validation workflows also passed on the same commit.
+
+### Follow-up
+- The test run exposed and helped correct REST response object handling and the missing FinanceController registration hook.
+- This verifies the tested API slice in CI, not full browser behavior, deployment, real partner data or production readiness.
