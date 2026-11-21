@@ -156,7 +156,9 @@ function dealz_render_styleguide_route(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		status_header( 404 );
 		nocache_headers();
-		include get_404_template();
+		get_header();
+		echo '<main id="primary" class="page-container"><h1>' . esc_html__( 'Không tìm thấy trang', 'dealz-theme' ) . '</h1></main>';
+		get_footer();
 		exit;
 	}
 	nocache_headers();

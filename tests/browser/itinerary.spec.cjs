@@ -253,8 +253,8 @@ test('admin-only styleguide is noindex and exposes the component states', async 
   await signIn(page);
   const response = await page.goto(BASE_URL + '/styleguide/');
   expect(response.status()).toBe(200);
-  await expect(page.locator('h1')).toHaveText('Trang styleguide');
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]').last()).toHaveAttribute('content', /noindex/);
   await expect(page.locator('[data-btn="primary"]')).toBeVisible();
   await expect(page.locator('.dz-chip--selected')).toBeVisible();
   await expect(page.locator('.dz-card--budget')).toBeVisible();
@@ -287,5 +287,5 @@ test('legal draft routes are public noindex and do not invent operative terms', 
 test('styleguide is not accessible without administrator capability', async ({ page }) => {
   const response = await page.goto(BASE_URL + '/styleguide/');
   expect(response.status()).toBe(404);
-  await expect(page.locator('h1')).not.toHaveText('Trang styleguide');
+  await expect(page.getByRole('heading', { name: 'Không tìm thấy trang', level: 1 })).toBeVisible();
 });
