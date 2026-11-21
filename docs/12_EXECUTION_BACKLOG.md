@@ -50,7 +50,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 
 ## Phase 4 – Core planning experience
 - [x] Add initial responsive manual itinerary workspace wired to APIs; [ ] implement full 16:10 stop cards, sourced route connectors and all exact design-rule details.
-- [ ] Implement schedule validation and reorder.
+- [x] Implement deterministic validation of explicit time overlaps; [ ] route-aware feasibility validation and reorder.
 - [ ] Implement route provider abstraction and map UI.
 - [ ] Implement budget lines and expense records.
 - [ ] Implement save/share/print/PDF only after interaction is functional.
