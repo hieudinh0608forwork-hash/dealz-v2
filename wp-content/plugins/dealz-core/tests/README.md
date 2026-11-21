@@ -11,6 +11,7 @@ The Trip and manual itinerary API integration tests use the official WordPress P
 - A different user cannot list days in another user's itinerary.
 - A fifth active main stop on one day is rejected.
 - Explicitly overlapping local time windows are reported by the day validator.
+- Explicitly overlapping local time windows are reported by the day validator.
 
 ## Run
 1. Set up the local WordPress environment using the root README.
