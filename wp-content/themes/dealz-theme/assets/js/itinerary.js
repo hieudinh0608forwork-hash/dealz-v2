@@ -80,6 +80,8 @@
 
 	function hideWorkspace() {
 		workspace.hidden = true;
+		const rentalWorkspace = document.getElementById('rental-workspace');
+		if (rentalWorkspace) rentalWorkspace.hidden = true;
 		if (tripList) tripList.hidden = false;
 		if (sectionHeading) sectionHeading.hidden = false;
 		if (createTripPanel) createTripPanel.hidden = false;
@@ -435,6 +437,24 @@
 		moveUp.addEventListener('click', function () { moveItem(-1); });
 		moveDown.addEventListener('click', function () { moveItem(1); });
 		moveControls.append(moveUp, moveDown);
+
+		if (isMainStop) {
+			const rental = document.createElement('a');
+			rental.className = 'button button--primary button--compact item-rental-cta';
+			rental.href = '#shop';
+			rental.textContent = 'Thuê đồ cho điểm này';
+			rental.setAttribute('aria-label', 'Mở mục thuê đồ cho ' + item.title_snapshot);
+			rental.addEventListener('click', function (event) {
+				event.preventDefault();
+				const params = new URLSearchParams({
+					stop: item.public_id,
+					name: item.title_snapshot,
+					return: window.location.hash
+				});
+				window.location.hash = 'shop?' + params.toString();
+			});
+			actions.append(rental);
+		}
 
 		if (isMainStop && item.address_snapshot) {
 			const directions = document.createElement('a');
@@ -908,8 +928,34 @@
 		});
 	}
 
+	function showRentalWorkspace(query) {
+		const rentalWorkspace = document.getElementById('rental-workspace');
+		if (!rentalWorkspace) return;
+		hideWorkspace();
+		if (tripList) tripList.hidden = true;
+		if (sectionHeading) sectionHeading.hidden = true;
+		if (createTripPanel) createTripPanel.hidden = true;
+		rentalWorkspace.hidden = false;
+		const params = new URLSearchParams(query || '');
+		const stopName = params.get('name') || 'điểm dừng đã chọn';
+		const heading = document.getElementById('rental-workspace-title');
+		const context = document.getElementById('rental-stop-context');
+		const back = document.getElementById('rental-back-link');
+		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
+		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
+		if (back) {
+			back.href = params.get('return') || '#trips';
+			back.textContent = '← Quay lại ' + stopName;
+		}
+	}
+
 	window.addEventListener('hashchange', function () {
 		const match = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
+		const shopMatch = window.location.hash.match(/^#shop(?:\\?(.*))?$/);
+		if (shopMatch) {
+			showRentalWorkspace(shopMatch[1] || '');
+			return;
+		}
 		if (match) {
 			loadTrip(match[1]);
 		} else {
@@ -918,6 +964,11 @@
 	});
 
 	window.dealzItinerary = { openTrip: openTrip };
+
+	const initialShopMatch = window.location.hash.match(/^#shop(?:\\?(.*))?$/);
+	if (initialShopMatch) {
+		showRentalWorkspace(initialShopMatch[1] || '');
+	}
 
 	const initialMatch = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
 	if (initialMatch) {
