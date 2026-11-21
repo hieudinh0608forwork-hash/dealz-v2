@@ -129,7 +129,7 @@ final class TripController {
 	public function get_trip( \WP_REST_Request $request ) {
 		$trip = $this->trips->find_owned( (string) $request['public_id'], get_current_user_id() );
 
-		if ( ! $trip ) {
+		if ( ! $trip || 'archived' === $trip->status ) {
 			return new \WP_Error( 'dealz_trip_not_found', __( 'Không tìm thấy chuyến đi.', 'dealz-core' ), array( 'status' => 404 ) );
 		}
 
@@ -154,6 +154,13 @@ final class TripController {
 
 		if ( is_wp_error( $data ) ) {
 			return $data;
+		}
+
+		$effective_start = array_key_exists( 'start_date', $data ) ? $data['start_date'] : $existing->start_date;
+		$effective_end   = array_key_exists( 'end_date', $data ) ? $data['end_date'] : $existing->end_date;
+
+		if ( $effective_start && $effective_end && $effective_end < $effective_start ) {
+			return new \\WP_Error( 'dealz_invalid_trip_range', __( 'Ngày kết thúc không được trước ngày bắt đầu.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
 		if ( empty( $data ) ) {
@@ -208,7 +215,7 @@ final class TripController {
 			switch ( $field ) {
 				case 'title':
 					$value = sanitize_text_field( (string) $value );
-					if ( '' === $value || mb_strlen( $value ) > 190 ) {
+					if ( '' === $value || ( function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ) ) > 190 ) {
 						return new \WP_Error( 'dealz_invalid_title', __( 'Tên chuyến đi không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
 					}
 					break;
