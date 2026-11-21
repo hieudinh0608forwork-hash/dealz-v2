@@ -153,7 +153,7 @@ final class FinanceController {
 			$this->repository->list_budget_lines( (int) $trip->id )
 		);
 
-		return new \\WP_REST_Response( array( 'lines' => $lines, 'summary' => $summary ), 200 );
+		return new \WP_REST_Response( array( 'lines' => $lines, 'summary' => $summary ), 200 );
 	}
 
 	/**
