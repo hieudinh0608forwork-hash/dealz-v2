@@ -84,6 +84,12 @@ add_action( 'wp_enqueue_scripts', 'dealz_theme_enqueue_assets' );
 // Avoid remote Gravatar image requests; the site must keep all visual assets local.
 add_filter( 'pre_option_show_avatars', '__return_zero' );
 
+/** Remove avatar markup so WordPress never requests a remote Gravatar image. */
+function dealz_disable_remote_avatar_markup( string $avatar ): string {
+	return '';
+}
+add_filter( 'get_avatar', 'dealz_disable_remote_avatar_markup', 10, 1 );
+
 
 /**
  * Preload the two most important local Vietnamese font subsets.
@@ -115,6 +121,27 @@ function dealz_styleguide_query_vars( array $vars ): array {
 	return $vars;
 }
 add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+/**
+ * Resolve theme routes even when rewrite rules have not yet been flushed.
+ */
+function dealz_detect_theme_routes(): void {
+	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+	$request_path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+	$slug = basename( trim( $request_path, '/' ) );
+	if ( 'styleguide' === $slug ) {
+		set_query_var( 'dealz_styleguide', '1' );
+	}
+	$legal_routes = array(
+		'chinh-sach-coc-va-huy' => 'deposit-cancellation',
+		'dieu-khoan'            => 'terms',
+		'bao-mat'               => 'privacy',
+	);
+	if ( isset( $legal_routes[ $slug ] ) ) {
+		set_query_var( 'dealz_legal_draft', $legal_routes[ $slug ] );
+	}
+}
+add_action( 'template_redirect', 'dealz_detect_theme_routes', -1 );
 
 function dealz_render_styleguide_route(): void {
 	if ( ! get_query_var( 'dealz_styleguide' ) ) {
