@@ -97,3 +97,11 @@
 ### Follow-up
 - The test run exposed and helped correct REST response object handling and the missing FinanceController registration hook.
 - This verifies the tested API slice in CI, not full browser behavior, deployment, real partner data or production readiness.
+
+## 2026-11-22 – Expanded itinerary edit and limit tests
+
+- Added explicit end-time input and inline editing for itinerary title, start/end time and duration.
+- Stop cards display both start and end times when entered.
+- Expanded daily-stop-limit tests: lunch/dinner cards do not count toward the four-main-stop cap, archiving a stop frees a slot, and a replacement stop can be added.
+- Expanded schedule test: updating the second item's time window removes the overlap.
+- GitHub Actions passed on commit `f7ecbc988c4625ff751d5bd330ac4c31253ad135`: **14 tests, 58 assertions**.
