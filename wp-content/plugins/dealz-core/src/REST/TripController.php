@@ -228,7 +228,7 @@ final class TripController {
 				case 'destination_name':
 					$value = sanitize_text_field( (string) $value );
 					if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ) ) > 190 ) {
-						return new \\WP_Error( 'dealz_invalid_destination', __( 'Tên điểm đến quá dài.', 'dealz-core' ), array( 'status' => 400 ) );
+						return new \WP_Error( 'dealz_invalid_destination', __( 'Tên điểm đến quá dài.', 'dealz-core' ), array( 'status' => 400 ) );
 					}
 					break;
 				case 'start_date':
