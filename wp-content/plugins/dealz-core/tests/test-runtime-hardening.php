@@ -271,7 +271,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 
 	public function test_migration_rejects_wrong_named_index_logs_notifies_admin_and_recovers_cleanly(): void {
 		global $wpdb;
-		$tables = \\DealZ\\Database\\Schema::table_names();
+		$tables = \DealZ\\Database\\Schema::table_names();
 		$table = $tables['items'];
 		$quote = chr( 96 );
 		$log_path = tempnam( sys_get_temp_dir(), 'dealz-schema-migration-' );
@@ -285,13 +285,13 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			$wrong_index_installed = true;
 			update_option( 'dealz_db_version', '1.1.0' );
 			ini_set( 'error_log', $log_path );
-			\\DealZ\\Database\\Schema::maybe_upgrade();
+			\DealZ\\Database\\Schema::maybe_upgrade();
 			$this->assertSame( '1.1.0', get_option( 'dealz_db_version' ), 'A failed migration must not advance the installed schema version.' );
 			$this->assertStringContainsString( 'day_type_status', (string) get_option( 'dealz_schema_migration_error' ) );
 			$this->assertStringContainsString( 'DealZ schema migration', (string) file_get_contents( $log_path ), 'The mismatch must be written to the PHP error log.' );
 			wp_set_current_user( $admin_id );
 			ob_start();
-			\\DealZ\\Database\\Schema::render_admin_notice();
+			\DealZ\\Database\\Schema::render_admin_notice();
 			$notice = ob_get_clean();
 			$this->assertStringContainsString( 'notice-error', $notice );
 			$this->assertStringContainsString( 'DealZ database migration failed.', $notice );
@@ -301,11 +301,11 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			// Restore the exact expected index, then prove a real successful retry clears the error.
 			$wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'day_id' . $quote . ',' . $quote . 'item_type' . $quote . ',' . $quote . 'status' . $quote . ')' );
 			$wrong_index_installed = false;
-			\\DealZ\\Database\\Schema::maybe_upgrade();
+			\DealZ\\Database\\Schema::maybe_upgrade();
 			$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
 			$this->assertFalse( get_option( 'dealz_schema_migration_error', false ), 'Successful migration must delete the previous error option.' );
 			ob_start();
-			\\DealZ\\Database\\Schema::render_admin_notice();
+			\DealZ\\Database\\Schema::render_admin_notice();
 			$cleared_notice = ob_get_clean();
 			$this->assertSame( '', $cleared_notice, 'Admin notice must disappear after successful recovery.' );
 		} finally {
@@ -314,7 +314,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 				$wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'day_id' . $quote . ',' . $quote . 'item_type' . $quote . ',' . $quote . 'status' . $quote . ')' );
 			}
 			update_option( 'dealz_db_version', '1.1.0' );
-			\\DealZ\\Database\\Schema::maybe_upgrade();
+			\DealZ\\Database\\Schema::maybe_upgrade();
 			wp_set_current_user( 0 );
 			if ( is_file( $log_path ) ) {
 				unlink( $log_path );
@@ -327,7 +327,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		wp_set_current_user( $admin_id );
 		update_option( 'dealz_schema_migration_error', '<script>/var/private/db-password.sql</script>' );
 		ob_start();
-		\\DealZ\\Database\\Schema::render_admin_notice();
+		\DealZ\\Database\\Schema::render_admin_notice();
 		$notice = ob_get_clean();
 		$this->assertStringContainsString( 'notice-error', $notice );
 		$this->assertStringNotContainsString( '<script>', $notice );
