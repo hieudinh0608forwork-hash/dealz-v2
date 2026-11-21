@@ -31,9 +31,9 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
 1. Use a fresh WordPress installation (do not import V1 code, database or plugins).
 2. Copy `dealz-core` into `wp-content/plugins/`.
 3. Activate **DealZ Core** in WordPress Admin.
-4. Activation creates/updates the additive v1.2.0 tables. The migration checks that every expected table exists before recording the schema version.
+4. Activation creates/updates the additive v1.2.0 tables. The migration checks that every expected table and required columns exist before recording the schema version.
 5. Open `/wp-json/dealz/v1/health`; it reports scaffold status and `application_ready: false`.
-6. Test Trip endpoints while authenticated using WordPress cookie authentication and the `X-WP-Nonce` REST nonce. For same-origin JavaScript, obtain the nonce through a server-rendered/localized value; never disable nonce verification to make requests work.
+6. Test Trip, itinerary and finance endpoints while authenticated using WordPress cookie authentication and the `X-WP-Nonce` REST nonce. For same-origin JavaScript, obtain the nonce through a server-rendered/localized value; never disable nonce verification to make requests work.
 
 ## Finance API routes
 
@@ -70,12 +70,12 @@ Only the authenticated owner can list, read, update or archive their own trips. 
 
 ## Contract
 
-See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the implemented health, Trip, itinerary, budget and expense routes. The contract intentionally excludes unimplemented AI, marketplace, route-provider, booking and payment features.
+See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the implemented health, Trip, itinerary, budget and expense routes. The contract covers the implemented health, Trip, itinerary, budget and expense routes; it excludes unimplemented AI, marketplace, route-provider, booking and payment features.
 
 ## Not implemented yet
 
 - The initial manual itinerary workspace is implemented in the theme; full design-rule stop cards, schedule overlap validation, route-provider integrations and maps remain open.
-- Budget and expense API is implemented; the frontend budget/expense interface is not implemented.
+- Budget and expense frontend screens.
 - Collaborator invitations and shared-trip permissions.
 - Destinations and verified place catalogue.
 - Marketplace listings, availability, quotes, orders and bookings.
