@@ -325,6 +325,77 @@ final class ItineraryRepository {
 	}
 
 	/**
+	 * Reorder every active item in a day atomically.
+	 *
+	 * @param int                $day_id Day ID.
+	 * @param array<int,string>  $public_ids Complete ordered UUID list.
+	 * @return bool
+	 */
+	public function reorder_items( int $day_id, array $public_ids ): bool {
+		global $wpdb;
+
+		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+			return false;
+		}
+
+		$locked_day = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT id FROM ' . $this->table( 'itinerary_days' ) . ' WHERE id = %d FOR UPDATE',
+				$day_id
+			)
+		);
+
+		if ( ! $locked_day ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
+		$current_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				'SELECT public_id FROM ' . $this->table( 'itinerary_items' ) . ' WHERE day_id = %d AND status = %s',
+				$day_id,
+				'active'
+			)
+		);
+		$expected = array_map( 'strval', $current_ids );
+		$provided = array_values( array_map( 'strval', $public_ids ) );
+		$sorted_expected = $expected;
+		$sorted_provided = $provided;
+		sort( $sorted_expected );
+		sort( $sorted_provided );
+
+		if ( count( $provided ) !== count( array_unique( $provided ) ) || $sorted_expected !== $sorted_provided ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
+		foreach ( $provided as $position => $public_id ) {
+			$updated = $wpdb->update(
+				$this->table( 'itinerary_items' ),
+				array(
+					'position'   => $position,
+					'updated_at' => current_time( 'mysql', true ),
+				),
+				array(
+					'public_id' => $public_id,
+					'day_id'    => $day_id,
+					'status'    => 'active',
+				),
+				array( '%d', '%s' ),
+				array( '%s', '%d', '%s' )
+			);
+
+			if ( false === $updated ) {
+				$wpdb->query( 'ROLLBACK' );
+				return false;
+			}
+		}
+
+		$wpdb->query( 'COMMIT' );
+		return true;
+	}
+
+	/**
 	 * Find an active item through its owning trip.
 	 *
 	 * @param string $public_id Item UUID.
