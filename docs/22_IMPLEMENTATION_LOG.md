@@ -52,3 +52,21 @@
 - Docker is not available in the current execution environment; no browser/runtime visual verification has been performed.
 - Local WOFF2 font assets are still missing; the theme currently uses system fallback fonts.
 - This is a functional first slice, not the complete approved itinerary UI: photo cards, sourced route connectors, map sync, schedule conflict validation and reordering remain open.
+
+## 2026-11-22 – Finance API and automated test harness
+
+### Added and corrected
+- Registered FinanceController in the plugin bootstrap so the already-authored budget and expense routes are actually exposed by WordPress REST.
+- Budget API returns active lines and grouped totals; line totals are calculated server-side with integer minor units and a fixed two-decimal quantity representation.
+- Expense API validates explicit ISO-8601 timezone offsets and normalizes timestamps to UTC.
+- Strict datetime parsing rejects impossible calendar dates rather than accepting PHP's silent date normalization.
+- Finance response serializers return monetary minor-unit values as JSON integers.
+- Added finance integration tests for calculated totals, owner isolation, UTC normalization and invalid calendar dates.
+- Added WordPress PHPUnit bootstrap/configuration and a GitHub Actions workflow backed by MySQL 8.0 and WordPress 6.8.
+- Replaced the malformed OpenAPI document with a concise YAML contract for the implemented health, Trip, itinerary, budget and expense routes.
+
+### Verification status
+- PHP syntax and OpenAPI YAML validation run in the PHP lint workflow.
+- WordPress integration tests run in a separate MySQL-backed workflow.
+- The workflows are configured but their first results have not yet been observed; no tests are claimed as passing.
+- Local Docker is unavailable in this work context; browser/runtime visual checks remain outstanding.
