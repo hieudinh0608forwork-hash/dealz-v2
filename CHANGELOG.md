@@ -19,3 +19,9 @@
 - Added OpenAPI 3.1 contract for health and Trip routes.
 - Added Docker Compose local WordPress/MySQL environment definition and local-only .env example; environment has not been executed in this context.
 - Added MVP implementation notes and manual runtime acceptance checklist. No runtime test or successful CI run is claimed.
+
+- Extended schema to v1.1.0 with item type/archive state and route-leg table; schema verification order is aligned with the migration statements.
+- Implemented owner-scoped manual itinerary version, day and stop/meal-card APIs. Daily main-stop maximum is four and is enforced under a database row lock.
+- Added item input validation, archive semantics, and integration test cases for date range, ownership and the fifth-main-stop rejection.
+- Added the first responsive traveler home / Trip dashboard screen, wired to the Trip list/create REST API. Local WOFF2 assets remain outstanding; browser behavior is not runtime-verified.
+- Expanded OpenAPI 3.1 contract and updated implementation/handoff notes. No passing CI or WordPress runtime test is claimed.
