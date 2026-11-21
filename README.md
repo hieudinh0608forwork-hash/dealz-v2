@@ -3,12 +3,12 @@
 Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấp dịch vụ và nền tảng công nghệ.
 
 ## Project status
-- Current stage: Phase 0 – Product/Technical Handoff (in progress).
+- Current stage: MVP implementation (in progress).
 - Repository: `hieudinh0608forwork-hash/dealz-v2` (Public).
 - Default branch: `main`.
 - Platform direction: fresh WordPress + custom plugin `dealz-core` + custom theme `dealz-theme` + REST API + MySQL.
 - Architecture: modular monolith.
-- Application code: initial WordPress plugin/theme scaffold committed; runtime not yet available or verified.
+- Application code: versioned trip-planning database migration and owner-scoped Trip CRUD API committed; runtime not yet available or verified.
 
 ## Start here
 1. Read [CLAUDE.md](CLAUDE.md).
@@ -36,6 +36,20 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - Do not invent deposits, refunds, commission, payout or cancellation policy.
 - Do not commit secrets or incur paid API costs without approval.
 - Do not claim Tested/Verified/Deployed without evidence.
+
+## Local development (Docker)
+
+1. Install Docker Desktop / Docker Engine with the Compose plugin.
+2. Copy `.env.example` to `.env` in the repository root. The sample values are local-only credentials.
+3. Run `docker compose up -d`.
+4. Open `http://localhost:8080` and complete the fresh WordPress installation.
+5. In WordPress Admin, activate **DealZ Core** and optionally activate **DealZ Theme**.
+6. Check `http://localhost:8080/wp-json/dealz/v1/health`; it should report scaffold status, not application readiness.
+7. Use WordPress cookie authentication and an `X-WP-Nonce` REST nonce when testing Trip endpoints.
+
+Stop the environment with `docker compose down`. To preserve local data, do not add `-v`. To deliberately reset local data, `docker compose down -v` removes the named WordPress/MySQL volumes; this is destructive and local-only.
+
+The compose environment has been authored but has not been executed or runtime-verified in this work session.
 
 ## Handoff status
 The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: only the initial WordPress scaffold exists; no WordPress environment, runtime tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
