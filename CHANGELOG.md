@@ -9,3 +9,7 @@
 - Created initial GitHub issues for environment audit, UX handoff, contract freeze and WordPress foundation.
 - Confirmed repository is Public, default branch `main`, and connected account has admin/push permissions.
 - No application code, WordPress environment, runtime test or production deployment has been completed or verified.
+
+- Started implementation: added DealZ Core plugin bootstrap, namespace autoloader, administrator capability bootstrap, non-sensitive health endpoint, non-destructive uninstall handler, and initial custom theme shell.
+- Added PHP syntax GitHub Actions workflow. Workflow result has not yet been observed; do not treat it as a passing test.
+- Corrected PHP namespace and WordPress REST response type issues during source review.
