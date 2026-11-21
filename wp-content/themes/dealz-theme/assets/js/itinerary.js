@@ -329,6 +329,12 @@
 		if (item.duration_minutes) detailParts.push(item.duration_minutes + ' phút');
 		if (item.address_snapshot) detailParts.push(item.address_snapshot);
 		details.textContent = detailParts.length ? detailParts.join(' · ') : 'Chưa có thời lượng hoặc địa chỉ.';
+		const photoHint = document.createElement('p');
+		photoHint.className = 'itinerary-item-card__photo-hint';
+		photoHint.textContent = 'Gợi ý góc chụp chung: ưu tiên toàn cảnh, ánh sáng tự nhiên và giữ địa danh làm điểm nhấn.';
+		const gearHint = document.createElement('p');
+		gearHint.className = 'itinerary-item-card__gear-hint';
+		gearHint.textContent = 'Đồ gợi ý: chưa có dữ liệu sản phẩm được xác minh.';
 
 		const editDetails = document.createElement('details');
 		editDetails.className = 'item-edit-details';
@@ -489,7 +495,9 @@
 			}
 		});
 		actions.append(archive);
-		card.append(top, title, details, actions);
+		card.append(top, title, details);
+		if (isMainStop) card.append(photoHint, gearHint);
+		card.append(actions);
 		return card;
 	}
 
@@ -946,9 +954,12 @@
 		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
 		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
 		if (back) {
-			back.href = params.get('return') || '#trips';
-			back.textContent = '← Quay lại ' + stopName;
+			const returnTarget = params.get('return') || '#trips';
+			back.href = returnTarget;
+			back.textContent = params.has('stop') && params.has('return') ? '← Quay lại ' + stopName : '← Quay lại hành trình';
 		}
+		const nextAction = rentalWorkspace.querySelector('.rental-empty-state__back');
+		if (nextAction && back) nextAction.href = back.href;
 	}
 
 	window.addEventListener('hashchange', function () {

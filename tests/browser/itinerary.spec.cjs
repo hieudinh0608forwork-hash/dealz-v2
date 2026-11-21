@@ -148,4 +148,22 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await card.scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'artifacts/mobile-stop-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/mobile-itinerary.png', fullPage: true });
+
+  await card.getByRole('link', { name: 'Mở mục thuê đồ cho Điểm dừng mobile' }).click();
+  await expect(page).toHaveURL(/#shop\\?stop=/);
+  await expect(page.locator('#rental-workspace')).toBeVisible();
+  await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho Điểm dừng mobile');
+  await expect(page.locator('#rental-empty-state, .rental-empty-state')).toBeVisible();
+  const rentalDimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+  expect(rentalDimensions.content).toBeLessThanOrEqual(rentalDimensions.viewport);
+  await page.screenshot({ path: 'artifacts/mobile-rental-viewport.png', fullPage: false });
+  await page.screenshot({ path: 'artifacts/mobile-rental-context.png', fullPage: true });
+  await page.locator('#rental-back-link').click();
+  await expect(page).toHaveURL(/#trip\\//);
+  await expect(page.locator('#itinerary-workspace')).toBeVisible();
+
+  await page.goto(BASE_URL + '/#shop');
+  await expect(page.locator('#rental-workspace')).toBeVisible();
+  await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho điểm dừng đã chọn');
+  await expect(page.locator('#rental-back-link')).toHaveAttribute('href', '#trips');
 });

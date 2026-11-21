@@ -792,3 +792,10 @@ body.is-rental-view .rental-workspace { padding-top: 42px; }
 @media (max-width: 640px) {
 	body.is-rental-view .rental-workspace { padding-top: 20px; }
 }
+
+.itinerary-item-card__photo-hint,
+.itinerary-item-card__gear-hint { margin: 8px 0; color: var(--dealz-muted); font-size: 13px; line-height: 1.55; }
+.itinerary-item-card__photo-hint { padding-left: 12px; border-left: 2px solid var(--dealz-border); }
+.rental-empty-state__back { margin-top: 16px; }
+body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
+@media (max-width: 640px) { .rental-empty-state { width: 100%; min-width: 0; overflow-wrap: anywhere; } }

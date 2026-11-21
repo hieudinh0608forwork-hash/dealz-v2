@@ -315,6 +315,7 @@ get_header();
 			<h3><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h3>
 			<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
 			<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
+			<a class="button button--primary button--compact rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại hành trình', 'dealz-theme' ); ?></a>
 		</div>
 	</section>
 </main>
