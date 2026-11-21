@@ -357,7 +357,24 @@ final class ItineraryRepository {
 	public function update_item( string $public_id, int $day_id, array $data ) {
 		global $wpdb;
 
+		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+			return false;
+		}
+
+		$locked_day = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT id FROM ' . $this->table( 'itinerary_days' ) . ' WHERE id = %d FOR UPDATE',
+				$day_id
+			)
+		);
+
+		if ( ! $locked_day ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
 		if ( isset( $data['item_type'] ) && 'stop' === $data['item_type'] && $this->count_main_stops( $day_id, $public_id ) >= 4 ) {
+			$wpdb->query( 'ROLLBACK' );
 			return new \WP_Error( 'dealz_daily_stop_limit', __( 'Mỗi ngày chỉ được có tối đa 4 điểm dừng chính.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
@@ -372,7 +389,13 @@ final class ItineraryRepository {
 			)
 		);
 
-		return false !== $result;
+		if ( false === $result ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
+		$wpdb->query( 'COMMIT' );
+		return true;
 	}
 
 	/**
