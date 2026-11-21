@@ -134,6 +134,86 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertEquals( $before, $after_failure, 'A failed UPDATE must roll back earlier position changes in the transaction.' );
 	}
 
+	public function test_migration_from_schema_1_0_preserves_itinerary_data_and_adds_v1_1_v1_2_fields(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$this->assertSame( 201, $itinerary->get_status() );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array(
+			'local_date' => '2027-04-01',
+		) );
+		$this->assertSame( 201, $day->get_status() );
+		$item = $this->request( 'POST', '/days/' . $day->get_data()['public_id'] . '/items', array(
+			'title_snapshot' => 'Dữ liệu cũ cần giữ',
+		) );
+		$this->assertSame( 201, $item->get_status() );
+
+		global $wpdb;
+		$tables = \\DealZ\\Database\\Schema::table_names();
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['items'] . '` DROP COLUMN `item_type`, DROP COLUMN `status`' ) );
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP COLUMN `status`' ) );
+		$this->assertNotFalse( $wpdb->query( 'DROP TABLE `' . $tables['route_legs'] . '`' ) );
+		update_option( 'dealz_db_version', '1.0.0' );
+
+		\\DealZ\\Database\\Schema::maybe_upgrade();
+
+		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
+		foreach ( array(
+			$tables['items'] . '.item_type',
+			$tables['items'] . '.status',
+			$tables['expenses'] . '.status',
+		) as $qualified_column ) {
+			list( $table, $column ) = explode( '.', $qualified_column, 2 );
+			$this->assertNotFalse( $wpdb->get_var( $wpdb->prepare( 'SHOW COLUMNS FROM `' . $table . '` LIKE %s', $column ) ) );
+		}
+		$this->assertSame( $tables['route_legs'], $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tables['route_legs'] ) ) );
+
+		$preserved = $wpdb->get_row( $wpdb->prepare(
+			'SELECT title_snapshot, item_type, status FROM ' . $tables['items'] . ' WHERE public_id = %s',
+			$item->get_data()['public_id']
+		) );
+		$this->assertSame( 'Dữ liệu cũ cần giữ', $preserved->title_snapshot );
+		$this->assertSame( 'stop', $preserved->item_type );
+		$this->assertSame( 'active', $preserved->status );
+	}
+
+	public function test_migration_from_schema_1_1_adds_expense_archive_status_without_data_loss(): void {
+		$trip_id = $this->create_trip();
+		global $wpdb;
+		$tables = \\DealZ\\Database\\Schema::table_names();
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP COLUMN `status`' ) );
+		$public_id = wp_generate_uuid4();
+		$now = current_time( 'mysql', true );
+		$this->assertSame( 1, $wpdb->insert(
+			$tables['expenses'],
+			array(
+				'public_id' => $public_id,
+				'trip_id' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . $tables['trips'] . ' WHERE public_id = %s', $trip_id ) ),
+				'payer_user_id' => get_current_user_id(),
+				'category' => 'food',
+				'amount_minor' => 275000,
+				'currency' => 'VND',
+				'occurred_at' => '2027-04-01 12:00:00',
+				'note' => 'Khoản chi từ schema 1.1',
+				'split_method' => 'none',
+				'created_at' => $now,
+				'updated_at' => $now,
+			)
+		) );
+		update_option( 'dealz_db_version', '1.1.0' );
+
+		\\DealZ\\Database\\Schema::maybe_upgrade();
+
+		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
+		$preserved = $wpdb->get_row( $wpdb->prepare(
+			'SELECT amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s',
+			$public_id
+		) );
+		$this->assertNotNull( $preserved );
+		$this->assertSame( '275000', (string) $preserved->amount_minor );
+		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
+		$this->assertSame( 'active', $preserved->status );
+	}
+
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
 		$trip_id = $this->create_trip();
 
