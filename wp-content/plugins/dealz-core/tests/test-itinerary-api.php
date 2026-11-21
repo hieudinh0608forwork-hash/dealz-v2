@@ -171,9 +171,8 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 					}
 
 					$wpdb->delete( $days_table, array( 'itinerary_id' => $itinerary_id ), array( '%d' ) );
+					$wpdb->delete( $routes_table, array( 'itinerary_id' => $itinerary_id ), array( '%d' ) );
 				}
-
-				$wpdb->delete( $routes_table, array( 'itinerary_id' => $itinerary_id ), array( '%d' ) );
 				$wpdb->delete( $itineraries_table, array( 'trip_id' => $trip->id ), array( '%d' ) );
 				$wpdb->delete( $trips_table, array( 'id' => $trip->id ), array( '%d' ) );
 			}
