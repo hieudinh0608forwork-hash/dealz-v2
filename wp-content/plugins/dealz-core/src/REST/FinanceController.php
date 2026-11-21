@@ -127,7 +127,7 @@ final class FinanceController {
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function get_budget( \\WP_REST_Request $request ) {
+	public function get_budget( \WP_REST_Request $request ) {
 		$trip = $this->repository->find_trip( (string) $request['trip_public_id'], get_current_user_id() );
 
 		if ( ! $trip ) {
@@ -588,10 +588,10 @@ final class FinanceController {
 		$errors       = \DateTimeImmutable::getLastErrors();
 
 		if ( ! $date || ( is_array( $errors ) && ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) ) ) {
-			return new \\WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phát sinh không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phát sinh không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
-		return $date->setTimezone( new \\DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
+		return $date->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
 	}
 
 	/**
