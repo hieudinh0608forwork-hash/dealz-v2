@@ -381,7 +381,20 @@
 		save.type = 'submit';
 		save.className = 'text-action';
 		save.textContent = 'Lưu thay đổi';
-		editForm.append(editInput, startInput, endInput, durationInput, save);
+		function addEditField(labelText, input) {
+			const label = document.createElement('label');
+			label.className = 'item-edit-field';
+			const caption = document.createElement('span');
+			caption.textContent = labelText;
+			label.append(caption, input);
+			editForm.append(label);
+		}
+		addEditField('Tên điểm dừng', editInput);
+		addEditField('Giờ đến', startInput);
+		addEditField('Giờ kết thúc', endInput);
+		addEditField('Thời lượng (phút)', durationInput);
+		save.className = 'button button--secondary item-edit-save';
+		editForm.append(save);
 		editDetails.append(editSummary, editForm);
 		editForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
@@ -421,11 +434,13 @@
 		moveUp.className = 'button button--icon';
 		moveUp.textContent = '↑';
 		moveUp.setAttribute('aria-label', 'Di chuyển lên');
+		moveUp.setAttribute('aria-label', 'Di chuyển lên');
 		moveUp.disabled = itemIndex <= 0;
 		const moveDown = document.createElement('button');
 		moveDown.type = 'button';
 		moveDown.className = 'button button--icon';
 		moveDown.textContent = '↓';
+		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.disabled = itemIndex >= allItems.length - 1;
 
@@ -487,26 +502,46 @@
 
 		const archive = document.createElement('button');
 		archive.type = 'button';
-		archive.className = 'text-action text-action--danger';
+		archive.className = 'text-action item-archive-action';
 		archive.textContent = 'Lưu trữ';
-		archive.addEventListener('click', async function () {
-			if (!window.confirm('Lưu trữ nội dung này?')) return;
-			archive.disabled = true;
-			archive.textContent = 'Đang lưu trữ…';
+		const archiveDialog = document.createElement('dialog');
+		archiveDialog.className = 'archive-dialog';
+		const archiveTitle = document.createElement('h3');
+		archiveTitle.textContent = 'Lưu trữ nội dung này?';
+		const archiveDescription = document.createElement('p');
+		archiveDescription.textContent = 'Nội dung sẽ chuyển sang trạng thái lưu trữ và không còn xuất hiện trong danh sách đang hoạt động. Giao diện hiện không có thao tác khôi phục.';
+		const archiveActions = document.createElement('div');
+		archiveActions.className = 'archive-dialog__actions';
+		const cancelArchive = document.createElement('button');
+		cancelArchive.type = 'button';
+		cancelArchive.className = 'button button--secondary';
+		cancelArchive.textContent = 'Giữ lại';
+		const confirmArchive = document.createElement('button');
+		confirmArchive.type = 'button';
+		confirmArchive.className = 'button button--tertiary';
+		confirmArchive.textContent = 'Lưu trữ';
+		cancelArchive.addEventListener('click', function () { archiveDialog.close(); });
+		confirmArchive.addEventListener('click', async function () {
+			confirmArchive.disabled = true;
+			confirmArchive.textContent = 'Đang lưu trữ…';
 			try {
 				await api('items/' + encodeURIComponent(item.public_id), 'DELETE');
+				archiveDialog.close();
 				showFeedback('Đã lưu trữ nội dung.', false);
 				await loadItems();
 			} catch (error) {
 				showFeedback(error.message, true);
-				archive.disabled = false;
-				archive.textContent = 'Lưu trữ';
+				confirmArchive.disabled = false;
+				confirmArchive.textContent = 'Lưu trữ';
 			}
 		});
+		archiveActions.append(cancelArchive, confirmArchive);
+		archiveDialog.append(archiveTitle, archiveDescription, archiveActions);
+		archive.addEventListener('click', function () { archiveDialog.showModal(); });
 		actions.append(archive);
 		card.append(top, title, details);
 		if (isMainStop) card.append(photoHint, gearHint);
-		card.append(actions);
+		card.append(actions, archiveDialog);
 		return card;
 	}
 
@@ -517,9 +552,9 @@
 		const icon = document.createElement('span');
 		icon.className = 'route-connector__icon';
 		icon.setAttribute('aria-hidden', 'true');
-		icon.textContent = '🛵';
+		icon.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 17h2l2-6h6l2 6h2M9 11l-1-3h5l2 3M5 17a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 		const label = document.createElement('span');
-		label.textContent = 'Chưa có dữ liệu tuyến đường';
+		label.textContent = 'Chưa có đủ dữ liệu tuyến đường';
 		connector.append(icon, label);
 		return connector;
 	}
