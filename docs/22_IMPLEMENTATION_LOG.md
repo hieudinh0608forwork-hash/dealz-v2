@@ -119,3 +119,9 @@
 ### Verification
 - WordPress 6.8 / MySQL 8.0 workflow passed on commit `c798656db30d1a4cb01466eff239d378fbdbc90e`: **15 tests, 69 assertions**.
 - PHP syntax workflow passed on the same commit. JavaScript/OpenAPI checks are run by the PHP syntax workflow and remain part of the current CI gate.
+
+## 2026-11-22 – Finance recalculation and date-range UX
+
+- Added a finance integration assertion proving that editing quantity recalculates the budget line total and grouped summary.
+- The GitHub Actions WordPress 6.8 / MySQL 8.0 workflow passed on commit `537bc96084dd1fbfcc55434017ef0862d29b752b`: **15 tests, 71 assertions**.
+- The day date picker now receives min/max dates from the selected Trip and defaults to the Trip start date when available.
