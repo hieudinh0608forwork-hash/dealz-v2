@@ -1,40 +1,49 @@
 # 07 – Business Rules Baseline
 
-## 1. Quy tắc đã được xác định
-- AI chỉ hỗ trợ đề xuất; không tự xác nhận đặt chỗ hoặc thanh toán.
-- Trip, Order và Booking là các thực thể khác nhau.
-- Một Order có thể chứa nhiều Booking.
-- Booking có trạng thái riêng theo dịch vụ/đối tác.
-- Backend là nguồn dữ liệu chính thức.
-- Không hard-code chính sách kinh doanh trong giao diện.
+## 1. Confirmed product invariants
+- AI suggests; the user chooses.
+- Backend is authoritative for prices, availability, order/booking/payment states and totals.
+- Trip, Order and Booking are separate.
+- One Order may group multiple independent Bookings.
+- Each Booking has its own supplier, service, terms and lifecycle.
+- No fake partner metrics, fake prices or fabricated availability.
+- Do not display shop contact details before DealZ confirmation.
+- Do not present unimplemented AI, payment or English support as live functionality.
+- No unapproved commission, price proposal or deposit rule is hard-coded.
 
-## 2. Quy tắc cần áp dụng khi triển khai
-- Giá hiển thị có thể thay đổi; backend phải xác minh lại giá tại thời điểm checkout.
-- Khả dụng phải được kiểm tra lại khi tạo booking.
-- Người dùng phải nhìn thấy thông tin dịch vụ, số lượng, giá, phí và điều kiện trước khi xác nhận.
-- Mọi thay đổi trạng thái giao dịch phải có actor/source, timestamp và lý do.
-- Partner chỉ xem và xử lý booking thuộc phạm vi được phân quyền.
-- Admin action quan trọng cần audit trail.
+## 2. Service fulfillment types
+- `instant_book`: only if reliable availability and price are verified at checkout.
+- `supplier_confirmation`: supplier must accept; state remains pending until accepted.
+- `request_only`: enquiry/request, not an instant reservation.
+- `external_affiliate`: redirect to external provider; DealZ does not claim to have completed the booking.
 
-## 3. Các chính sách chưa được phê duyệt
-Không tự đặt giá trị hoặc quy tắc mặc định cho:
-- Tiền cọc và tài sản bảo đảm.
-- Hủy booking và hoàn tiền.
-- Phí nền tảng/hoa hồng.
-- Payout và lịch thanh toán đối tác.
-- Phí dịch vụ, thuế và phụ phí.
-- Thời hạn giữ chỗ.
-- Xử lý no-show, tranh chấp và bồi thường.
-- Điều kiện xác nhận booking theo từng loại dịch vụ.
+The interface and payment flow must match the fulfillment type.
 
-## 4. Quy tắc tài chính
-- Tổng tiền phải được tính phía server từ snapshot giá và các khoản đã được phê duyệt.
-- Mọi khoản tiền có currency.
-- Payment event không đồng nghĩa ledger entry nếu chưa qua quy tắc hạch toán.
-- Không sửa/xóa lịch sử tài chính đã ghi; dùng bút toán điều chỉnh có tham chiếu.
-- Reconciliation cần so khớp nội bộ với báo cáo provider.
+## 3. Price and quote
+A quote should disclose base price/unit, quantity/duration, options, known taxes/fees, deposit if approved, discount, due now, balance later, refundable/non-refundable amounts, currency, price source/status and expiry. Store immutable quote/price/terms snapshots with booking. Labels: live, supplier-confirmed, manually entered or estimated.
 
-## 5. Quy tắc tồn khả dụng
-- Không xác nhận vượt capacity.
-- Cần cơ chế khóa/transaction khi giữ hoặc xác nhận chỗ.
-- Thời gian giữ chỗ, giải phóng và timeout phải được phê duyệt theo từng mô hình dịch vụ.
+Backend recalculates all totals. If price or availability changes before confirmation, show the difference and ask the customer to accept again.
+
+## 4. Booking and multi-service trip
+A Trip may contain bookings with different suppliers, dates, terms and states. The trip dashboard is an aggregation, not one atomic reservation. Never mark confirmed until the relevant supplier/payment conditions are met. State transitions must be audited.
+
+## 5. Deposit, cancellation, refund and damage
+Deposit amount, refundable status, cancellation window, damage deduction, refund SLA and evidence process are service/listing-specific and require approved policy/configuration. No default percentage or deadline may be invented. Refunds are separate transactions; do not edit original payment totals.
+
+## 6. Budget
+Estimated itinerary costs, supplier quotes, confirmed booking amounts and actual expenses are different types. Per-person estimates disclose allocation method. Contingency is a planning allowance, not a hidden fee. Budget does not guarantee affordability. Do not infer a user's financial eligibility.
+
+## 7. Revenue accounting
+Track separately: gross booking value, amount collected, refunds, refundable deposit liabilities, supplier payable, commission receivable/earned, payment fees and net platform revenue. Refundable deposits are not revenue. Reverse commission when the approved policy requires it. Ledger is append-only with reversal entries.
+
+## 8. Availability
+Support multiple models: date-range inventory, time-slot/capacity, manual supplier confirmation, request-only and external affiliate. Do not assume all services have real-time inventory. Prevent overbooking with atomic checks/transactions. Hold duration and release behavior require approved rules.
+
+## 9. Partner operations
+Partner onboarding and listing moderation precede public publication. Partner can only access its own organization/listings/bookings. Response deadlines, enforcement and dispute thresholds remain configurable only after owner approval. Contact details remain hidden until DealZ confirmation per design rule.
+
+## 10. Payment safety
+Sandbox/manual flow until credentials and webhooks are configured. Verify provider signature, expected amount/currency/order and event identity. Use idempotency. Never trust frontend redirect. Reconcile pending payments.
+
+## 11. Unapproved policy register
+Still unresolved: exact commission rates/basis, deposit amounts, cancellation windows, refund SLA, damage deductions, no-show rules, payout schedule, taxes/fees, supplier response deadline, booking hold TTL and dispute enforcement thresholds. Do not code business defaults for these.
