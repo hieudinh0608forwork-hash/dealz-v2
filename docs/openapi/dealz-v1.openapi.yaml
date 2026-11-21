@@ -163,6 +163,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DayValidation'
+  /days/{public_id}/reorder:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    post:
+      operationId: reorderDayItems
+      description: Replaces the complete ordered list of active items for the day. Partial lists and duplicate IDs are rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemOrder'
+      responses:
+        '200':
+          description: Items returned in their new order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItineraryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Supplied IDs do not match the active items in the day
   /days/{public_id}/items:
     parameters:
       - $ref: '#/components/parameters/PublicId'
@@ -460,6 +485,18 @@ components:
       properties:
         local_date: { type: string, format: date }
         position: { type: integer, minimum: 0, maximum: 999 }
+    ItemOrder:
+      type: object
+      additionalProperties: false
+      required: [item_public_ids]
+      properties:
+        item_public_ids:
+          type: array
+          maxItems: 100
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
     ItineraryItem:
       type: object
       required: [public_id, item_type, title_snapshot, position, currency, data_status, status]
