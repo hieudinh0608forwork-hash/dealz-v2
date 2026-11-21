@@ -100,6 +100,7 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 		$this->assertSame( 201, $day->get_status() );
 		$day_id = $day->get_data()['public_id'];
 
+		$first_stop_id = null;
 		for ( $index = 1; $index <= 4; $index++ ) {
 			$stop = $this->request(
 				'POST',
@@ -107,6 +108,9 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 				array( 'title_snapshot' => 'Điểm dừng ' . $index )
 			);
 			$this->assertSame( 201, $stop->get_status() );
+			if ( 1 === $index ) {
+				$first_stop_id = $stop->get_data()['public_id'];
+			}
 		}
 
 		$fifth = $this->request(
@@ -115,6 +119,16 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 			array( 'title_snapshot' => 'Điểm dừng thứ năm' )
 		);
 		$this->assertSame( 400, $fifth->get_status() );
+
+		$lunch = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'lunch', 'title_snapshot' => 'Bữa trưa' ) );
+		$dinner = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'dinner', 'title_snapshot' => 'Bữa tối' ) );
+		$this->assertSame( 201, $lunch->get_status() );
+		$this->assertSame( 201, $dinner->get_status() );
+
+		$archived = $this->request( 'DELETE', '/items/' . $first_stop_id );
+		$this->assertSame( 200, $archived->get_status() );
+		$replacement = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'title_snapshot' => 'Điểm thay thế' ) );
+		$this->assertSame( 201, $replacement->get_status() );
 	}
 
 	/**
