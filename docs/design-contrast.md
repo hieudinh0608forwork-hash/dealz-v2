@@ -84,4 +84,4 @@ Phương pháp: WCAG relative luminance, sRGB linearization, ratio (L1 + 0.05) /
 
 ## Tự động hóa
 
-CI chạy `scripts/check-design-contrast.php` để đọc token thực tế và kiểm tra từng cặp/ngưỡng trong ma trận. CI chạy `scripts/check-css-tokens.php` để cấm mã hex ngoài `assets/css/tokens.css` trong mã nguồn theme.
+CI chạy `scripts/check-design-contrast.php` để đọc token thực tế và kiểm tra từng cặp/ngưỡng trong ma trận. CI chạy `scripts/check-css-tokens.php` để cấm mã hex ngoài `assets/css/tokens.css` trong mã nguồn theme. Ma trận không áp dụng cho các cặp không dùng trong UI; ví dụ placeholder trên nền ngoài trắng, chữ kem trên nút cam, input trên forest và viền thẻ mang tính trang trí.

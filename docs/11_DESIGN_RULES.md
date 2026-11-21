@@ -32,8 +32,8 @@
 ## 11.3 Ô nhập, nút và thẻ
 
 ### 11.3.1 Ô nhập
-- Bo góc 14px, cao 52px, đệm 16px, nền trắng, viền 1.5px `#CFE0D8`, chữ tối thiểu 16px.
-- Focus: viền đặc `#FD550A` (3,24:1 trên trắng) + quầng 4px cam nhạt chỉ để trang trí. Outline ngoài 3px `#D63F00` đặc, offset 3px; trên nền forest dùng lime.
+- Bo góc 14px, cao 52px, đệm 16px, nền trắng, viền 1.5px `#7C948A`, chữ tối thiểu 16px.
+- Placeholder `#5F776D` chỉ dùng trên nền input trắng (4,83:1). Focus: viền đặc `#FD550A` (3,24:1 trên trắng) + quầng 4px cam nhạt chỉ để trang trí. Outline ngoài 3px `#D63F00` đặc, offset 3px; trên nền forest dùng lime `#E0F354`.
 - Lỗi: chữ đỏ + biểu tượng "!" dưới ô, viền đỏ.
 - Nhãn trên ô: 14px, độ đậm 600, màu `#31483F`.
 - Placeholder: `#5F776D` trên nền input trắng (4,83:1). Viền input riêng `#7C948A`; viền thẻ giữ `#CFE0D8`.
@@ -79,7 +79,8 @@
 | Chữ chính | `#0E2A22` |
 | Chữ phụ | `#4C635A` |
 | Chữ cam trên nền sáng | `#C43A00` |
-| Viền | `#CFE0D8` |
+| Viền thẻ | `#CFE0D8` |
+| Viền input | `#7C948A` |
 
 Chữ trên nền vàng chanh luôn dùng xanh đậm. Màu chữ phụ `#4C635A` thay `#5A6E66`.
 
@@ -104,13 +105,13 @@ Chữ trên nền vàng chanh luôn dùng xanh đậm. Màu chữ phụ `#4C635A
 
 Các ghi nhận dưới đây là trạng thái triển khai tại nhánh `work/ui-rental-cta-browser-migration-2026-11-22`, không phải quy tắc mới:
 
-| Hạng mục | Tình trạng đã kiểm chứng | Còn thiếu |
+| Hạng mục | Tình trạng | Còn thiếu / giới hạn |
 |---|---|---|
-| CSS design tokens | Các màu và overlay trong stylesheet được gom vào `:root` tokens | Chưa áp dụng điều chỉnh màu sau đo tương phản; cần xử lý theo phê duyệt của chủ dự án nếu khác quy tắc hiện hành |
-| Font | Theme có fallback cục bộ, không gọi font từ mạng ngoài | Chưa có WOFF2 được cấp phép của Bricolage Grotesque và Be Vietnam Pro |
-| Điểm dừng và tuyến đường | Chỉ hiển thị trạng thái chưa có dữ liệu tuyến đường; chỉ đường phụ thuộc địa chỉ | Chưa có routing provider hoặc dữ liệu routing xác minh |
-| Thuê đồ | Trạng thái trống nói rõ chưa có danh mục, giá, tồn kho hoặc shop được xác minh | Chưa có taxonomy, dữ liệu listing và quyết định vận hành |
-| Browser QA | Có workflow Chromium desktop/mobile và artifact trên GitHub Actions | Chưa có bằng chứng Firefox, Safari, thiết bị thật hoặc screen reader |
+| CSS design tokens | Token màu tập trung tại `assets/css/tokens.css`; CI có gate cấm hex ngoài file này và gate ma trận tương phản | Cần giữ các token semantic đồng bộ khi thêm component |
+| Font | Bricolage Grotesque 700/800 và Be Vietnam Pro 400/600/700 đã tải từ Google Fonts, subset latin/latin-ext/vietnamese, WOFF2 và OFL được lưu cục bộ | Be Vietnam Pro không có OpenType `tnum`; tổng WOFF2 279.284 bytes (272,74 KiB), cao hơn mục tiêu xấp xỉ 220 KiB. Không tự đổi font |
+| App shell | Header sticky, mobile nav island, footer và 3 trang legal draft noindex; Zalo chỉ hiện khi HTTPS option được cấu hình | Chưa có URL Zalo do chủ dự án chưa cung cấp |
+| Itinerary | Rail ngày, timeline, empty rental 7/5 và giới hạn 4 điểm dừng chính/ngày đã được triển khai; badge đếm stop chưa lưu trữ | Badge/meal behavior cần xác nhận với chủ dự án; chưa có ảnh thật/giấy phép |
+| Browser QA | Workflow Chromium desktop/mobile và artifact screenshot tồn tại | Chưa có bằng chứng Firefox, Safari, thiết bị thật hoặc screen reader |
 
 Không suy diễn trạng thái `Implemented`, `Tested` hoặc `Verified` ngoài những gì có log hoặc artifact gắn với commit cụ thể.
 

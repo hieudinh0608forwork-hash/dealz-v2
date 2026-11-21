@@ -24,9 +24,9 @@ Tài liệu này ghi lại các quyết định do chủ dự án chốt. Không
 - Không dùng alpha làm chỉ báo focus duy nhất.
 
 ## 5. Đo tương phản trên các nền thực tế
-- Phải đo lại mọi cặp màu trên tất cả nền: trắng, kem, mint-50, mint-100, lime-50, orange-50 và forest.
-- Ngưỡng: chữ thường tối thiểu 4,5:1; viền ô nhập và focus tối thiểu 3:1.
-- Cặp màu dưới ngưỡng phải được sửa và báo chủ dự án.
+- Chỉ đo các cặp màu thực sự được dùng trong giao diện theo ma trận đã chốt tại docs/design-contrast.md; không tạo phép đo giả cho các cặp không xuất hiện trong layout.
+- Ngưỡng: chữ thường tối thiểu 4,5:1; chữ lớn tối thiểu 3:1; viền ô nhập và focus tối thiểu 3:1.
+- Cặp đang dùng dưới ngưỡng phải được sửa và báo chủ dự án; cặp không dùng được ghi rõ là bị loại khỏi ma trận.
 - Cập nhật `docs/design-contrast.md`, `docs/11_DESIGN_RULES.md` và Master Handoff trong cùng một commit.
 - Không tuyên bố số đo mới nếu chưa thực sự đo bằng công cụ.
 
@@ -39,6 +39,7 @@ Tài liệu này ghi lại các quyết định do chủ dự án chốt. Không
   - WOFF2, các subset latin, latin-ext và vietnamese.
   - Kèm giấy phép OFL và ghi nguồn trong `docs/third-party.md`.
 - Nếu font thiếu glyph tiếng Việt hoặc tính năng `tnum`, báo chủ dự án; không tự đổi font.
+- Đo thực tế từ WOFF2 đã tải: Be Vietnam Pro không có OpenType `tnum`; tổng WOFF2 là 279.284 bytes (272,74 KiB), cao hơn mục tiêu xấp xỉ 220 KiB. Giữ đúng họ font đã chốt; không tự thay thế.
 
 ## 7. Zalo
 - URL Zalo chỉ lấy từ tùy chọn `dealz_zalo_url`.
@@ -57,6 +58,8 @@ Tài liệu này ghi lại các quyết định do chủ dự án chốt. Không
 - Giữ PR #10 ở trạng thái Draft; không merge main và không deploy trong phạm vi công việc này.
 
 ## 10. Ma trận tương phản đã đo (22/11/2026)
+
+Ma trận hiện hành chỉ đo các cặp thực sự dùng trong UI, theo yêu cầu cập nhật của chủ dự án; không áp dụng phép đo mọi token trên mọi nền.
 - Các cặp đang dùng và ngưỡng CI được liệt kê trong `docs/design-contrast.md`.
 - Placeholder `#5F776D` chỉ dùng trên nền input trắng: 4,83:1.
 - Viền input `#7C948A`: 3,25:1 so với nền input trắng; 3,04:1 so với kem; 3,00095:1 so với mint-50. Đạt ngưỡng 3:1 trên các nền ngoài được phép, không đổi sang `#6F887D`.
