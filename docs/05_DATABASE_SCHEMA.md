@@ -1,65 +1,101 @@
 # 05 – Database Schema Baseline
 
-## 1. Nguyên tắc
-- Mỗi thực thể có ID ổn định, timestamps và trạng thái phù hợp.
-- Dữ liệu quan hệ có foreign key logic và index; nếu dùng custom tables phải đánh giá hỗ trợ ràng buộc của MySQL.
-- Không lưu dữ liệu giao dịch quan trọng chỉ trong post meta không có cấu trúc.
-- Tiền lưu bằng integer đơn vị nhỏ nhất hoặc DECIMAL phù hợp; không dùng floating point.
-- Lưu currency rõ ràng.
-- Thời gian lưu theo UTC; hiển thị theo timezone phù hợp.
+## 1. Design rules
+- This is a logical model, not final migration SQL.
+- Use stable UUID public identifiers; internal numeric PKs are acceptable.
+- Store money as integer VND đồng or a precisely specified DECIMAL; never floating-point totals.
+- Store UTC timestamps and explicit destination timezone for local itinerary times.
+- Snapshot service, price, cancellation terms and fulfillment type at quote/booking.
+- Keep estimated cost, quoted amount, confirmed amount and actual expense separate.
+- Enforce ownership and partner scoping server-side.
+- Use indexes for owner/status/date, supplier/status, service/location and foreign-key lookups.
 
-## 2. Thực thể đề xuất
+## 2. Identity and organizations
+### wp_users
+WordPress account identity, authentication and base capabilities.
+### dealz_user_profiles
+user_id, display_name, phone/email visibility preferences, avatar, locale, timezone, preferences JSON (validated).
+### dealz_partners
+id, owner_user_id, legal/display name, status, onboarding state, created_at, updated_at.
+### dealz_partner_members
+partner_id, user_id, partner_role, status. Enables multiple staff later without sharing accounts.
 
-### users
-Có thể dùng WordPress users làm identity; profile mở rộng ở bảng riêng khi cần.
+## 3. Discovery and services
+### dealz_destinations
+id, slug, name, description, region, country_code, status, source metadata, optional centroid coordinates.
+### dealz_places
+id, destination_id, provider, provider_place_id, name, category, address, latitude, longitude, opening_hours JSON/source, source_url, verified_at, data_status.
+### dealz_service_categories
+id, slug, name, parent_id, status, sort_order.
+### dealz_listings
+id, partner_id, category_id, destination_id, title, description, fulfillment_type, price_basis, status, moderation_status, location, created_at, updated_at.
+### dealz_listing_prices
+id, listing_id, amount_minor, currency, unit, options_json, effective_from/to, source, updated_by.
+### dealz_availability
+id, listing_id, availability_type, start_at/end_at or service_date, capacity, remaining, status, version, updated_at.
+Availability model must support manual request, date-range inventory and time-slot capacity; exact schema depends on supplier types.
 
-### partners
-- id, owner_user_id, display_name, status, contact fields, created_at, updated_at.
+## 4. Trips and planning
+### dealz_trips
+id, owner_user_id, title, origin_place_id/text, destination_id, start_date, end_date, destination_timezone, traveler_count, budget_amount_minor, currency, status, visibility, created_at, updated_at.
+### dealz_trip_collaborators
+trip_id, user_id/invitation, permission (view/comment/edit), invitation_status, token_hash, expires_at, revoked_at.
+### dealz_itineraries
+id, trip_id, version, source (manual/ai), status, input_snapshot, created_at, created_by.
+### dealz_itinerary_days
+id, itinerary_id, local_date, position, notes.
+### dealz_itinerary_items
+id, day_id, place_id nullable, title_snapshot, description, start_local/end_local, duration_minutes, position, transport_mode, address_snapshot, latitude, longitude, estimated_cost_minor, currency, data_status, metadata.
+### dealz_route_legs
+id, itinerary_id, from_item_id, to_item_id, mode, distance_meters, duration_seconds, provider, calculated_at, status, warnings.
+### dealz_ai_runs
+id, trip_id, provider, model, prompt_version, input_hash, status, latency_ms, token_usage, error_code, created_at. Do not store secrets or unnecessary personal data.
 
-### destinations
-- id, slug, name, description, region, country_code, latitude, longitude, status.
+## 5. Budget and expenses
+### dealz_budget_lines
+id, trip_id, category, description, quantity, unit_amount_minor, total_amount_minor, currency, cost_type (estimate/quoted/confirmed/actual), source_type, source_id, status.
+### dealz_expenses
+id, trip_id, payer_user_id, category, amount_minor, currency, occurred_at, note, split_method, created_at.
 
-### services
-- id, partner_id, destination_id, category_id, title, description, price_amount, currency, pricing_unit, status, created_at, updated_at.
+## 6. Commerce
+### dealz_orders
+id, public_order_number, traveler_user_id, trip_id nullable, subtotal_minor, fees_minor, discount_minor, total_minor, currency, status, idempotency_key, created_at.
+### dealz_bookings
+id, public_booking_number, order_id, listing_id, partner_id, service_date/time, quantity, options_snapshot, fulfillment_type, price_snapshot, terms_snapshot, total_minor, currency, status, supplier_reference, created_at.
+### dealz_booking_events
+id, booking_id, from_status, to_status, actor_type, actor_id, reason, source, created_at.
+### dealz_payments
+id, order_id, booking_id nullable, provider, provider_reference, amount_minor, currency, status, idempotency_key, verified_at, created_at.
+### dealz_refunds
+id, payment_id, amount_minor, currency, reason, provider_reference, status, created_at.
+### dealz_ledger_entries
+id, transaction_group_id, account_code, debit_minor, credit_minor, currency, source_type, source_id, reversal_of_id nullable, created_at.
+### dealz_commissions
+id, booking_id, partner_id, basis_type, rate_bps nullable, amount_minor, currency, status, approved_at, reversed_at.
+Exact commission basis/rate must remain configuration/policy and cannot be invented.
 
-### service_availability
-- id, service_id, start_at, end_at, capacity, remaining_capacity, status, version.
+## 7. Platform operations
+### dealz_notifications
+id, user_id, channel, event_type, payload_safe, status, attempts, sent_at.
+### dealz_audit_events
+id, actor_type, actor_id, action, target_type, target_id, request_id, safe_metadata, created_at.
+### dealz_support_cases
+id, customer_id, booking_id nullable, category, status, assigned_to, resolution, created_at, updated_at.
 
-### trips
-- id, traveler_user_id, title, destination_id, start_date, end_date, traveler_count, budget_amount, currency, status.
+## 8. Relationships
+User 1:N Trips; Trip 1:N Itineraries; Itinerary 1:N Days; Day 1:N Items; Itinerary N:1 RouteLegs; Partner 1:N Listings; Listing 1:N Prices/Availability; Order 1:N Bookings; Booking 1:N Events; Order/Booking 1:N Payments; Payment 1:N Refunds; financial events map to ledger entries.
 
-### itineraries
-- id, trip_id, version, source (manual/ai), status, input_snapshot, created_at.
+Trip is not Order. Order is not Booking. A Trip may contain multiple independent bookings from different partners.
 
-### itinerary_items
-- id, itinerary_id, day_number, position, title, description, start_at, end_at, destination_name, address, latitude, longitude, estimated_cost, currency, metadata.
+## 9. Integrity and concurrency
+- Checkout revalidates price and availability.
+- Prevent overbooking with transaction/locking or atomic capacity update.
+- Idempotency key unique within a defined actor/operation scope.
+- Provider references unique where guaranteed by provider.
+- Ledger entries append-only; corrections use reversal entries.
+- Webhook event IDs are deduplicated.
+- No status transition without a recorded event.
+- Foreign key/index strategy must be verified against selected MySQL version.
 
-### orders
-- id, traveler_user_id, trip_id nullable, order_number, subtotal, fees, discount, total, currency, status, idempotency_key, created_at.
-
-### bookings
-- id, order_id, service_id, partner_id, quantity, unit_price, total_amount, currency, status, provider_reference, service_snapshot, created_at.
-
-### payments
-- id, order_id, provider, provider_reference, amount, currency, status, idempotency_key, paid_at, raw_event_reference.
-
-### ledger_entries
-- id, transaction_group_id, account_code, debit_amount, credit_amount, currency, source_type, source_id, created_at.
-
-## 3. Quan hệ
-- User 1:N Trips.
-- Partner 1:N Services.
-- Trip 1:N Itineraries.
-- Itinerary 1:N ItineraryItems.
-- Order 1:N Bookings.
-- Order 1:N Payments.
-- Booking thuộc một Partner và Service tại thời điểm đặt.
-- Trip không phải Order; Order không phải Booking.
-
-## 4. Ràng buộc và index cần đánh giá
-- Unique: destination.slug, order.order_number, provider + provider_reference khi provider đảm bảo duy nhất, idempotency_key theo phạm vi.
-- Index: owner/status/date; service/destination/status; booking partner/status; payment order/status.
-- Kiểm tra availability và tạo booking phải có transaction/locking phù hợp để tránh overbooking.
-
-## 5. Lưu ý
-Đây là logical schema, chưa phải migration SQL cuối cùng. Cần chốt chính sách booking, giá, tồn khả dụng, hủy/hoàn và lựa chọn lưu trữ trước khi triển khai vật lý.
+## 10. Implementation gate
+Before migrations: freeze ERD, field types/nullability, enum/state ownership, indexes, deletion policy, retention/privacy policy, availability model and financial policy dependencies.
