@@ -191,7 +191,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'active', $preserved->status );
 		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
-		$create_tables = new ReflectionMethod( \\DealZ\\Database\\Schema::class, 'create_tables' );
+		$create_tables = new ReflectionMethod( \DealZ\Database\Schema::class, 'create_tables' );
 		$create_tables->setAccessible( true );
 		$this->assertTrue( $create_tables->invoke( null ), 'Repeated schema DDL must remain successful.' );
 		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
@@ -235,7 +235,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
 		$this->assertSame( 'active', $preserved->status );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
-		$create_tables = new ReflectionMethod( \\DealZ\\Database\\Schema::class, 'create_tables' );
+		$create_tables = new ReflectionMethod( \DealZ\Database\Schema::class, 'create_tables' );
 		$create_tables->setAccessible( true );
 		$this->assertTrue( $create_tables->invoke( null ), 'Repeated schema DDL must remain successful.' );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
