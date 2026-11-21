@@ -290,8 +290,21 @@
 	}
 
 	function makeItemCard(item, itemIndex, allItems) {
+		const isMainStop = item.item_type === 'stop';
 		const card = document.createElement('article');
-		card.className = 'itinerary-item-card' + (item.item_type === 'stop' ? '' : ' itinerary-item-card--meal');
+		card.className = 'itinerary-item-card ' + (isMainStop ? 'itinerary-item-card--stop' : 'itinerary-item-card--meal');
+
+		if (isMainStop) {
+			const media = document.createElement('div');
+			media.className = 'itinerary-item-card__media';
+			media.setAttribute('role', 'img');
+			media.setAttribute('aria-label', 'Chưa có ảnh địa điểm được xác minh');
+			const mediaLabel = document.createElement('span');
+			mediaLabel.className = 'itinerary-item-card__media-label';
+			mediaLabel.textContent = 'Chưa có ảnh địa điểm được xác minh';
+			media.append(mediaLabel);
+			card.append(media);
+		}
 
 		const top = document.createElement('div');
 		top.className = 'itinerary-item-card__top';
@@ -314,6 +327,10 @@
 		if (item.address_snapshot) detailParts.push(item.address_snapshot);
 		details.textContent = detailParts.length ? detailParts.join(' · ') : 'Chưa có thời lượng hoặc địa chỉ.';
 
+		const editDetails = document.createElement('details');
+		editDetails.className = 'item-edit-details';
+		const editSummary = document.createElement('summary');
+		editSummary.textContent = 'Chỉnh sửa thông tin';
 		const editForm = document.createElement('form');
 		editForm.className = 'item-edit-form';
 		const editInput = document.createElement('input');
@@ -347,14 +364,18 @@
 		save.className = 'text-action';
 		save.textContent = 'Lưu thay đổi';
 		editForm.append(editInput, startInput, endInput, durationInput, save);
+		editDetails.append(editSummary, editForm);
 		editForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
 			const titleValue = editInput.value.trim();
 			if (!titleValue) {
 				showFeedback('Tên điểm dừng không được để trống.', true);
+				editInput.focus();
 				return;
 			}
 			const durationValue = durationInput.value.trim();
+			save.disabled = true;
+			save.textContent = 'Đang lưu…';
 			try {
 				await api('items/' + encodeURIComponent(item.public_id), 'PATCH', {
 					title_snapshot: titleValue,
@@ -366,21 +387,9 @@
 				await loadItems();
 			} catch (error) {
 				showFeedback(error.message, true);
-			}
-		});
-
-		const archive = document.createElement('button');
-		archive.type = 'button';
-		archive.className = 'text-action text-action--danger';
-		archive.textContent = 'Lưu trữ';
-		archive.addEventListener('click', async function () {
-			if (!window.confirm('Lưu trữ điểm dừng này?')) return;
-			try {
-				await api('items/' + encodeURIComponent(item.public_id), 'DELETE');
-				showFeedback('Đã lưu trữ điểm dừng.', false);
-				await loadItems();
-			} catch (error) {
-				showFeedback(error.message, true);
+			} finally {
+				save.disabled = false;
+				save.textContent = 'Lưu thay đổi';
 			}
 		});
 
@@ -409,6 +418,8 @@
 			const currentId = orderedIds[itemIndex];
 			orderedIds[itemIndex] = orderedIds[targetIndex];
 			orderedIds[targetIndex] = currentId;
+			moveUp.disabled = true;
+			moveDown.disabled = true;
 			try {
 				await api('days/' + encodeURIComponent(activeDay) + '/reorder', 'POST', {
 					item_public_ids: orderedIds
@@ -417,33 +428,106 @@
 				await loadItems();
 			} catch (error) {
 				showFeedback(error.message, true);
+				moveUp.disabled = itemIndex <= 0;
+				moveDown.disabled = itemIndex >= allItems.length - 1;
 			}
 		}
-
 		moveUp.addEventListener('click', function () { moveItem(-1); });
 		moveDown.addEventListener('click', function () { moveItem(1); });
 		moveControls.append(moveUp, moveDown);
-		actions.append(moveControls, editForm, archive);
+
+		if (isMainStop && item.address_snapshot) {
+			const directions = document.createElement('a');
+			directions.className = 'text-action item-directions';
+			directions.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(item.address_snapshot);
+			directions.target = '_blank';
+			directions.rel = 'noopener noreferrer';
+			directions.textContent = 'Chỉ đường';
+			directions.setAttribute('aria-label', 'Mở chỉ đường đến ' + item.title_snapshot + ' trên Google Maps');
+			actions.append(moveControls, directions, editDetails);
+		} else {
+			actions.append(moveControls, editDetails);
+		}
+
+		const archive = document.createElement('button');
+		archive.type = 'button';
+		archive.className = 'text-action text-action--danger';
+		archive.textContent = 'Lưu trữ';
+		archive.addEventListener('click', async function () {
+			if (!window.confirm('Lưu trữ nội dung này?')) return;
+			archive.disabled = true;
+			archive.textContent = 'Đang lưu trữ…';
+			try {
+				await api('items/' + encodeURIComponent(item.public_id), 'DELETE');
+				showFeedback('Đã lưu trữ nội dung.', false);
+				await loadItems();
+			} catch (error) {
+				showFeedback(error.message, true);
+				archive.disabled = false;
+				archive.textContent = 'Lưu trữ';
+			}
+		});
+		actions.append(archive);
 		card.append(top, title, details, actions);
 		return card;
 	}
 
+	function makeRoutePlaceholder() {
+		const connector = document.createElement('div');
+		connector.className = 'route-connector';
+		connector.setAttribute('role', 'note');
+		const icon = document.createElement('span');
+		icon.className = 'route-connector__icon';
+		icon.setAttribute('aria-hidden', 'true');
+		icon.textContent = '🛵';
+		const label = document.createElement('span');
+		label.textContent = 'Chưa có dữ liệu tuyến đường';
+		connector.append(icon, label);
+		return connector;
+	}
+
 	async function loadItems() {
 		if (!activeDay) return;
+		itemsList.setAttribute('aria-busy', 'true');
 		itemsList.replaceChildren(makeEmpty('Đang tải điểm dừng…'));
 		try {
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
 			itemsList.replaceChildren();
 			if (!Array.isArray(items) || items.length === 0) {
-				itemsList.append(makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.'));
+				const empty = makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.');
+				const action = document.createElement('button');
+				action.type = 'button';
+				action.className = 'button button--primary button--compact';
+				action.textContent = 'Thêm nội dung đầu tiên';
+				action.addEventListener('click', function () {
+					itemForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					const titleInput = document.getElementById('item-title');
+					if (titleInput) titleInput.focus();
+				});
+				empty.append(action);
+				itemsList.append(empty);
 				return;
 			}
+			let previousMainStop = false;
 			items.forEach(function (item, index) {
+				if (item.item_type === 'stop' && previousMainStop) {
+					itemsList.append(makeRoutePlaceholder());
+				}
 				itemsList.append(makeItemCard(item, index, items));
+				if (item.item_type === 'stop') previousMainStop = true;
 			});
 		} catch (error) {
 			showFeedback(error.message, true);
-			itemsList.replaceChildren(makeEmpty('Không tải được điểm dừng.'));
+			const retry = makeEmpty(error.message || 'Không tải được điểm dừng.');
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'button button--secondary button--compact';
+			button.textContent = 'Thử tải lại';
+			button.addEventListener('click', loadItems);
+			retry.append(button);
+			itemsList.replaceChildren(retry);
+		} finally {
+			itemsList.removeAttribute('aria-busy');
 		}
 	}
 

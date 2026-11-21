@@ -1,0 +1,72 @@
+name: WordPress Docker Compose smoke test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-wordpress-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Compose configuration
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+
+      - name: Start fresh WordPress and MySQL
+        run: docker compose up -d --wait --wait-timeout 180
+
+      - name: Install WordPress CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /tmp/wp-cli.phar
+          container_id="$(docker compose ps -q wordpress)"
+          test -n "$container_id"
+          docker cp /tmp/wp-cli.phar "$container_id:/tmp/wp-cli.phar"
+
+      - name: Install WordPress and activate DealZ
+        run: |
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root core install \
+            --url=http://localhost:8080 \
+            --title="DealZ V2 CI" \
+            --admin_user=dealz-ci-admin \
+            --admin_password=ci-only-password-not-for-reuse \
+            --admin_email=dealz-ci@example.invalid \
+            --skip-email
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
+
+      - name: Verify migration, eight tables, activation idempotency and health route
+        run: |
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
+            global $wpdb;
+            $tables = \DealZ\Database\Schema::table_names();
+            if ( count( $tables ) !== 8 ) { fwrite( STDERR, "Expected eight DealZ tables.\n" ); exit( 1 ); }
+            foreach ( $tables as $table ) {
+              $found = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) );
+              if ( $found !== $table ) { fwrite( STDERR, "Missing table: " . $table . "\n" ); exit( 1 ); }
+            }
+            if ( get_option( "dealz_db_version" ) !== \DealZ\Database\Schema::VERSION ) { fwrite( STDERR, "Schema version mismatch.\n" ); exit( 1 ); }
+            update_option( "dealz_smoke_sentinel", "preserve-me" );
+            echo "PASS: eight tables and schema version " . get_option( "dealz_db_version" ) . "\n";
+          '
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin deactivate dealz-core
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
+            global $wpdb;
+            foreach ( \DealZ\Database\Schema::table_names() as $table ) {
+              if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) ) !== $table ) { exit( 1 ); }
+            }
+            if ( get_option( "dealz_smoke_sentinel" ) !== "preserve-me" ) { exit( 1 ); }
+            echo "PASS: repeat activation preserved schema and data.\n";
+          '
+          curl -fsS http://localhost:8080/wp-json/dealz/v1/health
+
+      - name: Stop stack and remove ephemeral volumes
+        if: always()
+        run: docker compose down -v
