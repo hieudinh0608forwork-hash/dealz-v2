@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: DealZ V2 API
-  version: 0.1.0
-  description: Initial executable contract for the scaffold health check and traveler-owned trip CRUD. This is not a contract for unimplemented marketplace, AI, routing or payment modules.
+  version: 0.2.0
+  description: >
+    Executable contract for the implemented WordPress health, traveler trip,
+    manual itinerary, budget and expense endpoints. Marketplace, booking,
+    payment, AI and provider-backed routing are not represented as live APIs.
 servers:
   - url: /wp-json/dealz/v1
 security:
@@ -13,21 +16,19 @@ paths:
     get:
       operationId: getHealth
       security: []
-      summary: Check DealZ Core scaffold status
       responses:
         '200':
-          description: Scaffold status (not application readiness)
+          description: Scaffold status, not production readiness
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
   /trips:
     get:
-      operationId: listMyTrips
-      summary: List trips owned by the authenticated traveler
+      operationId: listTrips
       responses:
         '200':
-          description: Trips belonging to current user
+          description: Trips owned by the authenticated user
           content:
             application/json:
               schema:
@@ -38,7 +39,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
     post:
       operationId: createTrip
-      summary: Create a private draft trip
       requestBody:
         required: true
         content:
@@ -58,29 +58,20 @@ paths:
           $ref: '#/components/responses/Unauthorized'
   /trips/{public_id}:
     parameters:
-      - name: public_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      - $ref: '#/components/parameters/PublicId'
     get:
       operationId: getTrip
-      summary: Get a trip owned by current user
       responses:
         '200':
-          description: Trip
+          description: Owned trip
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trip'
         '404':
           $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
     patch:
       operationId: updateTrip
-      summary: Update editable fields of an owned trip
       requestBody:
         required: true
         content:
@@ -98,29 +89,17 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
     delete:
       operationId: archiveTrip
-      summary: Archive an owned trip without deleting its data
       responses:
         '200':
-          description: Archived trip
+          description: Trip archived, not physically deleted
           content:
             application/json:
               schema:
-                type: object
-                required: [public_id, status]
-                properties:
-                  public_id:
-                    type: string
-                    format: uuid
-                  status:
-                    const: archived
+                $ref: '#/components/schemas/Archived'
         '404':
           $ref: '#/components/responses/NotFound'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
   /trips/{trip_public_id}/itineraries:
     parameters:
       - name: trip_public_id
@@ -130,8 +109,7 @@ paths:
           type: string
           format: uuid
     get:
-      operationId: listTripItineraries
-      summary: List manual itinerary versions for an owned trip
+      operationId: listItineraries
       responses:
         '200':
           description: Itinerary versions
@@ -144,11 +122,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     post:
-      operationId: createManualItinerary
-      summary: Create a new manual itinerary version
+      operationId: createItinerary
       responses:
         '201':
-          description: Created itinerary
+          description: New manual itinerary version
           content:
             application/json:
               schema:
@@ -157,18 +134,12 @@ paths:
           $ref: '#/components/responses/NotFound'
   /itineraries/{public_id}/days:
     parameters:
-      - name: public_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      - $ref: '#/components/parameters/PublicId'
     get:
       operationId: listItineraryDays
-      summary: List days in an owned itinerary
       responses:
         '200':
-          description: Itinerary days
+          description: Days in an owned itinerary
           content:
             application/json:
               schema:
@@ -178,8 +149,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     post:
-      operationId: addItineraryDay
-      summary: Add a local calendar day within the trip date range
+      operationId: createItineraryDay
       requestBody:
         required: true
         content:
@@ -192,25 +162,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DayCreated'
+                $ref: '#/components/schemas/Day'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
   /days/{public_id}/validation:
     parameters:
-      - name: public_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      - $ref: '#/components/parameters/PublicId'
     get:
       operationId: validateItineraryDay
-      summary: Check explicit local-time overlaps for an owned itinerary day
+      description: Checks explicit user-entered local time overlaps only. Does not estimate route time or travel feasibility.
       responses:
         '200':
-          description: Deterministic validation result; does not estimate travel time
+          description: Schedule validation result
           content:
             application/json:
               schema:
@@ -219,18 +184,12 @@ paths:
           $ref: '#/components/responses/NotFound'
   /days/{public_id}/items:
     parameters:
-      - name: public_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      - $ref: '#/components/parameters/PublicId'
     get:
       operationId: listItineraryItems
-      summary: List active stops and meal cards for an owned day
       responses:
         '200':
-          description: Day items
+          description: Active stop and meal cards
           content:
             application/json:
               schema:
@@ -240,8 +199,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     post:
-      operationId: addItineraryItem
-      summary: Add a main stop or small lunch/dinner card
+      operationId: createItineraryItem
       requestBody:
         required: true
         content:
@@ -250,7 +208,7 @@ paths:
               $ref: '#/components/schemas/ItineraryItemCreate'
       responses:
         '201':
-          description: Created item
+          description: Created itinerary item
           content:
             application/json:
               schema:
@@ -261,15 +219,9 @@ paths:
           $ref: '#/components/responses/NotFound'
   /items/{public_id}:
     parameters:
-      - name: public_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      - $ref: '#/components/parameters/PublicId'
     patch:
       operationId: updateItineraryItem
-      summary: Update an owned itinerary item
       requestBody:
         required: true
         content:
@@ -289,21 +241,165 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       operationId: archiveItineraryItem
-      summary: Archive an item without physically deleting it
       responses:
         '200':
-          description: Archived item
+          description: Item archived
           content:
             application/json:
               schema:
-                type: object
-                required: [public_id, status]
-                properties:
-                  public_id:
-                    type: string
-                    format: uuid
-                  status:
-                    const: archived
+                $ref: '#/components/schemas/Archived'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /trips/{trip_public_id}/budget:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getTripBudget
+      responses:
+        '200':
+          description: Active budget lines and totals grouped by cost type and currency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetSummary'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /trips/{trip_public_id}/budget/lines:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createBudgetLine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetLineCreate'
+      responses:
+        '201':
+          description: Created budget line with server-calculated total
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /budget/lines/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    patch:
+      operationId: updateBudgetLine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetLineUpdate'
+      responses:
+        '200':
+          description: Updated budget line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: archiveBudgetLine
+      responses:
+        '200':
+          description: Budget line archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /trips/{trip_public_id}/expenses:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: listTripExpenses
+      responses:
+        '200':
+          description: Active actual expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: createExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+      responses:
+        '201':
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /expenses/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    patch:
+      operationId: updateExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseUpdate'
+      responses:
+        '200':
+          description: Updated expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: archiveExpense
+      responses:
+        '200':
+          description: Expense archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
         '404':
           $ref: '#/components/responses/NotFound'
 components:
@@ -312,655 +408,259 @@ components:
       type: apiKey
       in: cookie
       name: wordpress_logged_in_<site-hash>
-      description: WordPress logged-in cookie; the actual cookie suffix is site-specific.
+      description: Actual cookie suffix is site-specific.
     wordpressNonce:
       type: apiKey
       in: header
       name: X-WP-Nonce
-      description: WordPress REST nonce required for cookie-authenticated writes.
+      description: WordPress REST nonce for cookie-authenticated requests.
+  parameters:
+    PublicId:
+      name: public_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
     Health:
       type: object
       required: [service, status, application_ready, message]
       properties:
-        service:
-          const: dealz-core
-        status:
-          const: scaffolded
-        application_ready:
-          const: false
-        message:
-          type: string
+        service: { const: dealz-core }
+        status: { const: scaffolded }
+        application_ready: { const: false }
+        message: { type: string }
+    Archived:
+      type: object
+      required: [public_id, status]
+      properties:
+        public_id: { type: string, format: uuid }
+        status: { const: archived }
     Trip:
       type: object
       required: [public_id, title, origin_text, destination_name, destination_timezone, traveler_count, currency, status, created_at, updated_at]
       properties:
-        public_id:
-          type: string
-          format: uuid
-        title:
-          type: string
-          maxLength: 190
-        origin_text:
-          type: string
-        destination_name:
-          type: string
-          maxLength: 190
-        start_date:
-          type: [string, 'null']
-          format: date
-        end_date:
-          type: [string, 'null']
-          format: date
-        destination_timezone:
-          type: string
-          default: Asia/Ho_Chi_Minh
-        traveler_count:
-          type: integer
-          minimum: 1
-          maximum: 50
-        budget_amount_minor:
-          type: [integer, 'null']
-          minimum: 0
-          description: Integer minor units; VND is stored in đồng, not floating point.
-        currency:
-          type: string
-          pattern: '^[A-Z]{3}$'
-        status:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
+        public_id: { type: string, format: uuid }
+        title: { type: string, maxLength: 190 }
+        origin_text: { type: string }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string }
+        traveler_count: { type: integer, minimum: 1, maximum: 50 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        status: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     TripCreate:
       type: object
-      required: [title]
       additionalProperties: false
+      required: [title]
       properties:
-        title:
-          type: string
-          minLength: 1
-          maxLength: 190
-        origin_text:
-          type: string
-          maxLength: 255
-        destination_name:
-          type: string
-          maxLength: 190
-        start_date:
-          type: [string, 'null']
-          format: date
-        end_date:
-          type: [string, 'null']
-          format: date
-        destination_timezone:
-          type: string
-          default: Asia/Ho_Chi_Minh
-        traveler_count:
-          type: integer
-          minimum: 1
-          maximum: 50
-          default: 1
-        budget_amount_minor:
-          type: [integer, 'null']
-          minimum: 0
-        currency:
-          type: string
-          pattern: '^[A-Za-z]{3}$'
-          default: VND
+        title: { type: string, minLength: 1, maxLength: 190 }
+        origin_text: { type: string, maxLength: 255 }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string, default: Asia/Ho_Chi_Minh }
+        traveler_count: { type: integer, minimum: 1, maximum: 50, default: 1 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$', default: VND }
     TripUpdate:
       type: object
       additionalProperties: false
       minProperties: 1
       properties:
-        title:
-          type: string
-          minLength: 1
-          maxLength: 190
-        origin_text:
-          type: string
-          maxLength: 255
-        destination_name:
-          type: string
-          maxLength: 190
-        start_date:
-          type: [string, 'null']
-          format: date
-        end_date:
-          type: [string, 'null']
-          format: date
-        destination_timezone:
-          type: string
-        traveler_count:
-          type: integer
-          minimum: 1
-          maximum: 50
-        budget_amount_minor:
-          type: [integer, 'null']
-          minimum: 0
-        currency:
-          type: string
-          pattern: '^[A-Za-z]{3}$'
+        title: { type: string, minLength: 1, maxLength: 190 }
+        origin_text: { type: string, maxLength: 255 }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string }
+        traveler_count: { type: integer, minimum: 1, maximum: 50 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
     Itinerary:
       type: object
       required: [public_id, version, source, status, created_at]
       properties:
-        public_id:
-          type: string
-          format: uuid
-        version:
-          type: integer
-          minimum: 1
-        source:
-          const: manual
-        status:
-          type: string
-        created_at:
-          type: string
-          format: date-time
+        public_id: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        source: { const: manual }
+        status: { type: string }
+        created_at: { type: string, format: date-time }
     Day:
       type: object
       required: [public_id, local_date, position]
       properties:
-        public_id:
-          type: string
-          format: uuid
-        local_date:
-          type: string
-          format: date
-        position:
-          type: integer
-        notes:
-          type: [string, 'null']
+        public_id: { type: string, format: uuid }
+        local_date: { type: string, format: date }
+        position: { type: integer }
+        notes: { type: [string, 'null'] }
     DayCreate:
       type: object
-      required: [local_date]
       additionalProperties: false
+      required: [local_date]
       properties:
-        local_date:
-          type: string
-          format: date
-        position:
-          type: integer
-          minimum: 0
-          maximum: 999
-    DayCreated:
-      type: object
-      required: [public_id, local_date, position]
-      properties:
-        public_id:
-          type: string
-          format: uuid
-        local_date:
-          type: string
-          format: date
-        position:
-          type: [integer, 'null']
+        local_date: { type: string, format: date }
+        position: { type: integer, minimum: 0, maximum: 999 }
     ItineraryItem:
       type: object
       required: [public_id, item_type, title_snapshot, position, currency, data_status, status]
       properties:
-        public_id:
-          type: string
-          format: uuid
-        item_type:
-          type: string
-          enum: [stop, lunch, dinner]
-        title_snapshot:
-          type: string
-          maxLength: 190
-        description:
-          type: [string, 'null']
-        address_snapshot:
-          type: string
-        start_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        end_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        duration_minutes:
-          type: [integer, 'null']
-        position:
-          type: integer
-        transport_mode:
-          type: string
-        latitude:
-          type: [number, 'null']
-        longitude:
-          type: [number, 'null']
-        estimated_cost_minor:
-          type: [integer, 'null']
-        currency:
-          type: string
-          pattern: '^[A-Z]{3}      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        data_status:
-          type: string
-        status:
-          type: string
+        public_id: { type: string, format: uuid }
+        item_type: { type: string, enum: [stop, lunch, dinner] }
+        title_snapshot: { type: string, maxLength: 190 }
+        description: { type: [string, 'null'] }
+        address_snapshot: { type: string }
+        start_local: { type: [string, 'null'], pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$' }
+        end_local: { type: [string, 'null'], pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$' }
+        duration_minutes: { type: [integer, 'null'], minimum: 1, maximum: 1440 }
+        position: { type: integer }
+        transport_mode: { type: string }
+        latitude: { type: [number, 'null'], minimum: -90, maximum: 90 }
+        longitude: { type: [number, 'null'], minimum: -180, maximum: 180 }
+        estimated_cost_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        data_status: { type: string }
+        status: { type: string }
     ItineraryItemCreate:
       type: object
+      additionalProperties: false
       required: [title_snapshot]
-      additionalProperties: false
       properties:
-        item_type:
-          type: string
-          enum: [stop, lunch, dinner]
-          default: stop
-        title_snapshot:
-          type: string
-          minLength: 1
-          maxLength: 190
-        description:
-          type: string
-          maxLength: 2000
-        address_snapshot:
-          type: string
-          maxLength: 255
-        start_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        end_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        duration_minutes:
-          type: [integer, 'null']
-          minimum: 1
-          maximum: 1440
-        position:
-          type: integer
-          minimum: 0
-          maximum: 999
-        transport_mode:
-          type: string
-          maxLength: 24
-        latitude:
-          type: [number, 'null']
-          minimum: -90
-          maximum: 90
-        longitude:
-          type: [number, 'null']
-          minimum: -180
-          maximum: 180
-        estimated_cost_minor:
-          type: [integer, 'null']
-          minimum: 0
-        currency:
-          type: string
-          pattern: '^[A-Za-z]{3}      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-          default: VND
-        data_status:
-          type: string
-          enum: [verified, unverified, suggested, estimated]
-          default: unverified
+        item_type: { type: string, enum: [stop, lunch, dinner], default: stop }
+        title_snapshot: { type: string, minLength: 1, maxLength: 190 }
+        description: { type: string, maxLength: 2000 }
+        address_snapshot: { type: string, maxLength: 255 }
+        start_local: { type: [string, 'null'], pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$' }
+        end_local: { type: [string, 'null'], pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$' }
+        duration_minutes: { type: [integer, 'null'], minimum: 1, maximum: 1440 }
+        position: { type: integer, minimum: 0, maximum: 999 }
+        transport_mode: { type: string, maxLength: 24 }
+        latitude: { type: [number, 'null'], minimum: -90, maximum: 90 }
+        longitude: { type: [number, 'null'], minimum: -180, maximum: 180 }
+        estimated_cost_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$', default: VND }
+        data_status: { type: string, enum: [verified, unverified, suggested, estimated], default: unverified }
+        place_provider: { type: string, maxLength: 32 }
+        place_provider_id: { type: string, maxLength: 190 }
     ItineraryItemUpdate:
-      type: object
-      additionalProperties: false
+      allOf:
+        - $ref: '#/components/schemas/ItineraryItemCreate'
       minProperties: 1
-      properties:
-        item_type:
-          type: string
-          enum: [stop, lunch, dinner]
-        title_snapshot:
-          type: string
-          minLength: 1
-          maxLength: 190
-        description:
-          type: string
-          maxLength: 2000
-        address_snapshot:
-          type: string
-          maxLength: 255
-        start_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        end_local:
-          type: [string, 'null']
-          pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        duration_minutes:
-          type: [integer, 'null']
-          minimum: 1
-          maximum: 1440
-        position:
-          type: integer
-          minimum: 0
-          maximum: 999
-        transport_mode:
-          type: string
-          maxLength: 24
-        latitude:
-          type: [number, 'null']
-          minimum: -90
-          maximum: 90
-        longitude:
-          type: [number, 'null']
-          minimum: -180
-          maximum: 180
-        estimated_cost_minor:
-          type: [integer, 'null']
-          minimum: 0
-        currency:
-          type: string
-          pattern: '^[A-Za-z]{3}      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        data:
-          type: object
-          properties:
-            status:
-              type: integer
-  responses:
-    BadRequest:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Trip not found or not owned by current user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-        data_status:
-          type: string
-          enum: [verified, unverified, suggested, estimated]
     DayValidation:
       type: object
       required: [is_valid, checked_items, issues, limitations]
       properties:
-        is_valid:
-          type: boolean
-        checked_items:
-          type: integer
-          minimum: 0
+        is_valid: { type: boolean }
+        checked_items: { type: integer, minimum: 0 }
         issues:
           type: array
-          items:
-            $ref: '#/components/schemas/ScheduleIssue'
+          items: { $ref: '#/components/schemas/ScheduleIssue' }
         limitations:
           type: array
-          items:
-            type: string
+          items: { type: string }
     ScheduleIssue:
       type: object
       required: [code, item_public_id, message]
       properties:
-        code:
-          type: string
-          enum: [invalid_start_time, invalid_end_time, invalid_time_range, time_overlap]
-        item_public_id:
-          type: string
-          format: uuid
-        conflict_public_id:
-          type: string
-          format: uuid
-        message:
-          type: string
+        code: { type: string, enum: [invalid_start_time, invalid_end_time, invalid_time_range, time_overlap] }
+        item_public_id: { type: string, format: uuid }
+        conflict_public_id: { type: string, format: uuid }
+        message: { type: string }
+    BudgetLine:
+      type: object
+      required: [public_id, category, quantity, currency, cost_type, status]
+      properties:
+        public_id: { type: string, format: uuid }
+        category: { type: string, maxLength: 40 }
+        description: { type: string, maxLength: 255 }
+        quantity: { type: string, pattern: '^[0-9]+\\.[0-9]{2}$' }
+        unit_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        total_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        cost_type: { type: string, enum: [estimate, quoted, confirmed, actual] }
+        source_type: { type: string }
+        source_id: { type: string }
+        status: { type: string }
+    BudgetLineCreate:
+      type: object
+      additionalProperties: false
+      required: [category]
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        description: { type: string, maxLength: 255 }
+        quantity: { type: string, pattern: '^[0-9]{1,8}(?:\\.[0-9]{1,2})?$', default: '1.00' }
+        unit_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$', default: VND }
+        cost_type: { type: string, enum: [estimate, quoted, confirmed, actual], default: estimate }
+        source_type: { type: string, maxLength: 32 }
+        source_id: { type: string, maxLength: 64 }
+    BudgetLineUpdate:
+      allOf:
+        - $ref: '#/components/schemas/BudgetLineCreate'
+      minProperties: 1
+    BudgetSummary:
+      type: object
+      required: [lines, summary]
+      properties:
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/BudgetLine' }
+        summary:
+          type: array
+          items:
+            type: object
+            required: [cost_type, currency, line_count, total_amount_minor]
+            properties:
+              cost_type: { type: string }
+              currency: { type: string }
+              line_count: { type: integer }
+              total_amount_minor: { type: [integer, 'null'] }
+    Expense:
+      type: object
+      required: [public_id, category, amount_minor, currency, occurred_at, note, split_method, created_at]
+      properties:
+        public_id: { type: string, format: uuid }
+        category: { type: string, maxLength: 40 }
+        amount_minor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        occurred_at: { type: string, description: UTC datetime in MySQL format }
+        note: { type: string }
+        split_method: { type: string }
+        created_at: { type: string, format: date-time }
+    ExpenseCreate:
+      type: object
+      additionalProperties: false
+      required: [category, amount_minor, occurred_at]
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        amount_minor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$', default: VND }
+        occurred_at: { type: string, format: date-time, description: ISO-8601 timestamp with explicit timezone }
+        note: { type: string, maxLength: 1000 }
+    ExpenseUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        amount_minor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        occurred_at: { type: string, format: date-time }
+        note: { type: string, maxLength: 1000 }
     Error:
       type: object
       properties:
-        code:
-          type: string
-        message:
-          type: string
+        code: { type: string }
+        message: { type: string }
         data:
           type: object
           properties:
-            status:
-              type: integer
+            status: { type: integer }
   responses:
     BadRequest:
       description: Invalid input
@@ -975,7 +675,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     NotFound:
-      description: Trip not found or not owned by current user
+      description: Resource not found or not owned by current user
       content:
         application/json:
           schema:
