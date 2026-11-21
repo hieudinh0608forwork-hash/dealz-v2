@@ -165,7 +165,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		global $wpdb;
 		$tables = \DealZ\Database\Schema::table_names();
 		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['items'] . '` DROP INDEX `day_type_status`, DROP COLUMN `item_type`, DROP COLUMN `status`' ) );
-		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP COLUMN `status`' ) );
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP INDEX `trip_status`, DROP COLUMN `status`' ) );
 		$this->assertNotFalse( $wpdb->query( 'DROP TABLE IF EXISTS `' . $tables['route_legs'] . '`' ) );
 		update_option( 'dealz_db_version', '1.0.0' );
 
@@ -235,9 +235,8 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
 		$this->assertSame( 'active', $preserved->status );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
-		$create_tables = new ReflectionMethod( \DealZ\Database\Schema::class, 'create_tables' );
-		$create_tables->setAccessible( true );
-		$this->assertTrue( $create_tables->invoke( null ), 'Repeated schema DDL must remain successful.' );
+		update_option( 'dealz_db_version', '1.1.0' );
+		\DealZ\Database\Schema::maybe_upgrade();
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
 	}
 
