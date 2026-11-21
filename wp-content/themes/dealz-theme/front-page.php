@@ -17,7 +17,11 @@ get_header();
 			<p class="eyebrow"><?php esc_html_e( 'Bắt đầu từ Đà Nẵng – Hội An', 'dealz-theme' ); ?></p>
 			<h1><?php esc_html_e( 'Lên kế hoạch cho chuyến đi của bạn.', 'dealz-theme' ); ?></h1>
 			<p class="hero-section__description"><?php esc_html_e( 'Tập hợp thông tin chuyến đi và từng bước xây dựng hành trình phù hợp với lịch trình của bạn.', 'dealz-theme' ); ?></p>
+			<?php if ( is_user_logged_in() ) : ?>
 			<a class="button button--primary hero-section__cta" href="#create-trip"><?php esc_html_e( 'Tạo chuyến đi', 'dealz-theme' ); ?><span aria-hidden="true">↗</span></a>
+		<?php else : ?>
+			<a class="button button--primary hero-section__cta" href="<?php echo esc_url( wp_login_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Đăng nhập để bắt đầu', 'dealz-theme' ); ?><span aria-hidden="true">↗</span></a>
+		<?php endif; ?>
 			<p class="hero-section__note"><?php esc_html_e( 'Bạn chủ động lựa chọn và chỉnh sửa thông tin chuyến đi.', 'dealz-theme' ); ?></p>
 		</div>
 		<div class="hero-art" aria-hidden="true">
@@ -105,7 +109,11 @@ get_header();
 				<h2><?php esc_html_e( 'Bắt đầu bằng những thông tin cơ bản.', 'dealz-theme' ); ?></h2>
 				<p><?php esc_html_e( 'Phần chỉnh sửa lịch trình và quản lý điểm dừng sẽ được mở rộng ở các phiên bản tiếp theo.', 'dealz-theme' ); ?></p>
 			</div>
-			<a class="text-link" href="#create-trip"><?php esc_html_e( 'Tạo chuyến đi', 'dealz-theme' ); ?> <span aria-hidden="true">→</span></a>
+			<?php if ( is_user_logged_in() ) : ?>
+				<a class="text-link" href="#create-trip"><?php esc_html_e( 'Tạo chuyến đi', 'dealz-theme' ); ?> <span aria-hidden="true">→</span></a>
+			<?php else : ?>
+				<a class="text-link" href="<?php echo esc_url( wp_login_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Đăng nhập để bắt đầu', 'dealz-theme' ); ?> <span aria-hidden="true">→</span></a>
+			<?php endif; ?>
 		</div>
 	</section>
 </main>
