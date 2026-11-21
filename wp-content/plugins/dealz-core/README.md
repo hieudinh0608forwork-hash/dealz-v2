@@ -5,7 +5,7 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
 ## Implemented in repository
 
 - Plugin bootstrap and namespace-based autoloading.
-- Additive, versioned database migration v1.1.0 using WordPress `dbDelta`.
+- Additive, versioned database migration v1.2.0 using WordPress `dbDelta`.
 - Eight initial custom tables for trips, collaborators, itineraries, itinerary days/items, route legs, budget lines and expenses.
 - Minimal `manage_dealz` capability added to WordPress Administrators on activation.
 - Public, non-sensitive health endpoint: `GET /wp-json/dealz/v1/health`.
@@ -23,6 +23,7 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
   - `PATCH|DELETE /wp-json/dealz/v1/items/{public_id}`
 - Manual itinerary endpoints to create/list itinerary versions, add/list days, add/list stop and meal cards, update/archive items, and check explicit time overlaps.
 - Main stop limit of four per day, enforced under a database row lock.
+- Budget and expense REST endpoints with owner checks, integer minor-unit amounts, server-side line totals and UTC expense timestamps.
 - PHP syntax CI workflow.
 
 ## Local installation
@@ -30,9 +31,19 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
 1. Use a fresh WordPress installation (do not import V1 code, database or plugins).
 2. Copy `dealz-core` into `wp-content/plugins/`.
 3. Activate **DealZ Core** in WordPress Admin.
-4. Activation creates/updates the additive v1.1.0 tables. The migration checks that every expected table exists before recording the schema version.
+4. Activation creates/updates the additive v1.2.0 tables. The migration checks that every expected table exists before recording the schema version.
 5. Open `/wp-json/dealz/v1/health`; it reports scaffold status and `application_ready: false`.
 6. Test Trip endpoints while authenticated using WordPress cookie authentication and the `X-WP-Nonce` REST nonce. For same-origin JavaScript, obtain the nonce through a server-rendered/localized value; never disable nonce verification to make requests work.
+
+## Finance API routes
+
+- `GET /wp-json/dealz/v1/trips/{trip_public_id}/budget`
+- `POST /wp-json/dealz/v1/trips/{trip_public_id}/budget/lines`
+- `PATCH|DELETE /wp-json/dealz/v1/budget/lines/{public_id}`
+- `GET|POST /wp-json/dealz/v1/trips/{trip_public_id}/expenses`
+- `PATCH|DELETE /wp-json/dealz/v1/expenses/{public_id}`
+
+Budget line totals are calculated server-side using integer minor units and a quantity with at most two decimal places. Expense timestamps must be ISO-8601 with an explicit timezone and are normalized to UTC. These endpoints do not define deposits, refunds, commission, payout or payment behavior.
 
 ## Trip API example
 
@@ -59,12 +70,12 @@ Only the authenticated owner can list, read, update or archive their own trips. 
 
 ## Contract
 
-See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the implemented health and Trip routes. The contract intentionally excludes unimplemented AI, marketplace, route-provider, booking and payment features.
+See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the implemented health, Trip, itinerary, budget and expense routes. The contract intentionally excludes unimplemented AI, marketplace, route-provider, booking and payment features.
 
 ## Not implemented yet
 
 - The initial manual itinerary workspace is implemented in the theme; full design-rule stop cards, schedule overlap validation, route-provider integrations and maps remain open.
-- Budget and expense REST endpoints/calculators.
+- Budget and expense API is implemented; the frontend budget/expense interface is not implemented.
 - Collaborator invitations and shared-trip permissions.
 - Destinations and verified place catalogue.
 - Marketplace listings, availability, quotes, orders and bookings.
