@@ -202,6 +202,58 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Reordering is atomic, complete and owner-scoped.
+	 */
+	public function test_reorder_requires_exact_active_item_set(): void {
+		$fixture = $this->create_itinerary_fixture();
+		$day = $this->request(
+			'POST',
+			'/itineraries/' . $fixture['itinerary_id'] . '/days',
+			array( 'local_date' => '2027-04-01' )
+		);
+		$this->assertSame( 201, $day->get_status() );
+		$day_id = $day->get_data()['public_id'];
+
+		$first = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'title_snapshot' => 'Điểm A' ) );
+		$second = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'title_snapshot' => 'Điểm B' ) );
+		$this->assertSame( 201, $first->get_status() );
+		$this->assertSame( 201, $second->get_status() );
+		$first_id = $first->get_data()['public_id'];
+		$second_id = $second->get_data()['public_id'];
+
+		$reordered = $this->request(
+			'POST',
+			'/days/' . $day_id . '/reorder',
+			array( 'item_public_ids' => array( $second_id, $first_id ) )
+		);
+		$this->assertSame( 200, $reordered->get_status() );
+		$this->assertSame( $second_id, $reordered->get_data()[0]->public_id );
+		$this->assertSame( 0, (int) $reordered->get_data()[0]->position );
+
+		$duplicate = $this->request(
+			'POST',
+			'/days/' . $day_id . '/reorder',
+			array( 'item_public_ids' => array( $first_id, $first_id ) )
+		);
+		$this->assertSame( 400, $duplicate->get_status() );
+
+		$incomplete = $this->request(
+			'POST',
+			'/days/' . $day_id . '/reorder',
+			array( 'item_public_ids' => array( $first_id ) )
+		);
+		$this->assertSame( 409, $incomplete->get_status() );
+
+		wp_set_current_user( self::factory()->user->create() );
+		$forbidden = $this->request(
+			'POST',
+			'/days/' . $day_id . '/reorder',
+			array( 'item_public_ids' => array( $second_id, $first_id ) )
+		);
+		$this->assertSame( 404, $forbidden->get_status() );
+	}
+
+	/**
 	 * Remove test itinerary data and trip rows.
 	 */
 	public function tear_down(): void {
