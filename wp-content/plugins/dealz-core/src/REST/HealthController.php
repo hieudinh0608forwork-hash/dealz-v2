@@ -5,7 +5,7 @@
  * @package DealZ
  */
 
-namespace DealZ\\REST;
+namespace DealZ\REST;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,13 +38,13 @@ final class HealthController {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function get_health(): WP_REST_Response {
-		return new WP_REST_Response(
+	public function get_health(): \WP_REST_Response {
+		return new \WP_REST_Response(
 			array(
-				'service'            => 'dealz-core',
-				'status'             => 'scaffolded',
-				'application_ready'  => false,
-				'message'            => __( 'DealZ Core foundation is installed; application modules are not yet enabled.', 'dealz-core' ),
+				'service'           => 'dealz-core',
+				'status'            => 'scaffolded',
+				'application_ready' => false,
+				'message'           => __( 'DealZ Core foundation is installed; application modules are not yet enabled.', 'dealz-core' ),
 			),
 			200
 		);
