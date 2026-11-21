@@ -45,6 +45,14 @@ function dealz_theme_enqueue_assets(): void {
 			true
 		);
 
+		wp_enqueue_script(
+			'dealz-itinerary',
+			get_theme_file_uri( '/assets/js/itinerary.js' ),
+			array( 'dealz-app' ),
+			$theme_version,
+			true
+		);
+
 		wp_localize_script(
 			'dealz-app',
 			'dealzApp',
