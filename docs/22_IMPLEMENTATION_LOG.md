@@ -125,3 +125,11 @@
 - Added a finance integration assertion proving that editing quantity recalculates the budget line total and grouped summary.
 - The GitHub Actions WordPress 6.8 / MySQL 8.0 workflow passed on commit `537bc96084dd1fbfcc55434017ef0862d29b752b`: **15 tests, 71 assertions**.
 - The day date picker now receives min/max dates from the selected Trip and defaults to the Trip start date when available.
+
+## 2026-11-22 – Latest full CI gate
+
+- Latest application commit verified: `318908cc09d3a2ece20ff72f4373480b90320ec0`.
+- WordPress 6.8 / MySQL 8.0: **15 tests, 71 assertions, all passing**.
+- PHP syntax, JavaScript syntax and OpenAPI YAML validation: all passing on the same commit.
+- The tested UI includes manual itinerary create/edit/reorder, finance create/list/archive forms, and Trip-bounded day-date selection.
+- Local browser visual QA and staging/production deployment remain outstanding.
