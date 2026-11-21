@@ -220,10 +220,15 @@ final class TripController {
 					}
 					break;
 				case 'origin_text':
-				case 'destination_name':
 					$value = sanitize_text_field( (string) $value );
 					if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ) ) > 255 ) {
 						return new \WP_Error( 'dealz_invalid_location', __( 'Tên địa điểm quá dài.', 'dealz-core' ), array( 'status' => 400 ) );
+					}
+					break;
+				case 'destination_name':
+					$value = sanitize_text_field( (string) $value );
+					if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ) ) > 190 ) {
+						return new \\WP_Error( 'dealz_invalid_destination', __( 'Tên điểm đến quá dài.', 'dealz-core' ), array( 'status' => 400 ) );
 					}
 					break;
 				case 'start_date':
