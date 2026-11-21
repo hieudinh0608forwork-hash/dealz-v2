@@ -206,8 +206,8 @@ get_header();
 								<h4 id="budget-lines-title"><?php esc_html_e( 'Khoản dự kiến', 'dealz-theme' ); ?></h4>
 							</div>
 							<div id="budget-lines-list" class="finance-list" aria-live="polite"></div>
-							<form id="create-budget-form" class="finance-form">
-								<h5><?php esc_html_e( 'Thêm khoản ngân sách', 'dealz-theme' ); ?></h5>
+							<details class="finance-form-details"><summary>Thêm khoản dự kiến</summary><form id="create-budget-form" class="finance-form">
+								
 								<div class="form-field">
 									<label for="budget-category"><?php esc_html_e( 'Nhóm chi phí', 'dealz-theme' ); ?></label>
 									<select id="budget-category" name="category" required>
@@ -241,9 +241,9 @@ get_header();
 									</select>
 								</div>
 								<div class="form-field form-field--wide">
-									<button class="button button--primary" type="submit" id="create-budget-submit"><?php esc_html_e( 'Thêm khoản dự kiến', 'dealz-theme' ); ?></button>
+									<button class="button button--secondary" type="submit" id="create-budget-submit"><?php esc_html_e( 'Thêm khoản dự kiến', 'dealz-theme' ); ?></button>
 								</div>
-							</form>
+							</form></details>
 						</section>
 
 						<section class="finance-card" aria-labelledby="expenses-title">
@@ -251,8 +251,8 @@ get_header();
 								<h4 id="expenses-title"><?php esc_html_e( 'Khoản đã chi', 'dealz-theme' ); ?></h4>
 							</div>
 							<div id="expenses-list" class="finance-list" aria-live="polite"></div>
-							<form id="create-expense-form" class="finance-form">
-								<h5><?php esc_html_e( 'Ghi nhận khoản chi', 'dealz-theme' ); ?></h5>
+							<details class="finance-form-details"><summary>Ghi nhận khoản chi</summary><form id="create-expense-form" class="finance-form">
+								
 								<div class="form-field">
 									<label for="expense-category"><?php esc_html_e( 'Nhóm chi phí', 'dealz-theme' ); ?></label>
 									<select id="expense-category" name="category" required>
@@ -277,9 +277,9 @@ get_header();
 									<input id="expense-note" name="note" type="text" maxlength="1000">
 								</div>
 								<div class="form-field form-field--wide">
-									<button class="button button--primary" type="submit" id="create-expense-submit"><?php esc_html_e( 'Lưu khoản chi', 'dealz-theme' ); ?></button>
+									<button class="button button--secondary" type="submit" id="create-expense-submit"><?php esc_html_e( 'Lưu khoản chi', 'dealz-theme' ); ?></button>
 								</div>
-							</form>
+							</form></details>
 						</section>
 					</div>
 				</section>

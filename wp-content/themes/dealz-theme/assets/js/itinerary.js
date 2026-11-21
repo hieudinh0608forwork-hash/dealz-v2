@@ -137,6 +137,20 @@
 		return parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : value;
 	}
 
+	function renderTripMeta() {
+		const meta = document.getElementById('itinerary-workspace-meta');
+		if (!meta || !activeTripData) return;
+		const parts = [];
+		if (activeTripData.start_date && activeTripData.end_date) {
+			parts.push(formatDate(activeTripData.start_date) + ' – ' + formatDate(activeTripData.end_date));
+		}
+		if (activeDays.length > 0) {
+			parts.push(activeDays.length + ' ngày');
+		}
+		meta.textContent = parts.join(' · ');
+		meta.hidden = parts.length === 0;
+	}
+
 	function makeEmpty(message) {
 		const empty = document.createElement('div');
 		empty.className = 'workspace-empty';
@@ -172,6 +186,7 @@
 			const trip = await api('trips/' + encodeURIComponent(publicId));
 			if (sequence !== requestSequence) return;
 			activeTripData = trip;
+			renderTripMeta();
 			const dayDateInput = document.getElementById('itinerary-day-date');
 			if (dayDateInput) {
 				dayDateInput.min = trip.start_date || '';
@@ -254,6 +269,7 @@
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
 			activeDays = Array.isArray(days) ? days : [];
+			renderTripMeta();
 			updateTripStopBadge(activeDays);
 			daysList.replaceChildren();
 

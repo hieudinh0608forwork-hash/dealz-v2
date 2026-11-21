@@ -1079,3 +1079,13 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 }
 
 .admin-bar .site-header.admin-bar-scrolled { top: 0; }
+
+
+/* Finance forms open on demand; keep one primary action per screen. */
+.finance-form-details { margin-top: 18px; border-top: 1px solid var(--dealz-border); }
+.finance-form-details > summary { min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 10px 2px; color: var(--dealz-green); font-size: 15px; font-weight: 700; cursor: pointer; list-style: none; }
+.finance-form-details > summary::-webkit-details-marker { display: none; }
+.finance-form-details > summary::after { content: "+"; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--dealz-mint-100); color: var(--dealz-green); font-size: 20px; line-height: 1; }
+.finance-form-details[open] > summary::after { content: "−"; }
+.finance-form-details .finance-form { margin-top: 8px; }
+#itinerary-workspace-meta { min-height: 22px; }
