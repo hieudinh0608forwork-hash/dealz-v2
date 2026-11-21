@@ -233,10 +233,19 @@ final class Schema {
 		) $charset_collate;";
 
 		foreach ( $sql as $index => $statement ) {
+			$statement = self::remove_legacy_composite_indexes_from_delta( $statement );
 			dbDelta( $statement );
 			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
 
 			if ( $table_names[ $index ] !== $created_table ) {
+				return false;
+			}
+
+			$table_key = array_search( $table_names[ $index ], $tables, true );
+			if ( 'items' === $table_key && ! self::ensure_index( $table_names[ $index ], 'day_type_status', array( 'day_id', 'item_type', 'status' ) ) ) {
+				return false;
+			}
+			if ( 'expenses' === $table_key && ! self::ensure_index( $table_names[ $index ], 'trip_status', array( 'trip_id', 'status' ) ) ) {
 				return false;
 			}
 		}
@@ -261,6 +270,53 @@ final class Schema {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Remove two legacy composite indexes from dbDelta's parser input.
+	 * These indexes are maintained explicitly to avoid duplicate ADD KEY
+	 * statements emitted by dbDelta during repeated schema upgrades.
+	 *
+	 * @param string $statement CREATE TABLE statement.
+	 * @return string
+	 */
+	private static function remove_legacy_composite_indexes_from_delta( string $statement ): string {
+		$statement = preg_replace( '/^\\s*KEY\\s+(?:trip_status|day_type_status)\\s*\\([^)]+\\),?\\s*$/mi', '', $statement );
+		return preg_replace( '/,\\s*(\\n\\s*\\)\\s*\\$charset_collate;)/', '$1', $statement );
+	}
+
+	/**
+	 * Ensure a named composite index exists with its exact ordered columns.
+	 *
+	 * @param string        $table   Fully-qualified table name.
+	 * @param string        $name    Index name.
+	 * @param array<string> $columns Ordered index columns.
+	 * @return bool
+	 */
+	private static function ensure_index( string $table, string $name, array $columns ): bool {
+		global $wpdb;
+
+		$rows   = $wpdb->get_results( 'SHOW INDEX FROM ' . $table, ARRAY_A );
+		$actual = array();
+		foreach ( (array) $rows as $row ) {
+			if ( $name === $row['Key_name'] ) {
+				$actual[ (int) $row['Seq_in_index'] ] = (string) $row['Column_name'];
+			}
+		}
+		ksort( $actual );
+		if ( $columns === array_values( $actual ) ) {
+			return true;
+		}
+
+		if ( ! empty( $actual ) && false === $wpdb->query( 'ALTER TABLE ' . $table . ' DROP INDEX `' . esc_sql( $name ) . '`' ) ) {
+			return false;
+		}
+
+		$column_sql = implode( ',', array_map( static function ( $column ) {
+			return '`' . esc_sql( $column ) . '`';
+		}, $columns ) );
+		return false !== $wpdb->query( 'ALTER TABLE ' . $table . ' ADD KEY `' . esc_sql( $name ) . '` (' . $column_sql . ')' );
 	}
 
 	/**
