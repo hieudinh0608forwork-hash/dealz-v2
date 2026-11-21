@@ -1,0 +1,29 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# WordPress local runtime
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+
+# Dependencies / build outputs
+vendor/
+node_modules/
+dist/
+build/
+coverage/
+.phpunit.cache/
+
+# Logs
+*.log
