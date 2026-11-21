@@ -479,6 +479,22 @@ final class ItineraryRepository {
 	public function archive_item( string $public_id, int $day_id ): bool {
 		global $wpdb;
 
+		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+			return false;
+		}
+
+		$locked_day = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT id FROM ' . $this->table( 'itinerary_days' ) . ' WHERE id = %d FOR UPDATE',
+				$day_id
+			)
+		);
+
+		if ( ! $locked_day ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
 		$result = $wpdb->update(
 			$this->table( 'itinerary_items' ),
 			array(
@@ -494,6 +510,12 @@ final class ItineraryRepository {
 			array( '%s', '%d', '%s' )
 		);
 
-		return false !== $result;
+		if ( false === $result || 0 === $result ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
+		$wpdb->query( 'COMMIT' );
+		return true;
 	}
 }
