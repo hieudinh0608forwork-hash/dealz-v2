@@ -71,7 +71,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Admin support, audit and notification workflows.
 
 ## Phase 7 – QA and release
-- [ ] Unit/integration/contract/E2E tests.
+- [x] Author WordPress integration tests for Trip ownership/date validation and itinerary day/stop-limit ownership; [ ] execute tests in a configured WordPress test environment.
 - [ ] Cross-user and cross-partner access tests.
 - [ ] Responsive, accessibility, Vietnamese font and visual rule QA.
 - [ ] Provider failure, concurrency and webhook replay tests.
