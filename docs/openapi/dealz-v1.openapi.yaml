@@ -197,6 +197,26 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+  /days/{public_id}/validation:
+    parameters:
+      - name: public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: validateItineraryDay
+      summary: Check explicit local-time overlaps for an owned itinerary day
+      responses:
+        '200':
+          description: Deterministic validation result; does not estimate travel time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DayValidation'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /days/{public_id}/items:
     parameters:
       - name: public_id
@@ -897,6 +917,38 @@ components:
         data_status:
           type: string
           enum: [verified, unverified, suggested, estimated]
+    DayValidation:
+      type: object
+      required: [is_valid, checked_items, issues, limitations]
+      properties:
+        is_valid:
+          type: boolean
+        checked_items:
+          type: integer
+          minimum: 0
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleIssue'
+        limitations:
+          type: array
+          items:
+            type: string
+    ScheduleIssue:
+      type: object
+      required: [code, item_public_id, message]
+      properties:
+        code:
+          type: string
+          enum: [invalid_start_time, invalid_end_time, invalid_time_range, time_overlap]
+        item_public_id:
+          type: string
+          format: uuid
+        conflict_public_id:
+          type: string
+          format: uuid
+        message:
+          type: string
     Error:
       type: object
       properties:
