@@ -245,6 +245,9 @@ final class Schema {
 			if ( 'items' === $table_key && ! self::ensure_index( $table_names[ $index ], 'day_type_status', array( 'day_id', 'item_type', 'status' ) ) ) {
 				return false;
 			}
+			if ( 'itineraries' === $table_key && ! self::ensure_index( $table_names[ $index ], 'trip_status', array( 'trip_id', 'status' ) ) ) {
+				return false;
+			}
 			if ( 'expenses' === $table_key && ! self::ensure_index( $table_names[ $index ], 'trip_status', array( 'trip_id', 'status' ) ) ) {
 				return false;
 			}

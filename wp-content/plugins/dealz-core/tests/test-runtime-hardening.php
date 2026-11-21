@@ -189,6 +189,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Dữ liệu cũ cần giữ', $preserved->title_snapshot );
 		$this->assertSame( 'stop', $preserved->item_type );
 		$this->assertSame( 'active', $preserved->status );
+		$this->assert_index_columns( $tables['itineraries'], 'trip_status', array( 'trip_id', 'status' ) );
 		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
 		$create_tables = new ReflectionMethod( \DealZ\Database\Schema::class, 'create_tables' );
