@@ -148,13 +148,13 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 201, $item->get_status() );
 
 		global $wpdb;
-		$tables = \DealZ\\Database\\Schema::table_names();
+		$tables = \DealZ\Database\Schema::table_names();
 		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['items'] . '` DROP COLUMN `item_type`, DROP COLUMN `status`' ) );
 		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP COLUMN `status`' ) );
 		$this->assertNotFalse( $wpdb->query( 'DROP TABLE `' . $tables['route_legs'] . '`' ) );
 		update_option( 'dealz_db_version', '1.0.0' );
 
-		\DealZ\\Database\\Schema::maybe_upgrade();
+		\DealZ\Database\Schema::maybe_upgrade();
 
 		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
 		foreach ( array(
@@ -179,7 +179,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 	public function test_migration_from_schema_1_1_adds_expense_archive_status_without_data_loss(): void {
 		$trip_id = $this->create_trip();
 		global $wpdb;
-		$tables = \DealZ\\Database\\Schema::table_names();
+		$tables = \DealZ\Database\Schema::table_names();
 		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP COLUMN `status`' ) );
 		$public_id = wp_generate_uuid4();
 		$now = current_time( 'mysql', true );
@@ -201,7 +201,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		) );
 		update_option( 'dealz_db_version', '1.1.0' );
 
-		\DealZ\\Database\\Schema::maybe_upgrade();
+		\DealZ\Database\Schema::maybe_upgrade();
 
 		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
 		$preserved = $wpdb->get_row( $wpdb->prepare(
