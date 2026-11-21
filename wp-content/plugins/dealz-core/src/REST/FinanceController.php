@@ -568,13 +568,16 @@ final class FinanceController {
 			return new \WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phải là ISO-8601 và có múi giờ rõ ràng.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
-		try {
-			$date = new \DateTimeImmutable( $value );
-		} catch ( \Exception $exception ) {
-			return new \WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phát sinh không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
+		$has_seconds = (bool) preg_match( '/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/', $value );
+		$format       = $has_seconds ? '!Y-m-d\\TH:i:sP' : '!Y-m-d\\TH:iP';
+		$date         = \\DateTimeImmutable::createFromFormat( $format, $value );
+		$errors       = \\DateTimeImmutable::getLastErrors();
+
+		if ( ! $date || ( is_array( $errors ) && ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) ) ) {
+			return new \\WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phát sinh không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
-		return $date->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
+		return $date->setTimezone( new \\DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
 	}
 
 	/**
