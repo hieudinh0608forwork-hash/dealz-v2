@@ -97,7 +97,7 @@ Trip is not Order. Order is not Booking. A Trip may contain multiple independent
 - No status transition without a recorded event.
 - Foreign key/index strategy must be verified against selected MySQL version.
 
-## 10. Initial physical MVP schema (implemented as migration v1.0.0)
+## 10. Initial physical MVP schema (implemented as migration v1.1.0)
 
 The additive WordPress `dbDelta` schema is implemented in `wp-content/plugins/dealz-core/src/Database/Schema.php`. It creates these prefixed tables:
 
@@ -107,7 +107,8 @@ The additive WordPress `dbDelta` schema is implemented in `wp-content/plugins/de
 | `dealz_trip_collaborators` | Trip invitation and role records (not yet exposed through API) |
 | `dealz_itineraries` | Versioned manual/AI itinerary containers |
 | `dealz_itinerary_days` | Local-date itinerary days |
-| `dealz_itinerary_items` | Ordered stop snapshots and optional coordinates |
+| `dealz_itinerary_items` | Ordered stop/meal snapshots, item type, archive state and optional coordinates |
+| `dealz_route_legs` | Provider-sourced route legs between itinerary items; nullable route metrics until calculated |
 | `dealz_budget_lines` | Estimated/quoted/confirmed/actual planning lines |
 | `dealz_expenses` | Actual trip expense records |
 
