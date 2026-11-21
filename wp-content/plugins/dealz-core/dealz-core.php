@@ -40,7 +40,7 @@ spl_autoload_register(
 register_activation_hook(
 	__FILE__,
 	static function () {
-		DealZ\\Core\\Capabilities::activate();
+		\DealZ\Core\Capabilities::activate();
 		update_option( 'dealz_core_version', DEALZ_CORE_VERSION, false );
 	}
 );
@@ -48,6 +48,6 @@ register_activation_hook(
 add_action(
 	'plugins_loaded',
 	static function () {
-		DealZ\\Core\\Plugin::instance()->init();
+		\DealZ\Core\Plugin::instance()->init();
 	}
 );
