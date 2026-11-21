@@ -59,10 +59,10 @@ As of 2026-11-22:
 - H0 Source intake: substantially complete for the available 2026-11-21 Master Handoff and 2026-11-20 Design Rules; source precedence is recorded in `docs/21_SOURCE_TRACEABILITY.md`.
 - H1 Product definition: baseline documented; screen-by-screen acceptance and final MVP vertical slice remain in progress.
 - H2 UX/design: design rules and screen inventory documented; detailed wireframes and responsive visual verification remain open.
-- H3 Technical blueprint: architecture, logical schema, initial physical schema v1.1.0, permission matrix and OpenAPI contracts for Trip/manual itinerary APIs exist; full commerce schema, remaining module contracts and final transaction state transitions remain open.
+- H3 Technical blueprint: architecture, logical schema, initial physical schema v1.2.0, permission matrix and OpenAPI contracts for Trip, itinerary and finance APIs exist; full commerce schema, remaining module contracts and final transaction state transitions remain open.
 - H4 Build handoff: contributor instructions, local Docker Compose definition, environment example, migration setup and test instructions exist; Docker environment and WordPress test runner have not been executed.
-- H5 Implementation: in progress; plugin/theme foundation, Trip CRUD, manual itinerary/day/stop APIs, deterministic time-overlap validation and initial responsive traveler/itinerary workspace committed. No runtime feature is verified.
-- H6 Verification: integration test cases are authored for Trip ownership, date validation and itinerary stop limits; tests and browser/runtime checks have not been executed. No successful CI result is recorded.
+- H5 Implementation: in progress; plugin/theme foundation, Trip CRUD, manual itinerary/day/stop APIs, deterministic time-overlap validation, budget/expense APIs and initial responsive traveler/itinerary workspace committed. No runtime feature is verified.
+- H6 Verification: integration test cases are authored for Trip, itinerary and finance ownership/validation; tests and browser/runtime checks have not been executed. No successful CI result is recorded.
 - H7 Release readiness: not started; no staging/production environment verified.
 
 Therefore the project handoff is **NOT complete**. A scaffold and documentation are not a working application.
