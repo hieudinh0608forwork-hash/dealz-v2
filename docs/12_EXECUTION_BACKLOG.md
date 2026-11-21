@@ -37,8 +37,8 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Audit, notifications, idempotency and webhook contracts.
 
 ## Phase 3 – Fresh WordPress foundation
-- [ ] Provision local environment.
-- [ ] Confirm WordPress/PHP/MySQL compatibility.
+- [x] Add Docker Compose definition for isolated local WordPress/MySQL; [ ] execute and verify environment.
+- [ ] Confirm WordPress/PHP/MySQL compatibility in a running environment.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
 - [x] Add additive v1.0.0 WordPress dbDelta migration for 7 trip-planning tables; [ ] add automated WordPress integration test runner.
