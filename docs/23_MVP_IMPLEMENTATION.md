@@ -16,6 +16,7 @@ The first implementation slice covers authenticated traveler trip records and ma
 - {prefix}dealz_itineraries
 - {prefix}dealz_itinerary_days
 - {prefix}dealz_itinerary_items
+- {prefix}dealz_route_legs
 - {prefix}dealz_budget_lines
 - {prefix}dealz_expenses
 
@@ -72,8 +73,8 @@ These checks must be performed after starting the compose environment and activa
 
 - [ ] Fresh WordPress install completes.
 - [ ] DealZ Core activates without PHP fatal errors.
-- [ ] Seven expected custom tables exist with the active WordPress prefix.
-- [ ] dealz_db_version equals 1.0.0 only after all tables exist.
+- [ ] Eight expected custom tables exist with the active WordPress prefix.
+- [ ] dealz_db_version equals 1.1.0 only after all tables and required item columns exist.
 - [ ] Health route returns 200 and application_ready: false.
 - [ ] Anonymous Trip API requests are rejected.
 - [ ] Authenticated user A can create, list, read, update and archive their trip.
@@ -88,9 +89,9 @@ These checks must be performed after starting the compose environment and activa
 - No automated WordPress integration test runner yet.
 - No verified successful CI run is recorded yet.
 - No runtime test has been performed because Docker is unavailable in the current execution environment.
-- Initial responsive traveler home and trip dashboard screen is implemented in the theme and connected to Trip list/create API; visual/runtime behavior has not been verified.
-- Manual itinerary/day/stop APIs are implemented; route calculation, maps provider, AI, service marketplace, partner portal, booking and payment are not implemented.
-- Collaborator, itinerary, budget and expense tables are currently unused foundations.
+- Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs; browser/runtime behavior has not been verified.
+- Manual itinerary/day/stop APIs and initial workspace UI are implemented; full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
+- Collaborator, route-leg, budget and expense tables are currently unused foundations; itinerary/day/item tables are used by the manual planner APIs.
 - No production hosting or deployment is configured.
 
 ## 5. Next build sequence
@@ -100,5 +101,5 @@ These checks must be performed after starting the compose environment and activa
 3. Add itinerary/day/stop CRUD with owner checks and versioning.
 4. Add deterministic itinerary schedule validation and reorder.
 5. Add budget line and expense APIs with server-side calculations.
-6. Implement the approved itinerary UI and responsive states.
+6. Complete the approved itinerary UI and responsive states, including 16:10 stop media and route connectors when verified route data exists.
 7. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
