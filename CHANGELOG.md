@@ -8,7 +8,7 @@
 - Expanded product/architecture/data/API/business requirements to reflect the full-scope Master Handoff while preserving the 20/11 UI restrictions.
 - Created initial GitHub issues for environment audit, UX handoff, contract freeze and WordPress foundation.
 - Confirmed repository is Public, default branch `main`, and connected account has admin/push permissions.
-- No application code, WordPress environment, runtime test or production deployment has been completed or verified.
+- At that checkpoint, no application code, WordPress environment, runtime test or production deployment had been completed or verified.
 
 - Started implementation: added DealZ Core plugin bootstrap, namespace autoloader, administrator capability bootstrap, non-sensitive health endpoint, non-destructive uninstall handler, and initial custom theme shell.
 - Added PHP syntax GitHub Actions workflow. Workflow result has not yet been observed; do not treat it as a passing test.
