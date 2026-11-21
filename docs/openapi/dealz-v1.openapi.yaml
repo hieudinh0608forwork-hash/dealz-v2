@@ -1,0 +1,261 @@
+openapi: 3.1.0
+info:
+  title: DealZ V2 API
+  version: 0.1.0
+  description: Initial executable contract for the scaffold health check and traveler-owned trip CRUD. This is not a contract for unimplemented marketplace, AI, routing or payment modules.
+servers:
+  - url: /wp-json/dealz/v1
+security:
+  - wordpressCookie: []
+    wordpressNonce: []
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      security: []
+      summary: Check DealZ Core scaffold status
+      responses:
+        '200':
+          description: Scaffold status (not application readiness)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /trips:
+    get:
+      operationId: listMyTrips
+      summary: List trips owned by the authenticated traveler
+      responses:
+        '200':
+          description: Trips belonging to current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trip'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createTrip
+      summary: Create a private draft trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripCreate'
+      responses:
+        '201':
+          description: Created trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /trips/{public_id}:
+    parameters:
+      - name: public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getTrip
+      summary: Get a trip owned by current user
+      responses:
+        '200':
+          description: Trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      operationId: updateTrip
+      summary: Update editable fields of an owned trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripUpdate'
+      responses:
+        '200':
+          description: Updated trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      operationId: archiveTrip
+      summary: Archive an owned trip without deleting its data
+      responses:
+        '200':
+          description: Archived trip
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [public_id, status]
+                properties:
+                  public_id:
+                    type: string
+                    format: uuid
+                  status:
+                    const: archived
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    wordpressCookie:
+      type: apiKey
+      in: cookie
+      name: wordpress_logged_in
+      description: WordPress logged-in cookie; same-origin REST cookie authentication.
+    wordpressNonce:
+      type: apiKey
+      in: header
+      name: X-WP-Nonce
+      description: WordPress REST nonce required for cookie-authenticated writes.
+  schemas:
+    Health:
+      type: object
+      required: [service, status, application_ready, message]
+      properties:
+        service:
+          const: dealz-core
+        status:
+          const: scaffolded
+        application_ready:
+          const: false
+        message:
+          type: string
+    Trip:
+      type: object
+      required: [public_id, title, origin_text, destination_name, destination_timezone, traveler_count, currency, status, created_at, updated_at]
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 190
+        origin_text:
+          type: string
+        destination_name:
+          type: string
+        start_date:
+          type: [string, 'null']
+          format: date
+        end_date:
+          type: [string, 'null']
+          format: date
+        destination_timezone:
+          type: string
+          default: Asia/Ho_Chi_Minh
+        traveler_count:
+          type: integer
+          minimum: 1
+          maximum: 50
+        budget_amount_minor:
+          type: [integer, 'null']
+          minimum: 0
+          description: Integer minor units; VND is stored in đồng, not floating point.
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TripCreate:
+      type: object
+      required: [title]
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 190
+        origin_text:
+          type: string
+          maxLength: 255
+        destination_name:
+          type: string
+          maxLength: 255
+        start_date:
+          type: [string, 'null']
+          format: date
+        end_date:
+          type: [string, 'null']
+          format: date
+        destination_timezone:
+          type: string
+          default: Asia/Ho_Chi_Minh
+        traveler_count:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 1
+        budget_amount_minor:
+          type: [integer, 'null']
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Za-z]{3}$'
+          default: VND
+    TripUpdate:
+      allOf:
+        - $ref: '#/components/schemas/TripCreate'
+      description: At least one editable field must be provided. Fields omitted remain unchanged.
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Trip not found or not owned by current user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
