@@ -325,6 +325,7 @@ components:
           type: string
         destination_name:
           type: string
+          maxLength: 190
         start_date:
           type: [string, 'null']
           format: date
