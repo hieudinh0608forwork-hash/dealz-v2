@@ -8,6 +8,9 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [x] Create initial Knowledge Pack.
 - [x] Import and apply DealZ design rules dated 20/11/2026.
 - [x] Retrieve Master Handoff dated 21/11/2026 from Library.
+- [x] Expand product scope and requirements from Master Handoff.
+- [x] Add permission, AI, maps/routing, budget/finance, screen inventory, agent workflow and environment audit specifications.
+- [x] Add evidence-based handoff completion gates.
 - [ ] Inventory supplied theme ZIP, if re-supplied; inspect as reference only.
 - [ ] Audit hosting/domain/WordPress/PHP/MySQL/SSL/backup/cron/SMTP/build support.
 - [ ] Inventory current supplier data and proof of availability/pricing.
@@ -16,7 +19,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 ## Phase 1 – Product and UX handoff
 - [x] Define product roles and broad full-scope direction from Master Handoff.
 - [x] Apply itinerary card and visual rules.
-- [ ] Complete sitemap and screen inventory.
+- [x] Create initial screen inventory; [ ] complete sitemap and screen-by-screen wireframes.
 - [ ] Complete traveler, partner and operations user journeys.
 - [ ] Wireframe every MVP screen and all states.
 - [ ] Define component inventory and design QA checklist.
