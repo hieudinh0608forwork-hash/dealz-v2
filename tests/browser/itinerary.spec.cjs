@@ -105,13 +105,13 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await addStop(page, 'Điểm A', 'Cầu Rồng, Đà Nẵng');
   await addStop(page, 'Điểm B', 'Phố cổ Hội An');
   await expect(page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-directions')).toHaveAttribute('href', /google\.com\/maps\/dir/);
-  await expect(page.locator('.route-connector').first()).toContainText('Chưa có dữ liệu tuyến đường');
+  await expect(page.locator('.route-connector').first()).toContainText('Chưa có đủ dữ liệu tuyến đường');
   await expect(page.locator('.route-connector__number, .route-connector__badge, .route-number')).toHaveCount(0);
 
   const cards = page.locator('.itinerary-item-card--stop');
   await expect(cards).toHaveCount(2);
   await cards.nth(1).getByRole('button', { name: 'Di chuyển lên' }).click();
-  await expect(cards.nth(0).locator('h4')).toHaveText('Điểm B');
+  await expect(cards.nth(0).locator('h3')).toHaveText('Điểm B');
   await expect(cards.nth(1).locator('h4')).toHaveText('Điểm A');
 
   const firstCard = cards.nth(0);
@@ -141,8 +141,10 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await expect(page).toHaveURL(/#trip\//);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
 
-  page.once('dialog', dialog => dialog.accept());
-  await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.text-action--danger').click();
+  await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-archive-action').click();
+  const archiveDialog = page.locator('.archive-dialog');
+  await expect(archiveDialog).toBeVisible();
+  await archiveDialog.getByRole('button', { name: 'Lưu trữ' }).click();
   await expect(page.locator('.itinerary-item-card--stop')).toHaveCount(1);
   await expect(page.locator('.itinerary-item-card--stop')).not.toContainText('Điểm A');
   await addStop(page, 'Điểm chưa có địa chỉ', '');
@@ -288,4 +290,30 @@ test('styleguide is not accessible without administrator capability', async ({ p
   const response = await page.goto(BASE_URL + '/styleguide/');
   expect(response.status()).toBe(404);
   await expect(page.getByRole('heading', { name: 'Không tìm thấy trang', level: 1 })).toBeVisible();
+});
+
+
+test('journey badge counts only unarchived main stops across the selected trip', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await createTripAndDay(page, 'QA badge DealZ');
+  const badge = page.locator('#mobile-trip-badge');
+  await addStop(page, 'Điểm badge 1', '');
+  await addStop(page, 'Điểm badge 2', '');
+  await expect(badge).toHaveText('2');
+  await expect(badge).toHaveAttribute('aria-label', '2 điểm dừng chưa lưu trữ');
+  await page.locator('#item-title').fill('Bữa trưa không tính vào badge');
+  await page.locator('#item-type').selectOption('lunch');
+  await page.locator('#item-start').fill('12:00');
+  await page.locator('#item-duration').fill('60');
+  await page.locator('#create-item-submit').click();
+  await expect(page.locator('.itinerary-item-card--meal')).toHaveCount(1);
+  await expect(badge).toHaveText('2');
+  await addStop(page, 'Điểm badge 3', '');
+  await addStop(page, 'Điểm badge 4', '');
+  await expect(badge).toHaveText('4');
+  await expect(page.locator('#item-type option[value="stop"]')).toBeDisabled();
+  const archive = page.locator('.itinerary-item-card--stop').first().locator('.item-archive-action');
+  await archive.click();
+  await page.locator('.archive-dialog').getByRole('button', { name: 'Lưu trữ' }).click();
+  await expect(badge).toHaveText('3');
 });

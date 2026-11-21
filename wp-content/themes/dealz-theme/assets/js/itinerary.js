@@ -32,6 +32,7 @@
 	let activeItinerary = null;
 	let activeDay = null;
 	let activeDayNumber = null;
+	let activeDays = [];
 	let requestSequence = 0;
 
 	const baseUrl = String(config.restUrl || '').replace(/\/?$/, '/');
@@ -91,8 +92,41 @@
 		if (createTripPanel) createTripPanel.hidden = false;
 		activeTrip = null;
 		activeTripData = null;
+		activeDays = [];
+		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
+	}
+
+	function updateBadgeDisplay(count) {
+		const badge = document.getElementById('mobile-trip-badge');
+		if (!badge) return;
+		const safeCount = Number.isFinite(count) ? Math.max(0, count) : 0;
+		badge.textContent = String(safeCount);
+		badge.hidden = safeCount === 0;
+		badge.setAttribute('aria-label', safeCount + ' điểm dừng chưa lưu trữ');
+	}
+
+	async function updateTripStopBadge(days) {
+		if (!activeTrip || !Array.isArray(days) || days.length === 0) {
+			updateBadgeDisplay(0);
+			return;
+		}
+		try {
+			const itemLists = await Promise.all(days.map(function (day) {
+				return api('days/' + encodeURIComponent(day.public_id) + '/items');
+			}));
+			let count = 0;
+			itemLists.forEach(function (items) {
+				if (!Array.isArray(items)) return;
+				count += items.filter(function (item) {
+					return item.item_type === 'stop' && item.status !== 'archived';
+				}).length;
+			});
+			updateBadgeDisplay(count);
+		} catch (error) {
+			// Keep the last confirmed count; a transient read failure must not invent a new count.
+		}
 	}
 
 	function formatDate(value) {
@@ -127,6 +161,8 @@
 		editor.hidden = true;
 		itemsPanel.hidden = true;
 		activeTrip = publicId;
+		activeDays = [];
+		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
 
@@ -163,6 +199,11 @@
 			const itineraries = await api('trips/' + encodeURIComponent(activeTrip) + '/itineraries');
 			versionsList.replaceChildren();
 
+			const createItineraryButton = document.getElementById('create-itinerary-btn');
+			if (createItineraryButton) {
+				createItineraryButton.classList.toggle('button--primary', !Array.isArray(itineraries) || itineraries.length === 0);
+				createItineraryButton.classList.toggle('button--secondary', Array.isArray(itineraries) && itineraries.length > 0);
+			}
 			if (!Array.isArray(itineraries) || itineraries.length === 0) {
 				versionsList.append(makeEmpty('Chưa có lịch trình. Tạo một bản thủ công để thêm ngày và điểm dừng.'));
 				editor.hidden = true;
@@ -193,6 +234,8 @@
 	async function selectItinerary(publicId) {
 		activeItinerary = publicId;
 		activeDay = null;
+		activeDays = [];
+		updateBadgeDisplay(0);
 		editor.hidden = false;
 		itemsPanel.hidden = true;
 		versionsList.querySelectorAll('.version-chip').forEach(function (button) {
@@ -208,6 +251,8 @@
 			if (itemFormPanel) itemFormPanel.hidden = true;
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
+			activeDays = Array.isArray(days) ? days : [];
+			await updateTripStopBadge(activeDays);
 			daysList.replaceChildren();
 
 			if (!Array.isArray(days) || days.length === 0) {
@@ -224,11 +269,16 @@
 				button.dataset.dayId = day.public_id;
 				button.setAttribute('aria-pressed', 'false');
 				button.addEventListener('click', function () {
-					selectDay(day.public_id, day.local_date);
+					selectDay(day.public_id, day.local_date, index + 1);
 				});
 				daysList.append(button);
 			});
 
+			const daySubmit = document.querySelector('#create-day-form button[type="submit"]');
+			if (daySubmit) {
+				daySubmit.classList.toggle('button--primary', days.length === 0);
+				daySubmit.classList.toggle('button--secondary', days.length > 0);
+			}
 			const target = days.find(function (day) { return day.public_id === preferredDayId; }) || days[0];
 			const targetIndex = days.findIndex(function (day) { return day.public_id === target.public_id; });
 			await selectDay(target.public_id, target.local_date, targetIndex + 1);
@@ -434,13 +484,11 @@
 		moveUp.className = 'button button--icon';
 		moveUp.textContent = '↑';
 		moveUp.setAttribute('aria-label', 'Di chuyển lên');
-		moveUp.setAttribute('aria-label', 'Di chuyển lên');
 		moveUp.disabled = itemIndex <= 0;
 		const moveDown = document.createElement('button');
 		moveDown.type = 'button';
 		moveDown.className = 'button button--icon';
 		moveDown.textContent = '↓';
-		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.disabled = itemIndex >= allItems.length - 1;
 
@@ -480,7 +528,9 @@
 				const params = new URLSearchParams({
 					stop: item.public_id,
 					name: item.title_snapshot,
-					return: window.location.hash
+					return: window.location.hash,
+					day: activeDayNumber ? 'Ngày ' + activeDayNumber : '',
+					time: item.start_local ? item.start_local.slice(0, 5) : ''
 				});
 				window.location.hash = 'shop?' + params.toString();
 			});
@@ -567,7 +617,8 @@
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
 			itemsList.replaceChildren();
 			if (stopAnchorList) stopAnchorList.replaceChildren();
-			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop'; }).length : 0;
+			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop' && item.status !== 'archived'; }).length : 0;
+			await updateTripStopBadge(activeDays);
 			const mainStopOption = document.querySelector('#item-type option[value="stop"]');
 			if (mainStopOption) {
 				mainStopOption.disabled = activeMainStops >= 4;
@@ -584,7 +635,7 @@
 				const empty = makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.');
 				const action = document.createElement('button');
 				action.type = 'button';
-				action.className = 'button button--primary button--compact';
+				action.className = 'button button--secondary button--compact';
 				action.textContent = 'Thêm nội dung đầu tiên';
 				action.addEventListener('click', function () {
 					itemForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1020,9 +1071,17 @@
 		const heading = document.getElementById('rental-workspace-title');
 		const context = document.getElementById('rental-stop-context');
 		const contextChip = document.getElementById('rental-context-chip');
+		const contextChip = document.getElementById('rental-context-chip');
 		const back = document.getElementById('rental-back-link');
 		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
 		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
+		if (contextChip) {
+			const contextParts = ['Từ hành trình'];
+			if (params.get('day')) contextParts.push(params.get('day'));
+			if (params.get('time')) contextParts.push(params.get('time'));
+			contextChip.textContent = contextParts.join(' · ');
+			contextChip.hidden = !params.get('stop');
+		}
 		if (contextChip) {
 			const contextParts = ['Từ hành trình'];
 			if (params.get('day')) contextParts.push(params.get('day'));
