@@ -424,7 +424,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .day-list { margin-top: 14px; }
 .itinerary-item-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
 .itinerary-item-card { min-width: 0; padding: 20px; border: 1px solid var(--dealz-border); border-radius: 22px; background: var(--dealz-white); }
-.itinerary-item-card--meal { border-color: var(--dealz-note-border); background: var(--dealz-white)BEA; }
+.itinerary-item-card--meal { border-color: var(--dealz-note-border); background: var(--dealz-note-bg); }
 .itinerary-item-card__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
 .item-type-chip { padding: 5px 10px; border-radius: 999px; background: var(--dealz-surface-green); color: var(--dealz-green); font-size: 11px; font-weight: 700; }
 .itinerary-item-card--meal .item-type-chip { background: var(--dealz-note-chip-bg); }
@@ -985,4 +985,95 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 	.feature-card--timeline, .feature-card--budget, .feature-card--maps, .feature-card--rental { grid-column: 1; min-height: 180px; }
 	.feature-card { padding: 22px 18px; border-radius: 22px; }
 	.feature-card--rental { flex-direction: column; align-items: flex-start; }
+}
+
+
+/* T5.2 itinerary rail, timeline, and T5.3 empty rental layout. */
+.workspace-heading h1 { margin: 0; font-family: var(--dealz-font-heading); font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -.03em; }
+.workspace-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; color: var(--dealz-muted); font-size: 14px; }
+.itinerary-layout { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px; align-items: start; }
+.itinerary-rail { position: sticky; top: calc(var(--wp-admin--admin-bar--height, 0px) + 96px); grid-column: 1; display: grid; gap: 18px; min-width: 0; align-self: start; }
+.itinerary-rail__days { padding: 18px; border: 1px solid var(--dealz-border); border-radius: 22px; background: var(--dealz-white); }
+.itinerary-rail__days h3 { margin: 0 0 12px; font-family: var(--dealz-font-heading); font-size: 22px; }
+.itinerary-rail .day-list { display: grid; gap: 6px; margin: 0; }
+.itinerary-rail .day-chip { width: 100%; min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 0; border-radius: 14px; background: transparent; text-align: left; font-size: 15px; }
+.itinerary-rail .day-chip[aria-pressed="true"] { background: var(--dealz-lime-50); color: var(--dealz-green); }
+.itinerary-rail .day-chip[aria-pressed="true"]::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dealz-lime); }
+.itinerary-rail .budget-summary { margin: 0; }
+.itinerary-rail__note { padding: 20px; }
+.itinerary-main { grid-column: 2; display: grid; gap: 20px; min-width: 0; }
+.itinerary-main > .workspace-panel { margin: 0; }
+.stop-anchor-list { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 12px; scroll-snap-type: x proximity; }
+.stop-anchor-chip { min-height: 40px; flex: 0 0 auto; padding: 8px 14px; border: 1px solid var(--dealz-border); border-radius: 999px; background: var(--dealz-white); color: var(--dealz-green); font-size: 14px; font-weight: 600; scroll-snap-align: start; }
+.itinerary-item-list { position: relative; display: flex; flex-direction: column; gap: 14px; padding-left: 28px; }
+.itinerary-item-list::before { content: ""; position: absolute; top: 0; bottom: 0; left: 5px; width: 2px; background: var(--dealz-green); opacity: .25; }
+.itinerary-item-card { position: relative; scroll-margin-top: 120px; }
+.itinerary-item-card::before { content: ""; position: absolute; top: 26px; left: -30px; width: 12px; height: 12px; border: 2px solid var(--dealz-green); border-radius: 50%; background: var(--dealz-lime); }
+.itinerary-item-card h3 { margin: 0; font-family: var(--dealz-font-heading); font-size: clamp(22px, 2vw, 28px); line-height: 1.2; }
+.itinerary-item-card__details { max-width: 68ch; font-size: 14px; line-height: 1.5; }
+.itinerary-item-card__photo-hint, .itinerary-item-card__gear-hint { padding: 10px 12px; border-radius: 12px; background: var(--dealz-lime-50); font-size: 14px; }
+.item-card-actions { flex-wrap: wrap; justify-content: flex-start; }
+.item-card-actions .item-move-controls { margin-left: auto; }
+.item-move-controls { display: flex; gap: 6px; }
+.item-move-controls .button--icon { width: 44px; min-width: 44px; }
+.item-move-controls button:disabled { background: var(--dealz-mint-100); color: var(--dealz-muted); cursor: not-allowed; }
+.item-rental-cta, .item-directions { min-height: 44px; }
+.item-edit-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.item-edit-field { display: grid; gap: 6px; min-width: 0; color: var(--dealz-label); font-size: 14px; font-weight: 600; }
+.item-edit-field input { height: 48px; font-size: 16px; }
+.item-edit-save { grid-column: 1 / -1; }
+.item-archive-action { color: var(--dealz-muted); }
+.archive-dialog { width: min(480px, calc(100% - 32px)); padding: 28px; border: 1px solid var(--dealz-border); border-radius: 22px; background: var(--dealz-white); color: var(--dealz-ink); box-shadow: var(--dealz-shadow); }
+.archive-dialog::backdrop { background: var(--dealz-ink); opacity: .45; }
+.archive-dialog h3 { margin-top: 0; font-family: var(--dealz-font-heading); font-size: 26px; }
+.archive-dialog p { color: var(--dealz-muted); line-height: 1.6; }
+.archive-dialog__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.route-connector { position: relative; min-height: 48px; display: flex; align-items: center; gap: 12px; padding-left: 0; margin-left: -23px; color: var(--dealz-muted); font-size: 14px; }
+.route-connector::before { content: ""; position: absolute; top: -10px; bottom: -10px; left: 5px; width: 2px; height: auto; background: var(--dealz-green); opacity: .25; }
+.route-connector__icon { z-index: 1; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--dealz-border); border-radius: 50%; background: var(--dealz-white); color: var(--dealz-green); }
+.item-form { scroll-margin-top: 110px; }
+.item-form h3 { grid-column: 1 / -1; margin: 0; font-family: var(--dealz-font-heading); font-size: 24px; }
+.item-form .button { min-height: 52px; }
+.rental-heading h1 { max-width: 16ch; text-wrap: balance; }
+.rental-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(280px, 5fr); gap: 24px; align-items: stretch; }
+.rental-empty-state { max-width: none; min-height: 100%; margin: 0; padding: 32px; border-radius: 28px; background: var(--dealz-mint-50); box-shadow: none; }
+.rental-empty-state__symbol { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 20px; }
+.rental-empty-state__symbol svg { width: 38px; height: 38px; }
+.rental-empty-state h2 { margin: 0 0 14px; font-family: var(--dealz-font-heading); font-size: clamp(26px, 3vw, 34px); }
+.rental-empty-state__back { margin-top: 16px; }
+.rental-note { padding: 28px; }
+.rental-note h2 { margin: 0 0 16px; font-family: var(--dealz-font-heading); font-size: 25px; }
+.rental-note li { margin-top: 12px; color: var(--dealz-muted); line-height: 1.6; }
+.rental-next-step { margin-top: 56px; }
+@media (max-width: 1099px) {
+	.itinerary-layout { grid-template-columns: 1fr; }
+	.itinerary-rail { position: static; grid-column: 1; grid-template-columns: 1fr 1fr; }
+	.itinerary-rail__days { grid-column: 1 / -1; }
+	.itinerary-main { grid-column: 1; }
+	.rental-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+	.itinerary-layout { display: flex; flex-direction: column; gap: 14px; }
+	.itinerary-rail, .itinerary-main { display: contents; }
+	.itinerary-rail__days { position: sticky; top: calc(64px + var(--wp-admin--admin-bar--height, 0px)); z-index: 12; order: 0; padding: 10px 12px; border-radius: 16px; }
+	.itinerary-rail__days h3 { display: none; }
+	.itinerary-rail .day-list { display: flex; overflow-x: auto; gap: 8px; scroll-snap-type: x mandatory; }
+	.itinerary-rail .day-chip { width: auto; min-width: 118px; min-height: 48px; justify-content: center; scroll-snap-align: start; }
+	.itinerary-main > #itinerary-editor { order: 1; }
+	.itinerary-main > #day-items-panel { order: 2; }
+	.itinerary-rail > #budget-summary { order: 3; }
+	.itinerary-main > #create-item-panel { order: 4; }
+	.itinerary-main > #finance-panel { order: 5; }
+	.itinerary-rail__note { order: 6; }
+	.itinerary-item-list { padding-left: 22px; }
+	.itinerary-item-card--stop { padding: 16px; }
+	.itinerary-item-card::before { left: -24px; }
+	.item-card-actions { align-items: stretch; }
+	.item-card-actions .item-move-controls { margin-left: 0; }
+	.item-edit-form { grid-template-columns: 1fr; }
+	.item-edit-save { width: 100%; }
+	.finance-grid { grid-template-columns: 1fr; }
+	.rental-layout { grid-template-columns: 1fr; gap: 16px; }
+	.rental-empty-state { padding: 28px 20px; }
+	.rental-note { padding: 22px 18px; }
 }

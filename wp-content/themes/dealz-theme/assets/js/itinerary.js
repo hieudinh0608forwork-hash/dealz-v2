@@ -13,6 +13,8 @@
 	const itemsList = document.getElementById('day-items-list');
 	const dayForm = document.getElementById('create-day-form');
 	const itemForm = document.getElementById('create-item-form');
+	const itemFormPanel = document.getElementById('create-item-panel');
+	const stopAnchorList = document.getElementById('stop-anchor-list');
 	const feedback = document.getElementById('workspace-feedback');
 	const financeFeedback = document.getElementById('finance-feedback');
 	const budgetSummary = document.getElementById('budget-summary');
@@ -29,6 +31,7 @@
 	let activeTripData = null;
 	let activeItinerary = null;
 	let activeDay = null;
+	let activeDayNumber = null;
 	let requestSequence = 0;
 
 	const baseUrl = String(config.restUrl || '').replace(/\/?$/, '/');
@@ -202,6 +205,7 @@
 		if (!activeItinerary) return;
 		daysList.replaceChildren(makeEmpty('Đang tải ngày…'));
 		itemsPanel.hidden = true;
+			if (itemFormPanel) itemFormPanel.hidden = true;
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
 			daysList.replaceChildren();
@@ -216,6 +220,7 @@
 				button.type = 'button';
 				button.className = 'day-chip';
 				button.textContent = 'Ngày ' + (index + 1) + ' · ' + formatDate(day.local_date);
+				button.setAttribute('aria-label', 'Chọn ngày ' + (index + 1) + ', ' + formatDate(day.local_date));
 				button.dataset.dayId = day.public_id;
 				button.setAttribute('aria-pressed', 'false');
 				button.addEventListener('click', function () {
@@ -225,15 +230,17 @@
 			});
 
 			const target = days.find(function (day) { return day.public_id === preferredDayId; }) || days[0];
-			await selectDay(target.public_id, target.local_date);
+			const targetIndex = days.findIndex(function (day) { return day.public_id === target.public_id; });
+			await selectDay(target.public_id, target.local_date, targetIndex + 1);
 		} catch (error) {
 			showFeedback(error.message, true);
 			daysList.replaceChildren(makeEmpty('Không tải được danh sách ngày.'));
 		}
 	}
 
-	async function selectDay(publicId, date) {
+	async function selectDay(publicId, date, dayNumber) {
 		activeDay = publicId;
+		activeDayNumber = dayNumber || null;
 		const validationResults = document.getElementById('validation-results');
 		if (validationResults) { validationResults.hidden = true; validationResults.classList.remove('validation-results--error'); }
 		daysList.querySelectorAll('.day-chip').forEach(function (button) {
@@ -241,6 +248,7 @@
 		});
 		document.getElementById('day-items-title').textContent = 'Điểm dừng · ' + formatDate(date);
 		itemsPanel.hidden = false;
+		if (itemFormPanel) itemFormPanel.hidden = false;
 		await loadItems();
 	}
 
@@ -296,15 +304,16 @@
 		const isMainStop = item.item_type === 'stop';
 		const card = document.createElement('article');
 		card.className = 'itinerary-item-card ' + (isMainStop ? 'itinerary-item-card--stop' : 'itinerary-item-card--meal');
+		card.id = 'itinerary-item-' + item.public_id;
 
 		if (isMainStop) {
 			const media = document.createElement('div');
 			media.className = 'itinerary-item-card__media';
 			media.setAttribute('role', 'img');
-			media.setAttribute('aria-label', 'Chưa có ảnh địa điểm được xác minh');
+			media.setAttribute('aria-label', 'Chưa có ảnh đã xác minh cho ' + item.title_snapshot);
 			const mediaLabel = document.createElement('span');
 			mediaLabel.className = 'itinerary-item-card__media-label';
-			mediaLabel.textContent = 'Chưa có ảnh địa điểm được xác minh';
+			mediaLabel.textContent = item.title_snapshot + ' · Chưa có ảnh đã xác minh';
 			media.append(mediaLabel);
 			card.append(media);
 		}
@@ -318,10 +327,10 @@
 		time.className = 'item-time';
 		time.textContent = item.start_local
 			? item.start_local.slice(0, 5) + (item.end_local ? ' – ' + item.end_local.slice(0, 5) : '')
-			: 'Chưa có giờ';
+			: 'Chưa đặt giờ';
 		top.append(type, time);
 
-		const title = document.createElement('h4');
+		const title = document.createElement('h3');
 		title.textContent = item.title_snapshot;
 		const details = document.createElement('p');
 		details.className = 'itinerary-item-card__details';
@@ -331,10 +340,10 @@
 		details.textContent = detailParts.length ? detailParts.join(' · ') : 'Chưa có thời lượng hoặc địa chỉ.';
 		const photoHint = document.createElement('p');
 		photoHint.className = 'itinerary-item-card__photo-hint';
-		photoHint.textContent = 'Gợi ý góc chụp chung: ưu tiên toàn cảnh, ánh sáng tự nhiên và giữ địa danh làm điểm nhấn.';
+		photoHint.textContent = 'Góc chụp · Gợi ý chung: ưu tiên toàn cảnh, ánh sáng tự nhiên và giữ chủ thể chính rõ ràng.';
 		const gearHint = document.createElement('p');
 		gearHint.className = 'itinerary-item-card__gear-hint';
-		gearHint.textContent = 'Đồ gợi ý: chưa có dữ liệu sản phẩm được xác minh.';
+		gearHint.textContent = 'Đồ gợi ý · Chưa có dữ liệu sản phẩm được xác minh.';
 
 		const editDetails = document.createElement('details');
 		editDetails.className = 'item-edit-details';
@@ -409,13 +418,13 @@
 		moveControls.className = 'item-move-controls';
 		const moveUp = document.createElement('button');
 		moveUp.type = 'button';
-		moveUp.className = 'text-action';
+		moveUp.className = 'button button--icon';
 		moveUp.textContent = '↑';
 		moveUp.setAttribute('aria-label', 'Di chuyển lên');
 		moveUp.disabled = itemIndex <= 0;
 		const moveDown = document.createElement('button');
 		moveDown.type = 'button';
-		moveDown.className = 'text-action';
+		moveDown.className = 'button button--icon';
 		moveDown.textContent = '↓';
 		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.disabled = itemIndex >= allItems.length - 1;
@@ -447,7 +456,7 @@
 
 		if (isMainStop) {
 			const rental = document.createElement('a');
-			rental.className = 'button button--primary button--compact item-rental-cta';
+			rental.className = 'button button--tonal item-rental-cta';
 			rental.href = '#shop';
 			rental.textContent = 'Thuê đồ cho điểm này';
 			rental.setAttribute('aria-label', 'Mở mục thuê đồ cho ' + item.title_snapshot);
@@ -465,7 +474,7 @@
 
 		if (isMainStop && item.address_snapshot) {
 			const directions = document.createElement('a');
-			directions.className = 'text-action item-directions';
+			directions.className = 'button button--tertiary item-directions';
 			directions.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(item.address_snapshot);
 			directions.target = '_blank';
 			directions.rel = 'noopener noreferrer';
@@ -522,6 +531,7 @@
 		try {
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
 			itemsList.replaceChildren();
+			if (stopAnchorList) stopAnchorList.replaceChildren();
 			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop'; }).length : 0;
 			const mainStopOption = document.querySelector('#item-type option[value="stop"]');
 			if (mainStopOption) {
@@ -555,7 +565,18 @@
 				if (item.item_type === 'stop' && previousMainStop) {
 					itemsList.append(makeRoutePlaceholder());
 				}
-				itemsList.append(makeItemCard(item, index, items));
+				const card = makeItemCard(item, index, items);
+				itemsList.append(card);
+				if (stopAnchorList && item.item_type === 'stop') {
+					const anchor = document.createElement('button');
+					anchor.type = 'button';
+					anchor.className = 'stop-anchor-chip';
+					anchor.textContent = item.title_snapshot;
+					anchor.addEventListener('click', function () {
+						card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					});
+					stopAnchorList.append(anchor);
+				}
 				if (item.item_type === 'stop') previousMainStop = true;
 			});
 		} catch (error) {
@@ -963,9 +984,17 @@
 		const stopName = params.get('name') || 'điểm dừng đã chọn';
 		const heading = document.getElementById('rental-workspace-title');
 		const context = document.getElementById('rental-stop-context');
+		const contextChip = document.getElementById('rental-context-chip');
 		const back = document.getElementById('rental-back-link');
 		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
 		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
+		if (contextChip) {
+			const contextParts = ['Từ hành trình'];
+			if (params.get('day')) contextParts.push(params.get('day'));
+			if (params.get('time')) contextParts.push(params.get('time'));
+			contextChip.textContent = contextParts.join(' · ');
+			contextChip.hidden = !params.has('stop');
+		}
 		if (back) {
 			const returnTarget = params.get('return') || '#trips';
 			back.href = returnTarget;

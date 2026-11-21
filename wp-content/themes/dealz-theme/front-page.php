@@ -96,7 +96,8 @@ get_header();
 				</div>
 				<div class="workspace-heading">
 					<p class="eyebrow"><?php esc_html_e( 'Chuyến đi đang chọn', 'dealz-theme' ); ?></p>
-					<h2 id="itinerary-workspace-title"><?php esc_html_e( 'Đang tải chuyến đi…', 'dealz-theme' ); ?></h2>
+					<h1 id="itinerary-workspace-title"><?php esc_html_e( 'Đang tải chuyến đi…', 'dealz-theme' ); ?></h1>
+					<div id="itinerary-workspace-meta" class="workspace-meta" hidden></div>
 				</div>
 				<div id="pilot-warning" class="notice pilot-warning" role="status" hidden><?php esc_html_e( 'Điểm đến này nằm ngoài khu thí điểm Đà Nẵng – Hội An. Thông tin dịch vụ và tuyến đường có thể chưa được xác minh.', 'dealz-theme' ); ?></div>
 				<div id="workspace-feedback" class="notice" role="status" aria-live="polite" hidden></div>
@@ -112,11 +113,21 @@ get_header();
 					<div id="itinerary-versions" class="version-list" aria-live="polite"></div>
 				</section>
 
+				<div class="itinerary-layout">
+					<aside class="itinerary-rail" aria-label="Tóm tắt hành trình">
+						<section class="itinerary-rail__days" aria-labelledby="days-title">
+							<h3 id="days-title">Ngày trong chuyến đi</h3>
+							<div id="itinerary-days" class="day-list" aria-live="polite"></div>
+						</section>
+						<div id="budget-summary" class="budget-summary" aria-live="polite"></div>
+						<section class="itinerary-rail__note dz-card dz-card--note"><p class="eyebrow">Gợi ý chung</p><p>Gợi ý tại đây chưa dựa trên dữ liệu điểm dừng cụ thể.</p></section>
+					</aside>
+					<div class="itinerary-main">
 				<section id="itinerary-editor" class="workspace-panel" hidden aria-labelledby="days-title">
 					<div class="workspace-panel__heading">
 						<div>
 							<p class="eyebrow"><?php esc_html_e( 'Sắp xếp theo ngày', 'dealz-theme' ); ?></p>
-							<h3 id="days-title"><?php esc_html_e( 'Các ngày trong chuyến đi', 'dealz-theme' ); ?></h3>
+							<h3 id="add-day-title"><?php esc_html_e( 'Thêm ngày vào lịch trình', 'dealz-theme' ); ?></h3>
 						</div>
 					</div>
 					<form id="create-day-form" class="inline-form">
@@ -126,7 +137,6 @@ get_header();
 						</div>
 						<button class="button button--primary button--compact" type="submit"><?php esc_html_e( 'Thêm ngày', 'dealz-theme' ); ?></button>
 					</form>
-					<div id="itinerary-days" class="day-list" aria-live="polite"></div>
 				</section>
 
 				<section id="day-items-panel" class="workspace-panel" hidden aria-labelledby="day-items-title">
@@ -140,9 +150,13 @@ get_header();
 						<button class="button button--secondary" type="button" id="validate-day-btn"><?php esc_html_e( 'Kiểm tra khung giờ', 'dealz-theme' ); ?></button>
 						<div id="validation-results" class="validation-results" role="status" aria-live="polite" hidden></div>
 					</div>
+					<div id="stop-anchor-list" class="stop-anchor-list" aria-label="Điểm dừng trong ngày"></div>
 					<div id="day-items-list" class="itinerary-item-list" aria-live="polite"></div>
+				</section>
+
+				<section id="create-item-panel" class="workspace-panel" hidden aria-labelledby="create-item-title">
 					<form id="create-item-form" class="item-form">
-						<h4><?php esc_html_e( 'Thêm điểm dừng hoặc bữa ăn', 'dealz-theme' ); ?></h4>
+						<h3 id="create-item-title"><?php esc_html_e( 'Thêm điểm dừng hoặc bữa ăn', 'dealz-theme' ); ?></h3>
 						<div class="form-field">
 							<label for="item-title"><?php esc_html_e( 'Tên địa điểm / hoạt động', 'dealz-theme' ); ?></label>
 							<input id="item-title" name="title_snapshot" type="text" maxlength="190" required placeholder="<?php esc_attr_e( 'Nhập tên điểm dừng', 'dealz-theme' ); ?>">
@@ -186,7 +200,6 @@ get_header();
 						<span class="workspace-label"><?php esc_html_e( 'Đơn vị tiền tệ theo từng khoản', 'dealz-theme' ); ?></span>
 					</div>
 					<div id="finance-feedback" class="notice" role="status" aria-live="polite" hidden></div>
-					<div id="budget-summary" class="budget-summary" aria-live="polite"></div>
 					<div class="finance-grid">
 						<section class="finance-card" aria-labelledby="budget-lines-title">
 							<div class="finance-card__heading">
@@ -270,6 +283,8 @@ get_header();
 						</section>
 					</div>
 				</section>
+				</div>
+				</div>
 			</section>
 
 			<div class="create-trip-panel" id="create-trip">
@@ -342,18 +357,30 @@ get_header();
 			<a id="rental-back-link" class="text-link" href="#trips"><?php esc_html_e( '← Quay lại điểm dừng', 'dealz-theme' ); ?></a>
 			<span class="workspace-label"><?php esc_html_e( 'Khám phá đồ thuê', 'dealz-theme' ); ?></span>
 		</div>
-		<div class="workspace-heading">
-			<p class="eyebrow"><?php esc_html_e( 'Theo điểm dừng trong hành trình', 'dealz-theme' ); ?></p>
-			<h2 id="rental-workspace-title"><?php esc_html_e( 'Thuê đồ cho điểm dừng', 'dealz-theme' ); ?></h2>
+		<div class="workspace-heading rental-heading">
+			<span id="rental-context-chip" class="dz-chip" hidden></span>
+			<p class="eyebrow"><?php esc_html_e( 'Thuê đồ theo điểm dừng', 'dealz-theme' ); ?></p>
+			<h1 id="rental-workspace-title"><?php esc_html_e( 'Thuê đồ cho điểm dừng', 'dealz-theme' ); ?></h1>
 			<p id="rental-stop-context"></p>
 		</div>
-		<div class="rental-empty-state" role="status" aria-live="polite">
-			<div class="rental-empty-state__symbol" aria-hidden="true">⌁</div>
-			<h3><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h3>
-			<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
-			<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
-			<a class="button button--primary button--compact rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại hành trình', 'dealz-theme' ); ?></a>
+		<div class="rental-layout">
+			<div class="rental-empty-state" role="status" aria-live="polite">
+				<div class="rental-empty-state__symbol" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M15 14a17 17 0 0 0 34 0M32 31l-18 22h36L32 31Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+				<h2><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h2>
+				<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
+				<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
+				<a class="button button--primary rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại điểm dừng', 'dealz-theme' ); ?></a>
+			</div>
+			<aside class="rental-note dz-card dz-card--note">
+				<p class="eyebrow"><?php esc_html_e( 'Gợi ý chung', 'dealz-theme' ); ?></p>
+				<h2><?php esc_html_e( 'Gợi ý chung khi chụp ảnh', 'dealz-theme' ); ?></h2>
+				<ul><li><?php esc_html_e( 'Ưu tiên ánh sáng tự nhiên và tránh ngược sáng gắt.', 'dealz-theme' ); ?></li><li><?php esc_html_e( 'Chọn màu trang phục có độ tương phản vừa đủ với nền.', 'dealz-theme' ); ?></li><li><?php esc_html_e( 'Ưu tiên trang phục thoải mái khi di chuyển bằng xe máy.', 'dealz-theme' ); ?></li></ul>
+				<p class="styleguide-help"><?php esc_html_e( 'Gợi ý chung, chưa dựa trên dữ liệu điểm dừng.', 'dealz-theme' ); ?></p>
+				<?php $zalo_url = dealz_sanitize_zalo_url( get_option( 'dealz_zalo_url', '' ) ); ?>
+				<?php if ( $zalo_url ) : ?><a class="button button--tertiary" href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nhắn Zalo để được báo khi có shop', 'dealz-theme' ); ?> →</a><?php endif; ?>
+			</aside>
 		</div>
+		<section class="next-step-section rental-next-step"><div class="next-step-card"><div><p class="eyebrow"><?php esc_html_e( 'Tiếp theo', 'dealz-theme' ); ?></p><h2><?php esc_html_e( 'Xem toàn bộ hành trình.', 'dealz-theme' ); ?></h2></div><a class="button button--tertiary" href="#trips"><?php esc_html_e( 'Xem toàn bộ hành trình', 'dealz-theme' ); ?> →</a></div></section>
 	</section>
 </main>
 <?php
