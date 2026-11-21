@@ -1,0 +1,16 @@
+/*
+Theme Name: DealZ Theme
+Theme URI: https://github.com/hieudinh0608forwork-hash/dealz-v2
+Author: DealZ Project
+Description: Custom presentation theme for DealZ V2.
+Version: 0.1.0
+Requires at least: 6.5
+Requires PHP: 8.1
+Text Domain: dealz-theme
+*/
+
+/*
+ * Local WOFF2 font assets are a required handoff dependency.
+ * Do not load remote font services. Add @font-face declarations only after
+ * the licensed Bricolage Grotesque and Be Vietnam Pro files are supplied.
+ */
