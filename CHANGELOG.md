@@ -4,6 +4,8 @@
 - Initialized the DealZ V2 project knowledge pack in the new `dealz-v2` repository.
 - Added authoritative design rules from the 2026-11-20 handoff and aligned UX/design system documents.
 - Retrieved the 2026-11-21 Master Handoff from the user's Library and aligned product, architecture, data, API, business rules and backlog.
-- Added handoff completion gates, permission matrix, AI planner, maps/routing, budget/finance, screen inventory, agent workflow and environment audit specifications.
+- Added handoff completion gates, permission matrix, AI planner, maps/routing, budget/finance, screen inventory, agent workflow, environment audit, source traceability and four compact agent prompts.
+- Expanded product/architecture/data/API/business requirements to reflect the full-scope Master Handoff while preserving the 20/11 UI restrictions.
+- Created initial GitHub issues for environment audit, UX handoff, contract freeze and WordPress foundation.
 - Confirmed repository is Public, default branch `main`, and connected account has admin/push permissions.
 - No application code, WordPress environment, runtime test or production deployment has been completed or verified.
