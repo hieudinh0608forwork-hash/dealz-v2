@@ -87,6 +87,16 @@ final class ItineraryController {
 
 		register_rest_route(
 			'dealz/v1',
+			'/days/(?P<public_id>' . $uuid . ')/reorder',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'reorder_items' ),
+				'permission_callback' => array( $this, 'is_authenticated' ),
+			)
+		);
+
+		register_rest_route(
+			'dealz/v1',
 			'/days/(?P<public_id>' . $uuid . ')/items',
 			array(
 				array(
@@ -261,6 +271,43 @@ final class ItineraryController {
 			$validator->validate( $this->repository->list_items( (int) $day->id ) ),
 			200
 		);
+	}
+
+	/**
+	 * Reorder all active items in an owned day.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function reorder_items( \WP_REST_Request $request ) {
+		$day = $this->repository->find_day_owned( (string) $request['public_id'], get_current_user_id() );
+
+		if ( ! $day ) {
+			return $this->not_found();
+		}
+
+		$public_ids = $request->get_param( 'item_public_ids' );
+		if ( ! is_array( $public_ids ) || count( $public_ids ) > 100 ) {
+			return new \WP_Error( 'dealz_invalid_item_order', __( 'Danh sách thứ tự điểm dừng không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
+		}
+
+		$normalized_ids = array();
+		foreach ( $public_ids as $public_id ) {
+			if ( ! is_string( $public_id ) || ! preg_match( '/^[a-fA-F0-9-]{36}$/', $public_id ) ) {
+				return new \WP_Error( 'dealz_invalid_item_order', __( 'Mã điểm dừng trong danh sách không hợp lệ.', 'dealz-core' ), array( 'status' => 400 ) );
+			}
+			$normalized_ids[] = strtolower( $public_id );
+		}
+
+		if ( count( $normalized_ids ) !== count( array_unique( $normalized_ids ) ) ) {
+			return new \WP_Error( 'dealz_duplicate_item_order', __( 'Danh sách không được chứa điểm dừng trùng lặp.', 'dealz-core' ), array( 'status' => 400 ) );
+		}
+
+		if ( ! $this->repository->reorder_items( (int) $day->id, $normalized_ids ) ) {
+			return new \WP_Error( 'dealz_item_order_conflict', __( 'Danh sách không khớp với các điểm dừng đang hoạt động trong ngày.', 'dealz-core' ), array( 'status' => 409 ) );
+		}
+
+		return new \WP_REST_Response( $this->repository->list_items( (int) $day->id ), 200 );
 	}
 
 	/**
