@@ -99,7 +99,7 @@ if ( ! defined( 'ABSPATH' ) || ! current_user_can( 'manage_options' ) ) {
 		<div class="styleguide-demo-stack">
 			<div class="dz-toast" role="status" aria-live="polite"><strong>✓</strong><span>Đã lưu thay đổi.</span></div>
 			<div class="dz-toast dz-toast--error" role="alert"><strong>!</strong><span>Không thể tải dữ liệu. Hãy thử lại.</span></div>
-			<div class="dz-skeleton" aria-busy="true" aria-label="Đang tải nội dung"></div>
+			<div class="dz-skeleton" role="status" aria-busy="true" aria-label="Đang tải nội dung"></div>
 			<div class="dz-empty-state"><div class="dz-empty-state__icon" aria-hidden="true">＋</div><h3>Chưa có điểm dừng</h3><p>Thêm điểm dừng đầu tiên để bắt đầu lịch trình.</p><span class="button button--secondary">Thêm điểm dừng</span></div>
 		</div>
 	</section>

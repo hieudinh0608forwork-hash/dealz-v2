@@ -269,6 +269,7 @@
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
 			activeDays = Array.isArray(days) ? days : [];
+			if (activeDays.length === 0) updateBadgeDisplay(0);
 			renderTripMeta();
 			updateTripStopBadge(activeDays);
 			daysList.replaceChildren();
