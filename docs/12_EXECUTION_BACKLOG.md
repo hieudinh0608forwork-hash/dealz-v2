@@ -39,10 +39,10 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 ## Phase 3 – Fresh WordPress foundation
 - [ ] Provision local environment.
 - [ ] Confirm WordPress/PHP/MySQL compatibility.
-- [ ] Scaffold custom plugin dealz-core.
-- [ ] Scaffold custom theme dealz-theme with local WOFF2 fonts.
+- [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
+- [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
 - [ ] Add migrations and automated test runner.
-- [ ] Add CI checks and coding standards.
+- [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
 - [ ] Trip CRUD and manual itinerary CRUD.
