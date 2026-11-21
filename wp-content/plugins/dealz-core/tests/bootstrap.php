@@ -23,4 +23,9 @@ function dealz_manually_load_plugin(): void {
 }
 tests_add_filter( 'muplugins_loaded', 'dealz_manually_load_plugin' );
 
+$polyfills_path = getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' );
+if ( $polyfills_path ) {
+	define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', $polyfills_path );
+}
+
 require $_tests_dir . '/includes/bootstrap.php';
