@@ -97,7 +97,7 @@ Trip is not Order. Order is not Booking. A Trip may contain multiple independent
 - No status transition without a recorded event.
 - Foreign key/index strategy must be verified against selected MySQL version.
 
-## 10. Initial physical MVP schema (implemented as migration v1.1.0)
+## 10. Initial physical MVP schema (implemented as migration v1.2.0)
 
 The additive WordPress `dbDelta` schema is implemented in `wp-content/plugins/dealz-core/src/Database/Schema.php`. It creates these prefixed tables:
 
@@ -121,7 +121,7 @@ Physical schema decisions:
 - No SQL foreign keys are added in v1 because WordPress `dbDelta` does not provide a reliable cross-version foreign-key migration workflow. Referential integrity and ownership must be enforced by application services; a later migration may add verified constraints after runtime compatibility testing.
 - The migration is additive and non-destructive. It does not drop tables or erase data.
 - The schema version is stored in the non-autoloaded `dealz_db_version` option and upgraded on plugin activation / WordPress init.
-- Schema v1.1.0 adds `item_type` (`stop`, `lunch`, `dinner`) and `status` to itinerary items, plus the `dealz_route_legs` table. Main stops are limited to four per day by application logic; the limit is enforced under a row lock to avoid concurrent requests exceeding it.
+- Schema v1.1.0 added `item_type` (`stop`, `lunch`, `dinner`) and `status` to itinerary items, plus the `dealz_route_legs` table. Schema v1.2.0 adds `status` to expenses so records can be archived without physical deletion. Main stops are limited to four per day by application logic; the limit is enforced under a row lock to avoid concurrent requests exceeding it.
 
 Scope note: this first migration does not yet create marketplace, listing, availability, order, booking, payment, refund, ledger, notification or audit tables. Those are deliberately deferred until their domain contracts are frozen.
 
