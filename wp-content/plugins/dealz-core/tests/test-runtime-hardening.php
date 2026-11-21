@@ -102,6 +102,36 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		), OBJECT_K );
 
 		$this->assertEquals( $before, $after, 'A rejected reorder must not persist partial position changes.' );
+
+		// Force the second UPDATE in a valid reorder to fail after the first UPDATE has run.
+		// The repository must roll the first write back as part of the same transaction.
+		$trigger_name = 'dealz_test_reorder_rollback';
+		$wpdb->query( 'DROP TRIGGER IF EXISTS `' . $trigger_name . '`' );
+		$trigger_sql = sprintf(
+			"CREATE TRIGGER `%s` BEFORE UPDATE ON `%s` FOR EACH ROW BEGIN IF OLD.public_id = '%s' AND NEW.position = 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Forced DealZ rollback test'; END IF; END",
+			$trigger_name,
+			$items_table,
+			esc_sql( $first->get_data()['public_id'] )
+		);
+		$this->assertNotFalse( $wpdb->query( $trigger_sql ), 'The rollback test trigger must be created.' );
+		try {
+			$this->assertFalse(
+				$repository->reorder_items(
+					(int) $day_row->id,
+					array( $second->get_data()['public_id'], $first->get_data()['public_id'] )
+				),
+				'A database error after a partial reorder must fail the transaction.'
+			);
+		} finally {
+			$wpdb->query( 'DROP TRIGGER IF EXISTS `' . $trigger_name . '`' );
+		}
+
+		$after_failure = $wpdb->get_results( $wpdb->prepare(
+			'SELECT public_id, position FROM ' . $items_table . ' WHERE day_id = %d AND status = %s ORDER BY position ASC',
+			$day_row->id,
+			'active'
+		), OBJECT_K );
+		$this->assertEquals( $before, $after_failure, 'A failed UPDATE must roll back earlier position changes in the transaction.' );
 	}
 
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
