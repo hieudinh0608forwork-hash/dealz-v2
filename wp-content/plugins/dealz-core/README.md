@@ -6,7 +6,7 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
 
 - Plugin bootstrap and namespace-based autoloading.
 - Additive, versioned database migration v1.0.0 using WordPress `dbDelta`.
-- Seven initial custom tables for trips, collaborators, itineraries, itinerary days/items, budget lines and expenses.
+- Eight initial custom tables for trips, collaborators, itineraries, itinerary days/items, route legs, budget lines and expenses.
 - Minimal `manage_dealz` capability added to WordPress Administrators on activation.
 - Public, non-sensitive health endpoint: `GET /wp-json/dealz/v1/health`.
 - Authenticated, owner-scoped Trip endpoints:
@@ -15,6 +15,13 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
   - `GET /wp-json/dealz/v1/trips/{public_id}`
   - `PATCH /wp-json/dealz/v1/trips/{public_id}`
   - `DELETE /wp-json/dealz/v1/trips/{public_id}` (archives; does not hard-delete)
+- Itinerary routes:
+  - `GET|POST /wp-json/dealz/v1/trips/{trip_public_id}/itineraries`
+  - `GET|POST /wp-json/dealz/v1/itineraries/{public_id}/days`
+  - `GET|POST /wp-json/dealz/v1/days/{public_id}/items`
+  - `PATCH|DELETE /wp-json/dealz/v1/items/{public_id}`
+- Manual itinerary endpoints to create/list itinerary versions, add/list days, add/list stop and meal cards, update and archive items.
+- Main stop limit of four per day, enforced under a database row lock.
 - PHP syntax CI workflow.
 
 ## Local installation
