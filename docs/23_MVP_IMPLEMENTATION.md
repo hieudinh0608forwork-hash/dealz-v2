@@ -2,12 +2,12 @@
 
 ## 1. Current implemented slice
 
-The first executable vertical slice is limited to authenticated traveler trip records.
+The first implementation slice covers authenticated traveler trip records and manual itinerary construction (itinerary versions, days, stops and meal cards).
 
 ### WordPress foundation
 - Custom plugin: wp-content/plugins/dealz-core.
 - Custom theme shell: wp-content/themes/dealz-theme.
-- Versioned schema migration: dealz_db_version = 1.0.0.
+- Versioned schema migration: dealz_db_version = 1.1.0.
 - Local environment definition: root compose.yaml and .env.example.
 
 ### Database tables created by schema v1.0.0
@@ -44,6 +44,17 @@ All routes require an authenticated WordPress user. Queries scope by both public
 - Currency must be a three-letter code.
 - Unknown request fields are ignored; only the explicit allowlist is persisted.
 
+### Manual itinerary endpoints
+
+| Method | Route | Behavior |
+|---|---|---|
+| GET / POST | /trips/{trip_public_id}/itineraries | List or create manual itinerary versions |
+| GET / POST | /itineraries/{public_id}/days | List or add days within trip date range |
+| GET / POST | /days/{public_id}/items | List or add stops / lunch / dinner cards |
+| PATCH / DELETE | /items/{public_id} | Update or archive an owned item |
+
+A day can contain at most four active main stops (item_type=stop). Lunch and dinner are separate small-card types. The main-stop limit is checked under a day-row lock to protect against concurrent creates. Item deletion is archival, not physical deletion. Route-leg records are a schema foundation only; no routing provider is connected and no travel time/distance is fabricated.
+
 ## 2. Local environment
 
 The Docker Compose file defines:
@@ -77,8 +88,8 @@ These checks must be performed after starting the compose environment and activa
 - No automated WordPress integration test runner yet.
 - No verified successful CI run is recorded yet.
 - No runtime test has been performed because Docker is unavailable in the current execution environment.
-- No user-facing trip screens have been implemented.
-- No itinerary CRUD, route calculation, maps, AI, service marketplace, partner portal, booking or payment implementation exists.
+- Initial responsive traveler home and trip dashboard screen is implemented in the theme and connected to Trip list/create API; visual/runtime behavior has not been verified.
+- Manual itinerary/day/stop APIs are implemented; route calculation, maps provider, AI, service marketplace, partner portal, booking and payment are not implemented.
 - Collaborator, itinerary, budget and expense tables are currently unused foundations.
 - No production hosting or deployment is configured.
 
