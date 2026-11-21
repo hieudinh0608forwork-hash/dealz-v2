@@ -101,7 +101,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			'active'
 		), OBJECT_K );
 
-		$this->assertSame( $before, $after, 'A rejected reorder must not persist partial position changes.' );
+		$this->assertEquals( $before, $after, 'A rejected reorder must not persist partial position changes.' );
 	}
 
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
