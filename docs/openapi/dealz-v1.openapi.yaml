@@ -1,0 +1,638 @@
+openapi: 3.1.0
+info:
+  title: DealZ V2 API
+  version: 0.2.1
+  description: Implemented WordPress MVP routes only. No live AI, marketplace, payment or provider-backed routing API is implied.
+servers:
+  - url: /wp-json/dealz/v1
+security:
+  - wordpressCookie: []
+    wordpressNonce: []
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Scaffold status, not application readiness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /trips:
+    get:
+      operationId: listTrips
+      responses:
+        '200':
+          description: Trips owned by current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trip'
+    post:
+      operationId: createTrip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripCreate'
+      responses:
+        '201':
+          description: Created trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /trips/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    get:
+      operationId: getTrip
+      responses:
+        '200':
+          description: Owned trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateTrip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripUpdate'
+      responses:
+        '200':
+          description: Updated trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: archiveTrip
+      responses:
+        '200':
+          description: Trip archived without physical deletion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
+  /trips/{trip_public_id}/itineraries:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: listItineraries
+      responses:
+        '200':
+          description: Itinerary versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Itinerary'
+    post:
+      operationId: createItinerary
+      responses:
+        '201':
+          description: New manual itinerary version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Itinerary'
+  /itineraries/{public_id}/days:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    get:
+      operationId: listDays
+      responses:
+        '200':
+          description: Itinerary days
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Day'
+    post:
+      operationId: createDay
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DayCreate'
+      responses:
+        '201':
+          description: Created day
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Day'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /days/{public_id}/validation:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    get:
+      operationId: validateDay
+      description: Detects explicit user-entered time overlaps only; it does not estimate travel time.
+      responses:
+        '200':
+          description: Day validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DayValidation'
+  /days/{public_id}/items:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    get:
+      operationId: listDayItems
+      responses:
+        '200':
+          description: Active stop and meal cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItineraryItem'
+    post:
+      operationId: createDayItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItineraryItemCreate'
+      responses:
+        '201':
+          description: Created itinerary item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /items/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    patch:
+      operationId: updateDayItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItineraryItemUpdate'
+      responses:
+        '200':
+          description: Updated itinerary item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      operationId: archiveDayItem
+      responses:
+        '200':
+          description: Item archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
+  /trips/{trip_public_id}/budget:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getBudget
+      responses:
+        '200':
+          description: Active budget lines and totals grouped by cost type and currency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetSummary'
+  /trips/{trip_public_id}/budget/lines:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: createBudgetLine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetLineCreate'
+      responses:
+        '201':
+          description: Created line with server-calculated total
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /budget/lines/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    patch:
+      operationId: updateBudgetLine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetLineUpdate'
+      responses:
+        '200':
+          description: Updated budget line
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      operationId: archiveBudgetLine
+      responses:
+        '200':
+          description: Budget line archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
+  /trips/{trip_public_id}/expenses:
+    parameters:
+      - name: trip_public_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: listExpenses
+      responses:
+        '200':
+          description: Active actual expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+    post:
+      operationId: createExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+      responses:
+        '201':
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /expenses/{public_id}:
+    parameters:
+      - $ref: '#/components/parameters/PublicId'
+    patch:
+      operationId: updateExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseUpdate'
+      responses:
+        '200':
+          description: Updated expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      operationId: archiveExpense
+      responses:
+        '200':
+          description: Expense archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archived'
+components:
+  securitySchemes:
+    wordpressCookie:
+      type: apiKey
+      in: cookie
+      name: wordpress_logged_in_<site-hash>
+    wordpressNonce:
+      type: apiKey
+      in: header
+      name: X-WP-Nonce
+  parameters:
+    PublicId:
+      name: public_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    Health:
+      type: object
+      required: [service, status, application_ready, message]
+      properties:
+        service: { const: dealz-core }
+        status: { const: scaffolded }
+        application_ready: { const: false }
+        message: { type: string }
+    Archived:
+      type: object
+      required: [public_id, status]
+      properties:
+        public_id: { type: string, format: uuid }
+        status: { const: archived }
+    Trip:
+      type: object
+      required: [public_id, title, origin_text, destination_name, destination_timezone, traveler_count, currency, status, created_at, updated_at]
+      properties:
+        public_id: { type: string, format: uuid }
+        title: { type: string, maxLength: 190 }
+        origin_text: { type: string }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string }
+        traveler_count: { type: integer, minimum: 1, maximum: 50 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        status: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    TripCreate:
+      type: object
+      additionalProperties: false
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 190 }
+        origin_text: { type: string, maxLength: 255 }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string }
+        traveler_count: { type: integer, minimum: 1, maximum: 50 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+    TripUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        title: { type: string, minLength: 1, maxLength: 190 }
+        origin_text: { type: string, maxLength: 255 }
+        destination_name: { type: string, maxLength: 190 }
+        start_date: { type: [string, 'null'], format: date }
+        end_date: { type: [string, 'null'], format: date }
+        destination_timezone: { type: string }
+        traveler_count: { type: integer, minimum: 1, maximum: 50 }
+        budget_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+    Itinerary:
+      type: object
+      required: [public_id, version, source, status, created_at]
+      properties:
+        public_id: { type: string, format: uuid }
+        version: { type: integer }
+        source: { const: manual }
+        status: { type: string }
+        created_at: { type: string }
+    Day:
+      type: object
+      required: [public_id, local_date, position]
+      properties:
+        public_id: { type: string, format: uuid }
+        local_date: { type: string, format: date }
+        position: { type: integer }
+    DayCreate:
+      type: object
+      additionalProperties: false
+      required: [local_date]
+      properties:
+        local_date: { type: string, format: date }
+        position: { type: integer, minimum: 0, maximum: 999 }
+    ItineraryItem:
+      type: object
+      required: [public_id, item_type, title_snapshot, position, currency, data_status, status]
+      properties:
+        public_id: { type: string, format: uuid }
+        item_type: { type: string, enum: [stop, lunch, dinner] }
+        title_snapshot: { type: string, maxLength: 190 }
+        description: { type: [string, 'null'] }
+        address_snapshot: { type: string }
+        start_local: { type: [string, 'null'] }
+        end_local: { type: [string, 'null'] }
+        duration_minutes: { type: [integer, 'null'] }
+        position: { type: integer }
+        currency: { type: string }
+        data_status: { type: string }
+        status: { type: string }
+    ItineraryItemCreate:
+      type: object
+      additionalProperties: false
+      required: [title_snapshot]
+      properties:
+        item_type: { type: string, enum: [stop, lunch, dinner] }
+        title_snapshot: { type: string, minLength: 1, maxLength: 190 }
+        description: { type: string, maxLength: 2000 }
+        address_snapshot: { type: string, maxLength: 255 }
+        start_local: { type: [string, 'null'] }
+        end_local: { type: [string, 'null'] }
+        duration_minutes: { type: [integer, 'null'], minimum: 1, maximum: 1440 }
+        position: { type: integer, minimum: 0, maximum: 999 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+    ItineraryItemUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        item_type: { type: string, enum: [stop, lunch, dinner] }
+        title_snapshot: { type: string, minLength: 1, maxLength: 190 }
+        description: { type: string, maxLength: 2000 }
+        address_snapshot: { type: string, maxLength: 255 }
+        start_local: { type: [string, 'null'] }
+        end_local: { type: [string, 'null'] }
+        duration_minutes: { type: [integer, 'null'], minimum: 1, maximum: 1440 }
+        position: { type: integer, minimum: 0, maximum: 999 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+    DayValidation:
+      type: object
+      required: [is_valid, checked_items, issues, limitations]
+      properties:
+        is_valid: { type: boolean }
+        checked_items: { type: integer }
+        issues:
+          type: array
+          items:
+            type: object
+            required: [code, item_public_id, message]
+            properties:
+              code: { type: string }
+              item_public_id: { type: string, format: uuid }
+              conflict_public_id: { type: string, format: uuid }
+              message: { type: string }
+        limitations:
+          type: array
+          items: { type: string }
+    BudgetLine:
+      type: object
+      required: [public_id, category, quantity, currency, cost_type, status]
+      properties:
+        public_id: { type: string, format: uuid }
+        category: { type: string }
+        description: { type: string }
+        quantity: { type: string }
+        unit_amount_minor: { type: [integer, 'null'] }
+        total_amount_minor: { type: [integer, 'null'] }
+        currency: { type: string }
+        cost_type: { type: string }
+        source_type: { type: string }
+        source_id: { type: string }
+        status: { type: string }
+    BudgetLineCreate:
+      type: object
+      additionalProperties: false
+      required: [category]
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        description: { type: string, maxLength: 255 }
+        quantity: { type: string, default: '1.00' }
+        unit_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        cost_type: { type: string, enum: [estimate, quoted, confirmed, actual] }
+        source_type: { type: string, maxLength: 32 }
+        source_id: { type: string, maxLength: 64 }
+    BudgetLineUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        description: { type: string, maxLength: 255 }
+        quantity: { type: string }
+        unit_amount_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        cost_type: { type: string, enum: [estimate, quoted, confirmed, actual] }
+        source_type: { type: string, maxLength: 32 }
+        source_id: { type: string, maxLength: 64 }
+    BudgetSummary:
+      type: object
+      required: [lines, summary]
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetLine'
+        summary:
+          type: array
+          items:
+            type: object
+            required: [cost_type, currency, line_count, total_amount_minor]
+            properties:
+              cost_type: { type: string }
+              currency: { type: string }
+              line_count: { type: integer }
+              total_amount_minor: { type: [integer, 'null'] }
+    Expense:
+      type: object
+      required: [public_id, category, amount_minor, currency, occurred_at, note, split_method, created_at]
+      properties:
+        public_id: { type: string, format: uuid }
+        category: { type: string }
+        amount_minor: { type: integer }
+        currency: { type: string }
+        occurred_at: { type: string }
+        note: { type: string }
+        split_method: { type: string }
+        created_at: { type: string }
+    ExpenseCreate:
+      type: object
+      additionalProperties: false
+      required: [category, amount_minor, occurred_at]
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        amount_minor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        occurred_at: { type: string, format: date-time, description: ISO-8601 with explicit timezone }
+        note: { type: string, maxLength: 1000 }
+    ExpenseUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        category: { type: string, minLength: 1, maxLength: 40 }
+        amount_minor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        occurred_at: { type: string, format: date-time }
+        note: { type: string, maxLength: 1000 }
+    Error:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        data:
+          type: object
+          properties:
+            status: { type: integer }
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found or not owned by current user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
