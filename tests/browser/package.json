@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Playwright browser QA for DealZ V2",
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
