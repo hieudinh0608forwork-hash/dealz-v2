@@ -286,7 +286,7 @@ get_header();
 			<div>
 				<p class="eyebrow"><?php esc_html_e( 'Tiếp theo', 'dealz-theme' ); ?></p>
 				<h2><?php esc_html_e( 'Bắt đầu bằng những thông tin cơ bản.', 'dealz-theme' ); ?></h2>
-				<p><?php esc_html_e( 'Phần chỉnh sửa lịch trình và quản lý điểm dừng sẽ được mở rộng ở các phiên bản tiếp theo.', 'dealz-theme' ); ?></p>
+				<p><?php esc_html_e( 'Bạn có thể thêm ngày, điểm dừng, khoản dự kiến và khoản chi thực tế. Bản đồ, tuyến đường và dịch vụ đặt chỗ sẽ được bổ sung khi có nguồn dữ liệu được xác minh.', 'dealz-theme' ); ?></p>
 			</div>
 			<?php if ( is_user_logged_in() ) : ?>
 				<a class="text-link" href="#create-trip"><?php esc_html_e( 'Tạo chuyến đi', 'dealz-theme' ); ?> <span aria-hidden="true">→</span></a>
