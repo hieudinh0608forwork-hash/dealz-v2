@@ -105,3 +105,17 @@
 - Expanded daily-stop-limit tests: lunch/dinner cards do not count toward the four-main-stop cap, archiving a stop frees a slot, and a replacement stop can be added.
 - Expanded schedule test: updating the second item's time window removes the overlap.
 - GitHub Actions passed on commit `f7ecbc988c4625ff751d5bd330ac4c31253ad135`: **14 tests, 58 assertions**.
+
+## 2026-11-22 – Transactional itinerary reordering
+
+### Added
+- Added owner-scoped `POST /days/{public_id}/reorder`.
+- The endpoint requires the complete set of active item UUIDs, rejects duplicate, missing and foreign IDs, and returns the new ordered list.
+- Repository reorder operation locks the day row and updates every active item's position in one transaction.
+- Item archival now locks the same day row so create, edit, reorder and archive operations serialize against one another.
+- Added up/down controls to itinerary cards and documented the new endpoint in OpenAPI.
+- Added integration coverage for correct reorder, duplicate rejection, incomplete-list conflict and cross-user denial.
+
+### Verification
+- WordPress 6.8 / MySQL 8.0 workflow passed on commit `c798656db30d1a4cb01466eff239d378fbdbc90e`: **15 tests, 69 assertions**.
+- PHP syntax workflow passed on the same commit. JavaScript/OpenAPI checks are run by the PHP syntax workflow and remain part of the current CI gate.
