@@ -1,90 +1,105 @@
-# 01 – Product Requirements
+# 01 – Product Requirements Document
 
-## 1. Người dùng và nhu cầu
+## 1. Mục tiêu người dùng
+Khách có thể bắt đầu từ nhu cầu du lịch, xây dựng hoặc chỉnh sửa hành trình khả thi, xem bản đồ và ngân sách, khám phá dịch vụ liên quan, gửi yêu cầu đặt và quản lý các dịch vụ trong cùng một chuyến đi. Đối tác có thể quản lý dịch vụ và phản hồi yêu cầu. Vận hành có thể kiểm duyệt và xử lý ngoại lệ.
 
-### Traveler
-- Khám phá điểm đến và dịch vụ.
-- Tạo chuyến đi theo điểm đến, ngày đi, số người, sở thích và ngân sách.
-- Nhận lịch trình gợi ý, chỉnh sửa và lưu.
-- Xem điểm đến trên bản đồ, thứ tự hoạt động và thời gian di chuyển ước tính.
-- Xem ngân sách dự kiến và các giả định cấu thành.
-- Tìm dịch vụ phù hợp và gửi yêu cầu đặt.
-- Theo dõi đơn hàng, từng booking và thông tin chuyến đi.
+## 2. Vai trò
+- Guest: khám phá nội dung công khai.
+- Traveler/Customer: quản lý hồ sơ, Trip, itinerary, budget, expense, share và booking của mình.
+- Partner: quản lý hồ sơ tổ chức, listing, giá, availability và booking được phân quyền.
+- Operations: hỗ trợ, kiểm duyệt, xử lý ngoại lệ theo capability.
+- Administrator: cấu hình và quản trị toàn nền tảng.
 
-### Partner
-- Quản lý hồ sơ đối tác và dịch vụ được cấp quyền.
-- Cập nhật thông tin cung cấp, giá, lịch khả dụng và giới hạn phục vụ.
-- Tiếp nhận, xác nhận/từ chối booking theo quy trình được duyệt.
-- Theo dõi trạng thái giao dịch liên quan.
+Partner portal là giao diện riêng; không cấp quyền WordPress Administrator cho đối tác.
 
-### Admin/Operations
-- Quản lý người dùng, đối tác, điểm đến, danh mục và nội dung.
-- Kiểm duyệt dịch vụ.
-- Hỗ trợ booking, khiếu nại và vận hành.
-- Theo dõi giao dịch, nhật ký và báo cáo.
+## 3. Hành trình khách hàng
+### A. Khám phá
+Trang chủ → khám phá điểm đến → trang chi tiết → dịch vụ liên quan. Nội dung ngoài Đà Nẵng – Hội An phải hiển thị cảnh báo ngoài khu thí điểm theo rulebook.
 
-## 2. Luồng sản phẩm chính
-1. Người dùng khám phá hoặc tạo Trip.
-2. Người dùng nhập thông tin chuyến đi.
-3. AI tạo bản nháp itinerary có cấu trúc.
-4. Backend kiểm tra cấu trúc và lưu phiên bản.
-5. Người dùng chỉnh sửa, thêm/xóa/sắp xếp hoạt động.
-6. Hệ thống tính ngân sách dự kiến từ dữ liệu/giả định có nguồn.
-7. Người dùng khám phá dịch vụ.
-8. Người dùng chọn dịch vụ và gửi yêu cầu checkout.
-9. Backend kiểm tra giá, tồn khả dụng và chính sách tại thời điểm đặt.
-10. Hệ thống tạo Order và các Booking liên quan theo trạng thái phù hợp.
-11. Người dùng chủ động xác nhận thanh toán qua cổng được tích hợp.
-12. Hệ thống cập nhật trạng thái dựa trên kết quả xác thực từ payment provider.
-13. Người dùng theo dõi Trip, Order và từng Booking.
+### B. Lập kế hoạch
+Nhập điểm đến/ý định khám phá, nơi xuất phát nếu có, ngày, số người, ngân sách, sở thích, phương tiện và nhịp độ → tạo itinerary thủ công hoặc bằng AI khi chức năng AI đã được triển khai → kiểm tra lịch trình → chỉnh sửa → lưu.
 
-## 3. Phân loại yêu cầu
-- Must: bắt buộc để MVP có thể sử dụng an toàn.
-- Should: quan trọng nhưng có thể sau luồng cốt lõi.
-- Could: cải thiện trải nghiệm.
-- Later: ngoài MVP đầu tiên.
+### C. Xem lộ trình
+Hiển thị theo thẻ từng ngày: tối đa 4 điểm dừng chính/ngày; cấu hình hiện tại là 3 điểm chính, bữa trưa/bữa tối là thẻ nhỏ. Có giờ đến, thời lượng gợi ý, góc chụp, đồ gợi ý, liên kết thuê đồ, chỉ đường và đoạn nối ước tính. Tuyệt đối không dùng dải vòng tròn đánh số.
 
-## 4. Yêu cầu chức năng baseline
+### D. Ngân sách
+Phân biệt estimate, supplier quote, confirmed booking amount và actual expense. Hiển thị giả định, nguồn, tiền/người và cảnh báo vượt ngân sách. Không dùng AI để kết luận khả năng chi trả.
 
-| ID | Yêu cầu | Ưu tiên | Tiêu chí chấp nhận |
+### E. Dịch vụ và booking
+Tìm dịch vụ theo loại, địa điểm, ngày và điều kiện. Xem fulfillment type, giá, phụ phí đã biết, cọc nếu được cấu hình, điều kiện và thời hạn báo giá. Checkout phải kiểm tra lại giá/availability phía server. Booking cần supplier confirmation không được hiển thị như đã xác nhận trước khi đối tác chấp nhận.
+
+### F. Quản lý chuyến đi
+Trip dashboard tổng hợp itinerary, từng booking, payment, expense và thông báo; các booking vẫn độc lập về trạng thái và điều kiện.
+
+### G. Chia sẻ
+Chủ Trip tạo và thu hồi liên kết chia sẻ. Quyền view/comment/edit phải được kiểm soát. Không lộ profile riêng tư, liên hệ, booking hoặc payment qua link công khai.
+
+## 4. Functional requirements
+
+| ID | Requirement | Priority | Acceptance |
 |---|---|---|---|
-| FR-001 | Đăng ký/đăng nhập | Must | Người dùng xác thực được; lỗi được xử lý an toàn |
-| FR-002 | Hồ sơ người dùng | Must | Người dùng xem/sửa dữ liệu được phép |
-| FR-003 | Vai trò và quyền | Must | Traveler, Partner, Admin có quyền tách biệt |
-| FR-004 | Danh mục điểm đến | Must | Admin quản lý; người dùng xem được nội dung đã xuất bản |
-| FR-005 | Danh mục dịch vụ | Must | Dịch vụ có trạng thái xuất bản/ẩn và thông tin cơ bản |
-| FR-006 | Tạo và quản lý Trip | Must | Người dùng tạo, xem, sửa Trip của mình |
-| FR-007 | AI tạo itinerary | Should | Kết quả theo schema; lỗi AI không làm hỏng Trip |
-| FR-008 | Chỉnh sửa itinerary | Must | Người dùng thêm/sửa/xóa/sắp xếp hoạt động |
-| FR-009 | Bản đồ | Should | Hiển thị vị trí có tọa độ hợp lệ |
-| FR-010 | Dự toán ngân sách | Must | Có tổng và các khoản cấu thành; nêu rõ ước tính |
-| FR-011 | Tìm/lọc dịch vụ | Must | Lọc theo điểm đến, loại, ngày và điều kiện có dữ liệu |
-| FR-012 | Khởi tạo Order/Booking | Later | Không tạo giao dịch không hợp lệ; tách vòng đời |
-| FR-013 | Thanh toán | Later | Chỉ cập nhật theo callback/webhook xác thực |
-| FR-014 | Dashboard chuyến đi | Must | Tập hợp Trip và thông tin liên quan của chủ sở hữu |
-| FR-015 | Quản trị nội dung | Must | Admin quản lý điểm đến/dịch vụ |
-| FR-016 | Quản lý dịch vụ đối tác | Should | Partner chỉ thao tác tài nguyên được cấp quyền |
+| FR-001 | Register/login/logout/reset | P0 | Xác thực an toàn, lỗi có kiểm soát |
+| FR-002 | Profile/preferences | P0 | Người dùng chỉ sửa hồ sơ được phép |
+| FR-003 | Roles/capabilities | P0 | Guest, Traveler, Partner, Ops, Admin tách quyền |
+| FR-004 | Destination/place catalogue | P0 | Có trạng thái, nguồn và dữ liệu công khai |
+| FR-005 | Service catalogue | P0 | Listing có category, partner, giá basis, status |
+| FR-006 | Trip CRUD | P0 | Owner tạo/xem/sửa/xóa Trip của mình |
+| FR-007 | Manual itinerary editor | P0 | Thêm/sửa/xóa/sắp xếp/move item |
+| FR-008 | AI itinerary generation | P1 | Schema-valid, preview, warnings, user acceptance |
+| FR-009 | Schedule validation | P1 | Cảnh báo overlap, thời gian di chuyển không khả thi |
+| FR-010 | Map and route display | P1 | Marker/list sync; route chỉ khi có dữ liệu routing |
+| FR-011 | Budget and expenses | P1 | Tách estimate/quote/confirmed/actual |
+| FR-012 | Trip share/collaboration | P1 | Quyền có thể thu hồi, không lộ dữ liệu riêng |
+| FR-013 | Service search/filter | P0 | Lọc theo loại, vị trí, ngày khi có dữ liệu |
+| FR-014 | Partner portal/listing | P1 | Partner chỉ quản lý tài nguyên được cấp |
+| FR-015 | Quote/booking lifecycle | P1 | Fulfillment type và trạng thái đúng |
+| FR-016 | Order aggregation | P1 | Một Order có thể có nhiều Booking độc lập |
+| FR-017 | Payment adapter/webhook | P2 | Chỉ cập nhật từ sự kiện xác thực |
+| FR-018 | Ledger/refund/commission/payout | P2 | Chỉ triển khai theo policy được phê duyệt |
+| FR-019 | Notifications/support | P1 | Có log trạng thái gửi và xử lý lỗi |
+| FR-020 | Admin/operations | P1 | Kiểm duyệt, hỗ trợ, audit |
+| FR-021 | Analytics/reporting | P2 | Chỉ số tính từ dữ liệu thật, không giả lập |
+| FR-022 | Itinerary save/share/print/PDF | P1 | Chỉ công bố nút khi tương tác đã hoạt động |
 
-## 5. Yêu cầu phi chức năng
-- Security: xác thực, authorization, validation, escaping, rate limiting phù hợp.
-- Privacy: chỉ thu thập dữ liệu cần thiết; hạn chế dữ liệu cá nhân trong log.
-- Reliability: thao tác quan trọng có xử lý lỗi và khả năng retry an toàn.
-- Integrity: ràng buộc dữ liệu và giao dịch nhất quán.
-- Performance: phân trang, truy vấn có chỉ mục, tránh tải toàn bộ dữ liệu.
-- Accessibility: điều khiển bàn phím, nhãn biểu mẫu, tương phản đủ.
-- Responsive: hỗ trợ mobile, tablet và desktop.
-- Maintainability: business logic trong plugin, UI trong theme.
-- Observability: log có ngữ cảnh, không chứa secrets.
+## 5. Danh mục dịch vụ định hướng
+- Lưu trú.
+- Thuê trang phục/đồ theo phong cách và điểm dừng.
+- Nhiếp ảnh.
+- Thuê phương tiện.
+- Hoạt động/trải nghiệm/vé.
+- Tour/hướng dẫn.
+- Nhóm dịch vụ khác sau kiểm duyệt.
 
-## 6. Ngoài phạm vi MVP ban đầu
-- Microservices.
-- Tự động đặt chỗ hoặc thanh toán bởi AI.
-- Payout tự động nhiều đối tác trước khi có ledger/đối soát.
-- Ứng dụng native iOS/Android.
-- Dynamic pricing phức tạp.
-- Loyalty/gamification nâng cao.
+Danh mục này là phạm vi sản phẩm định hướng; không đồng nghĩa đã có nhà cung cấp hoặc inventory thực tế.
 
-## 7. Câu hỏi còn mở
-- Thị trường/địa bàn triển khai đầu tiên và danh mục dịch vụ ưu tiên cần được xác nhận từ tài liệu nghiệp vụ chi tiết.
-- Quy định giá, tiền cọc, hủy/hoàn, hoa hồng và payout chưa được chốt trong baseline kỹ thuật.
-- Nhà cung cấp AI, bản đồ, routing, thời tiết và thanh toán chưa được chọn.
+## 6. Non-functional requirements
+Security: authentication, authorization, ownership, validation, escaping, prepared SQL, CSRF/nonce, rate limits.
+Privacy: data minimization, public share redaction, safe logs.
+Integrity: money in integer/decimal-safe representation, idempotency, immutable snapshots, audit.
+Reliability: provider timeout/fallback, retry safe, no duplicate transaction.
+Performance: pagination, indexes, caching with invalidation.
+Accessibility: keyboard, focus, labels, contrast.
+Responsive: mobile-first, tablet, desktop.
+Maintainability: business logic in plugin, presentation in theme.
+Observability: request IDs, safe logs, integration health.
+
+## 7. Out of scope / not assumed
+- Không xây inventory aggregator hàng không/khách sạn từ đầu.
+- Không cam kết availability realtime khi không có provider/partner data.
+- Không tự động mua/đặt từ bên thứ ba nếu chưa có xác nhận của người dùng.
+- Không lending/credit scoring.
+- Không settlement đa tiền tệ phức tạp trước khi VND flow ổn định.
+- Không native mobile app trong giai đoạn đầu.
+- Không microservices trước khi có nhu cầu đo được.
+
+## 8. Presentation rule for unfinished capabilities
+AI, payment và tiếng Anh là các hạng mục sản phẩm có thể nằm trong roadmap; tuy nhiên UI không được trình bày chúng như tính năng đang hoạt động cho đến khi code đã triển khai, cấu hình thật và kiểm thử. Nếu chưa có thì ẩn hoặc hiển thị trạng thái chưa hỗ trợ một cách rõ ràng, không dựng nút giả.
+
+## 9. Acceptance gates
+P0: login, role, destination/service catalogue, Trip CRUD, manual itinerary, ownership/security.
+P1: AI planner, maps/routing, budget/expenses, sharing, partner portal, quote/booking.
+P2: payment, financial ledger, refund/commission/payout, analytics.
+Mỗi gate cần test và bằng chứng cụ thể trước khi đánh dấu đạt.
+
+## 10. Open decisions
+Provider AI/maps/geocoding/routing/weather/payment/email; hosting/runtime; service suppliers; exact commercial policies; booking availability model; domain and launch budget. Không tự suy diễn quyết định kinh doanh.
