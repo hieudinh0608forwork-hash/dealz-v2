@@ -8,7 +8,7 @@ This document defines when DealZ V2 handoff is considered complete. Completion i
 - H1 – Product definition: scope, users, journeys, acceptance criteria and exclusions documented.
 - H2 – UX/design: sitemap, screen inventory, interaction rules, responsive behavior, design tokens and visual acceptance checks documented. Must comply with `docs/11_DESIGN_RULES.md`.
 - H3 – Technical blueprint: architecture, data model, API contracts, permissions, state transitions, integrations and security documented.
-- H4 – Build handoff: repository structure, setup instructions, environment variables example, migrations, test instructions and contributor instructions are ready.
+- H4 – Build handoff: repository structure, local Docker Compose definition, environment example, migration and API setup instructions exist; local runtime and automated WordPress test harness remain unverified.
 - H5 – Implementation: agreed MVP flows implemented in the repository.
 - H6 – Verification: automated/manual tests run with evidence; critical security and ownership checks pass.
 - H7 – Release readiness: deployment/rollback, backup, monitoring, operations and known limitations documented. Production deployment still requires explicit owner authorization.
