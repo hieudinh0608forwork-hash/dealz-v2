@@ -22,7 +22,7 @@ final class Schema {
 	/**
 	 * Current database schema version.
 	 */
-	public const VERSION = '1.1.0';
+	public const VERSION = '1.2.0';
 
 	/**
 	 * Option storing the installed schema version.
@@ -199,11 +199,13 @@ final class Schema {
 			occurred_at datetime NOT NULL,
 			note text DEFAULT NULL,
 			split_method varchar(20) NOT NULL DEFAULT 'none',
+			status varchar(16) NOT NULL DEFAULT 'active',
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY public_id (public_id),
 			KEY trip_occurred (trip_id,occurred_at),
+			KEY trip_status (trip_id,status),
 			KEY payer_user (payer_user_id)
 		) $charset_collate;";
 
@@ -239,17 +241,22 @@ final class Schema {
 			}
 		}
 
-		$required_columns = array( 'item_type', 'status' );
-		foreach ( $required_columns as $column ) {
-			$column_exists = $wpdb->get_var(
-				$wpdb->prepare(
-					'SHOW COLUMNS FROM ' . $tables['items'] . ' LIKE %s',
-					$column
-				)
-			);
+		$required_columns = array(
+			'items'    => array( 'item_type', 'status' ),
+			'expenses' => array( 'status' ),
+		);
+		foreach ( $required_columns as $table_key => $columns ) {
+			foreach ( $columns as $column ) {
+				$column_exists = $wpdb->get_var(
+					$wpdb->prepare(
+						'SHOW COLUMNS FROM ' . $tables[ $table_key ] . ' LIKE %s',
+						$column
+					)
+				);
 
-			if ( ! $column_exists ) {
-				return false;
+				if ( ! $column_exists ) {
+					return false;
+				}
 			}
 		}
 
