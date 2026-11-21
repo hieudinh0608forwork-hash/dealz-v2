@@ -52,4 +52,4 @@ Stop the environment with `docker compose down`. To preserve local data, do not 
 The compose environment has been authored but has not been executed or runtime-verified in this work session.
 
 ## Handoff status
-The repository contains the project knowledge pack, detailed baseline specifications and initial WordPress application slices. The first WordPress integration workflow passed 15 tests / 69 assertions, and PHP/JavaScript/OpenAPI checks also passed. This is not a completed application handoff: local browser acceptance, staging and production deployment remain unverified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
+The repository contains the project knowledge pack, detailed baseline specifications and initial WordPress application slices. The first WordPress integration workflow passed 15 tests / 71 assertions, and PHP/JavaScript/OpenAPI checks also passed. This is not a completed application handoff: local browser acceptance, staging and production deployment remain unverified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
