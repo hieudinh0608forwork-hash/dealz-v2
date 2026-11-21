@@ -741,3 +741,44 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	.item-edit-form input:first-child,
 	.item-edit-form button { grid-column: 1 / -1; }
 }
+
+
+/* Stop-specific rental handoff; no inventory is implied by this CTA. */
+.item-rental-cta {
+	flex: 0 1 auto;
+	min-height: 42px;
+	padding: 0 16px;
+	font-size: 14px;
+	text-decoration: none;
+	white-space: normal;
+}
+.item-rental-cta:hover { color: #fff; transform: translateY(-1px); }
+.rental-workspace { min-height: 55vh; padding-top: 28px; padding-bottom: 72px; }
+.rental-empty-state {
+	max-width: 760px;
+	margin: 28px auto 0;
+	padding: clamp(24px, 5vw, 42px);
+	border: 1px solid var(--dealz-border);
+	border-radius: 26px;
+	background: #F3F7F3;
+	box-shadow: var(--dealz-shadow);
+}
+.rental-empty-state__symbol {
+	width: 52px;
+	height: 52px;
+	display: grid;
+	place-items: center;
+	margin-bottom: 18px;
+	border-radius: 17px;
+	background: var(--dealz-lime);
+	color: var(--dealz-green);
+	font-size: 28px;
+}
+.rental-empty-state h3 { margin: 0 0 12px; font-family: var(--dealz-font-heading); font-size: clamp(22px, 3vw, 28px); }
+.rental-empty-state p { max-width: 64ch; color: var(--dealz-muted); }
+.rental-empty-state p:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+	.item-rental-cta { width: 100%; justify-content: center; }
+	.rental-workspace { padding-top: 12px; }
+	.rental-empty-state { margin-top: 20px; border-radius: 20px; }
+}
