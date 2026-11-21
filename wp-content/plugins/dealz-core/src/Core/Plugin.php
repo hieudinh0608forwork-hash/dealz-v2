@@ -5,9 +5,9 @@
  * @package DealZ
  */
 
-namespace DealZ\\Core;
+namespace DealZ\Core;
 
-use DealZ\\REST\\HealthController;
+use DealZ\REST\HealthController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
