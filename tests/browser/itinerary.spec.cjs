@@ -13,6 +13,24 @@ async function signIn(page) {
   await page.goto(BASE_URL + '/');
 }
 
+function captureBrowserErrors(page) {
+  const consoleErrors = [];
+  const pageErrors = [];
+  page.on('console', message => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('pageerror', error => pageErrors.push(error.message));
+  return { consoleErrors, pageErrors };
+}
+
+function assertNoUnexpectedBrowserErrors(errors, allowExpectedApiAbort = false) {
+  const consoleErrors = allowExpectedApiAbort
+    ? errors.consoleErrors.filter(message => !message.includes('net::ERR_FAILED') && !message.includes('Failed to load resource'))
+    : errors.consoleErrors;
+  expect(consoleErrors, 'Unexpected browser console errors').toEqual([]);
+  expect(errors.pageErrors, 'Uncaught browser page errors').toEqual([]);
+}
+
 async function createTripAndDay(page, title) {
   await signIn(page);
   await page.locator('#trip-title').fill(title);
@@ -44,6 +62,7 @@ async function addStop(page, title, address) {
 
 test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboard', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
+  const browserErrors = captureBrowserErrors(page);
   await createTripAndDay(page, 'QA desktop DealZ');
 
   let delayFirstRead = true;
@@ -85,6 +104,9 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
 
   await addStop(page, 'Điểm A', 'Cầu Rồng, Đà Nẵng');
   await addStop(page, 'Điểm B', 'Phố cổ Hội An');
+  await expect(page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-directions')).toHaveAttribute('href', /google\.com\/maps\/dir/);
+  await expect(page.locator('.route-connector').first()).toContainText('Chưa có dữ liệu tuyến đường');
+  await expect(page.locator('.route-connector__number, .route-connector__badge, .route-number')).toHaveCount(0);
 
   const cards = page.locator('.itinerary-item-card--stop');
   await expect(cards).toHaveCount(2);
@@ -123,16 +145,24 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.text-action--danger').click();
   await expect(page.locator('.itinerary-item-card--stop')).toHaveCount(1);
   await expect(page.locator('.itinerary-item-card--stop')).not.toContainText('Điểm A');
+  await addStop(page, 'Điểm chưa có địa chỉ', '');
+  const noAddressCard = page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm chưa có địa chỉ' });
+  await expect(noAddressCard.locator('.item-directions')).toHaveCount(0);
+  assertNoUnexpectedBrowserErrors(browserErrors, true);
 });
 
 test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  const browserErrors = captureBrowserErrors(page);
   await createTripAndDay(page, 'QA mobile DealZ');
   await addStop(page, 'Điểm dừng mobile', 'Biển Mỹ Khê, Đà Nẵng');
 
   const card = page.locator('.itinerary-item-card--stop').first();
   await expect(card.locator('.itinerary-item-card__media')).toBeVisible();
   await expect(card.getByRole('link', { name: 'Mở mục thuê đồ cho Điểm dừng mobile' })).toBeVisible();
+  await expect(card.locator('.item-directions')).toHaveAttribute('href', /google\.com\/maps\/dir/);
+  await expect(page.locator('.route-connector').first()).toContainText('Chưa có dữ liệu tuyến đường');
+  await expect(page.locator('.route-connector__number, .route-connector__badge, .route-number')).toHaveCount(0);
 
   const dimensions = await page.evaluate(() => ({
     viewport: document.documentElement.clientWidth,
@@ -166,4 +196,5 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await expect(page.locator('#rental-workspace')).toBeVisible();
   await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho điểm dừng đã chọn');
   await expect(page.locator('#rental-back-link')).toHaveAttribute('href', '#trips');
+  assertNoUnexpectedBrowserErrors(browserErrors);
 });
