@@ -42,6 +42,10 @@ final class ScheduleValidator {
 			$end = null;
 			if ( ! empty( $item->end_local ) ) {
 				$end = $this->time_to_minutes( (string) $item->end_local );
+				if ( null === $end ) {
+					$issues[] = $this->issue( 'invalid_end_time', $item, __( 'Giờ kết thúc không hợp lệ.', 'dealz-core' ) );
+					continue;
+				}
 			} elseif ( ! empty( $item->duration_minutes ) ) {
 				$end = $start + (int) $item->duration_minutes;
 			}
