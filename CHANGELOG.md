@@ -28,3 +28,5 @@
 
 - Added deterministic day schedule validation endpoint. It detects overlapping explicit local time windows and reports missing/invalid ranges without inventing travel times or distances.
 - Added WordPress integration test for overlapping stop windows and expanded the OpenAPI contract.
+
+- Connected the day schedule-validation endpoint to the manual itinerary workspace. The UI reports explicit overlap findings and the validator's limitations; it does not claim travel feasibility without routing data.
