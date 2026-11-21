@@ -156,6 +156,7 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   const browserErrors = captureBrowserErrors(page);
   await createTripAndDay(page, 'QA mobile DealZ');
   await addStop(page, 'Điểm dừng mobile', 'Biển Mỹ Khê, Đà Nẵng');
+  await addStop(page, 'Điểm kế tiếp chưa có địa chỉ', '');
 
   const card = page.locator('.itinerary-item-card--stop').first();
   await expect(card.locator('.itinerary-item-card__media')).toBeVisible();
