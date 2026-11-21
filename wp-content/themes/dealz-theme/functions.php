@@ -81,6 +81,9 @@ function dealz_theme_enqueue_assets(): void {
 }
 add_action( 'wp_enqueue_scripts', 'dealz_theme_enqueue_assets' );
 
+// Avoid remote Gravatar image requests; the site must keep all visual assets local.
+add_filter( 'pre_option_show_avatars', '__return_zero' );
+
 
 /**
  * Preload the two most important local Vietnamese font subsets.
