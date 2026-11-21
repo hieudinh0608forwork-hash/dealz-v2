@@ -22,7 +22,7 @@ final class Schema {
 	/**
 	 * Current database schema version.
 	 */
-	public const VERSION = '1.0.0';
+	public const VERSION = '1.1.0';
 
 	/**
 	 * Option storing the installed schema version.
@@ -139,6 +139,8 @@ final class Schema {
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			public_id char(36) NOT NULL,
 			day_id bigint(20) unsigned NOT NULL,
+			item_type varchar(16) NOT NULL DEFAULT 'stop',
+			status varchar(16) NOT NULL DEFAULT 'active',
 			place_provider varchar(32) NOT NULL DEFAULT '',
 			place_provider_id varchar(190) NOT NULL DEFAULT '',
 			title_snapshot varchar(190) NOT NULL,
@@ -160,6 +162,7 @@ final class Schema {
 			PRIMARY KEY  (id),
 			UNIQUE KEY public_id (public_id),
 			KEY day_position (day_id,position),
+			KEY day_type_status (day_id,item_type,status),
 			KEY place_lookup (place_provider,place_provider_id)
 		) $charset_collate;";
 
@@ -206,6 +209,27 @@ final class Schema {
 
 		$table_names = array_values( $tables );
 
+
+		$sql[] = "CREATE TABLE {$tables['route_legs']} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			public_id char(36) NOT NULL,
+			itinerary_id bigint(20) unsigned NOT NULL,
+			from_item_id bigint(20) unsigned NOT NULL,
+			to_item_id bigint(20) unsigned NOT NULL,
+			mode varchar(24) NOT NULL DEFAULT 'motorcycle',
+			distance_meters int(10) unsigned DEFAULT NULL,
+			duration_seconds int(10) unsigned DEFAULT NULL,
+			provider varchar(64) NOT NULL DEFAULT '',
+			calculated_at datetime DEFAULT NULL,
+			status varchar(20) NOT NULL DEFAULT 'unavailable',
+			warnings text DEFAULT NULL,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY public_id (public_id),
+			UNIQUE KEY route_pair_mode (from_item_id,to_item_id,mode),
+			KEY itinerary_status (itinerary_id,status)
+		) $charset_collate;";
+
 		foreach ( $sql as $index => $statement ) {
 			dbDelta( $statement );
 			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
@@ -232,6 +256,7 @@ final class Schema {
 			'itineraries'   => $wpdb->prefix . 'dealz_itineraries',
 			'days'          => $wpdb->prefix . 'dealz_itinerary_days',
 			'items'         => $wpdb->prefix . 'dealz_itinerary_items',
+			'route_legs'    => $wpdb->prefix . 'dealz_route_legs',
 			'budget_lines'  => $wpdb->prefix . 'dealz_budget_lines',
 			'expenses'      => $wpdb->prefix . 'dealz_expenses',
 		);
