@@ -201,3 +201,49 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await expect(page.locator('#rental-back-link')).toHaveAttribute('href', '#trips');
   assertNoUnexpectedBrowserErrors(browserErrors);
 });
+
+test('local Vietnamese fonts load with glyph coverage and no external origin requests', async ({ page }) => {
+  const externalRequests = [];
+  page.on('request', request => {
+    const requestUrl = new URL(request.url());
+    if (requestUrl.origin !== new URL(BASE_URL).origin) externalRequests.push(request.url());
+  });
+  await signIn(page);
+  const fontResult = await page.evaluate(async () => {
+    const sample = 'Ướ ặ ẫ ỡ ọ';
+    await document.fonts.load('800 40px "Bricolage Grotesque"', sample);
+    await document.fonts.load('400 17px "Be Vietnam Pro"', sample);
+    await document.fonts.ready;
+    const heading = document.querySelector('h1');
+    const body = document.querySelector('main p, .hero-section p');
+    const input = document.querySelector('#trip-title');
+    if (heading) heading.textContent = sample;
+    if (body) body.textContent = sample;
+    if (input) input.value = sample;
+    return {
+      bricolage: document.fonts.check('800 40px "Bricolage Grotesque"', sample),
+      beVietnam: document.fonts.check('400 17px "Be Vietnam Pro"', sample),
+      headingText: heading ? heading.textContent : '',
+      bodyText: body ? body.textContent : '',
+      inputValue: input ? input.value : '',
+      headingFamily: heading ? getComputedStyle(heading).fontFamily : '',
+      bodyFamily: body ? getComputedStyle(body).fontFamily : '',
+      inputFamily: input ? getComputedStyle(input).fontFamily : ''
+    };
+  });
+  expect(fontResult.bricolage, 'Bricolage Grotesque 800 must load Vietnamese glyphs').toBe(true);
+  expect(fontResult.beVietnam, 'Be Vietnam Pro 400 must load Vietnamese glyphs').toBe(true);
+  expect(fontResult.headingText).toBe('Ướ ặ ẫ ỡ ọ');
+  expect(fontResult.bodyText).toBe('Ướ ặ ẫ ỡ ọ');
+  expect(fontResult.inputValue).toBe('Ướ ặ ẫ ỡ ọ');
+  expect(fontResult.headingFamily).toContain('Bricolage Grotesque');
+  expect(fontResult.bodyFamily).toContain('Be Vietnam Pro');
+  expect(fontResult.inputFamily).toContain('Be Vietnam Pro');
+  expect(externalRequests, 'Site must not request fonts or other assets from external origins').toEqual([]);
+  const proof = await page.evaluate(async () => {
+    const response = await fetch('/wp-content/themes/dealz-theme/assets/fonts/font-proof.json');
+    return response.json();
+  });
+  expect(proof.total_bytes).toBe(279284);
+  expect(proof.be_vietnam_pro_tnum).toBe(false);
+});

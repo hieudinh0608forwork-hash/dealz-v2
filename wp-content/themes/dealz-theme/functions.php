@@ -37,9 +37,16 @@ function dealz_theme_enqueue_assets(): void {
 	);
 
 	wp_enqueue_style(
+		'dealz-local-fonts',
+		get_theme_file_uri( '/assets/fonts/fonts.css' ),
+		array( 'dealz-design-tokens' ),
+		$theme_version
+	);
+
+	wp_enqueue_style(
 		'dealz-theme',
 		get_stylesheet_uri(),
-		array( 'dealz-design-tokens' ),
+		array( 'dealz-design-tokens', 'dealz-local-fonts' ),
 		$theme_version
 	);
 
@@ -73,3 +80,20 @@ function dealz_theme_enqueue_assets(): void {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'dealz_theme_enqueue_assets' );
+
+
+/**
+ * Preload the two most important local Vietnamese font subsets.
+ *
+ * @return void
+ */
+function dealz_theme_preload_fonts(): void {
+	$font_files = array(
+		'/assets/fonts/bricolage-grotesque-800-vietnamese.woff2',
+		'/assets/fonts/be-vietnam-pro-400-vietnamese.woff2',
+	);
+	foreach ( $font_files as $font_file ) {
+		echo '<link rel="preload" href="' . esc_url( get_theme_file_uri( $font_file ) ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+	}
+}
+add_action( 'wp_head', 'dealz_theme_preload_fonts', 1 );
