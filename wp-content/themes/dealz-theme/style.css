@@ -488,3 +488,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	.item-edit-form { width: 100%; }
 	.item-edit-form input { flex: 1; width: auto; }
 }
+
+
+.validation-tools { display: flex; align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+.validation-results { width: 100%; padding: 16px 18px; border: 1px solid var(--dealz-border); border-radius: 16px; background: #F7FAF7; color: var(--dealz-muted); font-size: 13px; }
+.validation-results p { margin: 0; }
+.validation-results p + p { margin-top: 7px; }
+.validation-results__success { color: var(--dealz-green); font-weight: 700; }
+.validation-results__warning { color: #9C2E00; font-weight: 700; }
+.validation-results__issue { color: #9C2E00; }
+.validation-results__note { color: var(--dealz-muted); font-size: 12px; }
+.validation-results--error { border-color: #E9B7A4; background: #FFF5F0; color: #9C2E00; }
