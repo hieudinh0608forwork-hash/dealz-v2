@@ -160,7 +160,7 @@ final class TripController {
 		$effective_end   = array_key_exists( 'end_date', $data ) ? $data['end_date'] : $existing->end_date;
 
 		if ( $effective_start && $effective_end && $effective_end < $effective_start ) {
-			return new \\WP_Error( 'dealz_invalid_trip_range', __( 'Ngày kết thúc không được trước ngày bắt đầu.', 'dealz-core' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'dealz_invalid_trip_range', __( 'Ngày kết thúc không được trước ngày bắt đầu.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
 		if ( empty( $data ) ) {
@@ -222,7 +222,7 @@ final class TripController {
 				case 'origin_text':
 				case 'destination_name':
 					$value = sanitize_text_field( (string) $value );
-					if ( mb_strlen( $value ) > 255 ) {
+					if ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ) ) > 255 ) {
 						return new \WP_Error( 'dealz_invalid_location', __( 'Tên địa điểm quá dài.', 'dealz-core' ), array( 'status' => 400 ) );
 					}
 					break;
