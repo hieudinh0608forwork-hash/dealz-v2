@@ -8,6 +8,7 @@
 namespace DealZ\Core;
 
 use DealZ\REST\HealthController;
+use DealZ\REST\FinanceController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
