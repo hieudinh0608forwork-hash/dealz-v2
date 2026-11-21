@@ -41,6 +41,7 @@ register_activation_hook(
 	__FILE__,
 	static function () {
 		\DealZ\Core\Capabilities::activate();
+		\DealZ\Database\Schema::maybe_upgrade();
 		update_option( 'dealz_core_version', DEALZ_CORE_VERSION, false );
 	}
 );
