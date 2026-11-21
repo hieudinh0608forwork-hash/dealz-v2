@@ -319,10 +319,5 @@ get_header();
 		</div>
 	</section>
 </main>
-<nav class="mobile-nav" aria-label="<?php esc_attr_e( 'Điều hướng nhanh', 'dealz-theme' ); ?>">
-	<a href="#explore"><span aria-hidden="true">⌂</span><span><?php esc_html_e( 'Khám phá', 'dealz-theme' ); ?></span></a>
-	<a href="#trips"><span aria-hidden="true">⌁</span><span><?php esc_html_e( 'Hành trình', 'dealz-theme' ); ?></span></a>
-	<a href="<?php echo esc_url( is_user_logged_in() ? admin_url( 'profile.php' ) : wp_login_url( home_url( '/' ) ) ); ?>"><span aria-hidden="true">○</span><span><?php esc_html_e( 'Tài khoản', 'dealz-theme' ); ?></span></a>
-</nav>
 <?php
 get_footer();

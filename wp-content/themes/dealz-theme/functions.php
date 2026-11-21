@@ -29,6 +29,14 @@ add_action( 'after_setup_theme', 'dealz_theme_setup' );
 function dealz_theme_enqueue_assets(): void {
 	$theme_version = wp_get_theme()->get( 'Version' );
 
+	wp_enqueue_script(
+		'dealz-shell',
+		get_theme_file_uri( '/assets/js/shell.js' ),
+		array(),
+		$theme_version,
+		true
+	);
+
 	wp_enqueue_style(
 		'dealz-design-tokens',
 		get_theme_file_uri( '/assets/css/tokens.css' ),
