@@ -130,7 +130,7 @@
 			activeTripData = trip;
 			const pilotWarning = document.getElementById('pilot-warning');
 			if (pilotWarning) {
-				const destination = String(trip.destination_name || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+				const destination = String(trip.destination_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 				pilotWarning.hidden = !destination || destination.includes('da nang') || destination.includes('hoi an');
 			}
 			document.getElementById('itinerary-workspace-title').textContent = trip.title || 'Chuyến đi';
