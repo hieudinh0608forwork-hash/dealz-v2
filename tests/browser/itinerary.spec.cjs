@@ -102,6 +102,8 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await details.locator('button[type="submit"]').click();
   await expect(cards.nth(0).locator('h4')).toHaveText('Điểm B đã sửa');
 
+  await cards.nth(0).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/desktop-stop-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/desktop-itinerary.png', fullPage: true });
 
   const rentalLink = cards.nth(0).getByRole('link', { name: 'Mở mục thuê đồ cho Điểm B đã sửa' });
@@ -110,6 +112,8 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await expect(page.locator('#rental-workspace')).toBeVisible();
   await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho Điểm B đã sửa');
   await expect(page.locator('#rental-workspace')).toContainText('Danh mục thuê đồ chưa sẵn sàng');
+  await page.locator('#rental-workspace').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/desktop-rental-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/desktop-rental-context.png', fullPage: true });
   await page.locator('#rental-back-link').click();
   await expect(page).toHaveURL(/#trip\//);
@@ -141,5 +145,7 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await page.keyboard.press('Enter');
   await expect(card.locator('.item-edit-details')).toHaveAttribute('open', '');
 
+  await card.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/mobile-stop-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/mobile-itinerary.png', fullPage: true });
 });
