@@ -45,5 +45,6 @@ final class Plugin {
 	 */
 	public function init(): void {
 		add_action( 'rest_api_init', array( new HealthController(), 'register_routes' ) );
+		add_action( 'init', array( \\DealZ\\Database\\Schema::class, 'maybe_upgrade' ), 1 );
 	}
 }
