@@ -354,6 +354,7 @@ test('six viewport matrix has no horizontal overflow or undersized controls', as
 test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async ({ page }) => {
   await signIn(page);
   await page.setViewportSize({ width: 390, height: 844 });
+  await createTripAndDay(page, 'QA locale and motion DealZ');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const reduced = await page.evaluate(() => { const el = document.querySelector('.dz-skeleton'); return el ? getComputedStyle(el).animationDuration : '0s'; });
   expect(['0s', '0.01ms']).toContain(reduced);
@@ -369,4 +370,39 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.evaluate(() => window.scrollTo(0, 600));
   const top = await page.locator('.site-header').evaluate(el => el.getBoundingClientRect().top);
   expect(top).toBeGreaterThanOrEqual(0);
+});
+test('one primary action per active screen and CLS budget', async ({ page }) => {
+  await signIn(page);
+  await page.goto(BASE_URL + '/');
+  await expect(page.locator('.button--primary:visible')).toHaveCount(1);
+  await createTripAndDay(page, 'QA primary DealZ');
+  await expect(page.locator('.button--primary:visible')).toHaveCount(1);
+  await addStop(page, 'Điểm CTA', 'Đà Nẵng');
+  await page.locator('.item-rental-cta').click();
+  await expect(page.locator('.button--primary:visible')).toHaveCount(1);
+  await page.goto(BASE_URL + '/');
+  await page.waitForLoadState('networkidle');
+  const cls = await page.evaluate(() => performance.getEntriesByType('layout-shift').filter(entry => !entry.hadRecentInput).reduce((sum, entry) => sum + entry.value, 0));
+  expect(cls).toBeLessThan(0.1);
+});
+
+test('capture home, itinerary and rental screenshots at all required viewports', async ({ page }) => {
+  await signIn(page);
+  const widths = [360, 390, 768, 1024, 1280, 1536];
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(BASE_URL + '/');
+    await page.screenshot({ path: 'artifacts/home-' + width + '.png', fullPage: true });
+  }
+  await createTripAndDay(page, 'QA responsive screenshots DealZ');
+  await addStop(page, 'Điểm dừng ảnh QA', 'Đà Nẵng');
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({ path: 'artifacts/itinerary-' + width + '.png', fullPage: true });
+    await page.locator('.item-rental-cta').click();
+    await expect(page.locator('#rental-workspace')).toBeVisible();
+    await page.screenshot({ path: 'artifacts/rental-' + width + '.png', fullPage: true });
+    await page.locator('#rental-back-link').click();
+    await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  }
 });

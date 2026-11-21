@@ -1089,3 +1089,5 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 .finance-form-details[open] > summary::after { content: "−"; }
 .finance-form-details .finance-form { margin-top: 8px; }
 #itinerary-workspace-meta { min-height: 22px; }
+
+.button--compact { min-height: 44px; }
