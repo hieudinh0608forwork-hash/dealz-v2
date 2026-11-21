@@ -30,9 +30,16 @@ function dealz_theme_enqueue_assets(): void {
 	$theme_version = wp_get_theme()->get( 'Version' );
 
 	wp_enqueue_style(
+		'dealz-design-tokens',
+		get_theme_file_uri( '/assets/css/tokens.css' ),
+		array(),
+		$theme_version
+	);
+
+	wp_enqueue_style(
 		'dealz-theme',
 		get_stylesheet_uri(),
-		array(),
+		array( 'dealz-design-tokens' ),
 		$theme_version
 	);
 
