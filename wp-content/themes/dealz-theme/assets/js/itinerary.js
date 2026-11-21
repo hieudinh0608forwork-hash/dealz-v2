@@ -281,7 +281,7 @@
 		return 'Điểm dừng chính';
 	}
 
-	function makeItemCard(item) {
+	function makeItemCard(item, itemIndex, allItems) {
 		const card = document.createElement('article');
 		card.className = 'itinerary-item-card' + (item.item_type === 'stop' ? '' : ' itinerary-item-card--meal');
 
@@ -378,7 +378,44 @@
 
 		const actions = document.createElement('div');
 		actions.className = 'item-card-actions';
-		actions.append(editForm, archive);
+
+		const moveControls = document.createElement('div');
+		moveControls.className = 'item-move-controls';
+		const moveUp = document.createElement('button');
+		moveUp.type = 'button';
+		moveUp.className = 'text-action';
+		moveUp.textContent = '↑';
+		moveUp.setAttribute('aria-label', 'Di chuyển lên');
+		moveUp.disabled = itemIndex <= 0;
+		const moveDown = document.createElement('button');
+		moveDown.type = 'button';
+		moveDown.className = 'text-action';
+		moveDown.textContent = '↓';
+		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
+		moveDown.disabled = itemIndex >= allItems.length - 1;
+
+		async function moveItem(direction) {
+			const targetIndex = itemIndex + direction;
+			if (targetIndex < 0 || targetIndex >= allItems.length) return;
+			const orderedIds = allItems.map(function (entry) { return entry.public_id; });
+			const currentId = orderedIds[itemIndex];
+			orderedIds[itemIndex] = orderedIds[targetIndex];
+			orderedIds[targetIndex] = currentId;
+			try {
+				await api('days/' + encodeURIComponent(activeDay) + '/reorder', 'POST', {
+					item_public_ids: orderedIds
+				});
+				showFeedback('Đã sắp xếp lại lịch trình.', false);
+				await loadItems();
+			} catch (error) {
+				showFeedback(error.message, true);
+			}
+		}
+
+		moveUp.addEventListener('click', function () { moveItem(-1); });
+		moveDown.addEventListener('click', function () { moveItem(1); });
+		moveControls.append(moveUp, moveDown);
+		actions.append(moveControls, editForm, archive);
 		card.append(top, title, details, actions);
 		return card;
 	}
@@ -393,8 +430,8 @@
 				itemsList.append(makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.'));
 				return;
 			}
-			items.forEach(function (item) {
-				itemsList.append(makeItemCard(item));
+			items.forEach(function (item, index) {
+				itemsList.append(makeItemCard(item, index, items));
 			});
 		} catch (error) {
 			showFeedback(error.message, true);
