@@ -30,4 +30,4 @@ The Trip, manual itinerary and finance API integration tests use the official Wo
 4. Configure the test bootstrap to load the plugin and this test file.
 5. Run the test class with PHPUnit.
 
-The repository includes a GitHub Actions workflow that provisions MySQL, installs the WordPress 6.8 test library and runs this suite. The WordPress 6.8 / MySQL 8.0 CI run on commit `537bc96084dd1fbfcc55434017ef0862d29b752b` passed: 15 tests and 71 assertions, including meal-card limits, archive slot reuse, schedule conflict resolution, transactional item reordering and budget total recalculation after edits. Future changes must keep the workflow green.
+The repository includes a GitHub Actions workflow that provisions MySQL, installs the WordPress 6.8 test library and runs this suite. The WordPress 6.8 / MySQL 8.0 CI run on commit `318908cc09d3a2ece20ff72f4373480b90320ec0` passed: 15 tests and 71 assertions, including meal-card limits, archive slot reuse, schedule conflict resolution, transactional item reordering and budget total recalculation after edits. Future changes must keep the workflow green.
