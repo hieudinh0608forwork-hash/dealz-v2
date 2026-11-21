@@ -58,7 +58,7 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 			)
 		);
 		$this->assertSame( 201, $trip->get_status() );
-		$trip_id = $trip->get_data()['public_id'];
+		$trip_id = $trip->get_data()->public_id;
 		$this->trip_public_ids[] = $trip_id;
 
 		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
