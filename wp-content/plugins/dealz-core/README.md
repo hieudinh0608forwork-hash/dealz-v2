@@ -5,7 +5,7 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
 ## Implemented in repository
 
 - Plugin bootstrap and namespace-based autoloading.
-- Additive, versioned database migration v1.0.0 using WordPress `dbDelta`.
+- Additive, versioned database migration v1.1.0 using WordPress `dbDelta`.
 - Eight initial custom tables for trips, collaborators, itineraries, itinerary days/items, route legs, budget lines and expenses.
 - Minimal `manage_dealz` capability added to WordPress Administrators on activation.
 - Public, non-sensitive health endpoint: `GET /wp-json/dealz/v1/health`.
@@ -62,7 +62,7 @@ See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the 
 
 ## Not implemented yet
 
-- Itinerary CRUD, stop scheduling, route legs and map-provider integrations.
+- Itinerary frontend screens, schedule overlap validation, route-provider integrations and maps.
 - Budget and expense REST endpoints/calculators.
 - Collaborator invitations and shared-trip permissions.
 - Destinations and verified place catalogue.
