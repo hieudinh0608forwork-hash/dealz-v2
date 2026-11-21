@@ -127,20 +127,33 @@ final class FinanceController {
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function get_budget( \WP_REST_Request $request ) {
+	public function get_budget( \\WP_REST_Request $request ) {
 		$trip = $this->repository->find_trip( (string) $request['trip_public_id'], get_current_user_id() );
 
 		if ( ! $trip ) {
 			return $this->not_found();
 		}
 
-		return new \WP_REST_Response(
-			array(
-				'lines'   => $this->repository->list_budget_lines( (int) $trip->id ),
-				'summary' => $this->repository->budget_summary( (int) $trip->id ),
-			),
-			200
+		$summary = array_map(
+			static function ( object $row ): array {
+				return array(
+					'cost_type'          => (string) $row->cost_type,
+					'currency'           => (string) $row->currency,
+					'line_count'         => (int) $row->line_count,
+					'total_amount_minor' => null === $row->total_amount_minor ? null : (int) $row->total_amount_minor,
+				);
+			},
+			$this->repository->budget_summary( (int) $trip->id )
 		);
+
+		$lines = array_map(
+			function ( object $line ): array {
+				return $this->serialize_budget_line( $line );
+			},
+			$this->repository->list_budget_lines( (int) $trip->id )
+		);
+
+		return new \\WP_REST_Response( array( 'lines' => $lines, 'summary' => $summary ), 200 );
 	}
 
 	/**
