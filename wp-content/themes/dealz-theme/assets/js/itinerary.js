@@ -951,7 +951,7 @@
 
 	window.addEventListener('hashchange', function () {
 		const match = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
-		const shopMatch = window.location.hash.match(/^#shop(?:\\?(.*))?$/);
+		const shopMatch = window.location.hash.match(/^#shop(?:\?(.*))?$/);
 		if (shopMatch) {
 			showRentalWorkspace(shopMatch[1] || '');
 			return;
@@ -965,7 +965,7 @@
 
 	window.dealzItinerary = { openTrip: openTrip };
 
-	const initialShopMatch = window.location.hash.match(/^#shop(?:\\?(.*))?$/);
+	const initialShopMatch = window.location.hash.match(/^#shop(?:\?(.*))?$/);
 	if (initialShopMatch) {
 		showRentalWorkspace(initialShopMatch[1] || '');
 	}
