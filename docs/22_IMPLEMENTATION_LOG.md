@@ -35,3 +35,20 @@
 3. Freeze physical database schema and migrations.
 4. Implement Identity/Access and Trip/Itinerary MVP services and REST contracts.
 5. Build actual UI screens against the approved design rules and local font assets.
+
+## 2026-11-22 – Manual itinerary editor slice
+
+### Added
+- Schema v1.1.0: itinerary item type (stop/lunch/dinner), archive status and route-leg table.
+- Owner-scoped manual itinerary version, day and item endpoints.
+- Day date-range validation, item field validation, item archive behavior and four-main-stop limit.
+- Database row locks around itinerary version allocation and main-stop creation/type changes.
+- WordPress integration test cases for itinerary ownership, trip date range and daily stop limit.
+- Initial responsive manual itinerary workspace in the theme: choose trip, create/select itinerary version, add days, add stop/meal cards, edit stop title and archive an item.
+
+### Verification status
+- PHP syntax workflow is configured but no workflow run/check result is available through the repository status endpoints.
+- WordPress integration tests are authored but not executed.
+- Docker is not available in the current execution environment; no browser/runtime visual verification has been performed.
+- Local WOFF2 font assets are still missing; the theme currently uses system fallback fonts.
+- This is a functional first slice, not the complete approved itinerary UI: photo cards, sourced route connectors, map sync, schedule conflict validation and reordering remain open.
