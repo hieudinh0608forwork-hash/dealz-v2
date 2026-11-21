@@ -145,6 +145,7 @@
 				const button = document.createElement('button');
 				button.type = 'button';
 				button.className = 'version-chip';
+				button.dataset.itineraryId = itinerary.public_id;
 				button.textContent = 'Bản ' + itinerary.version + ' · ' + (itinerary.source === 'manual' ? 'Thủ công' : itinerary.source);
 				button.setAttribute('aria-pressed', String(itinerary.public_id === (selectId || itineraries[0].public_id)));
 				button.addEventListener('click', function () {
@@ -166,7 +167,7 @@
 		editor.hidden = false;
 		itemsPanel.hidden = true;
 		versionsList.querySelectorAll('.version-chip').forEach(function (button) {
-			button.setAttribute('aria-pressed', String(button.textContent.indexOf('Bản ') === 0 && button.dataset.itineraryId === publicId));
+			button.setAttribute('aria-pressed', String(button.dataset.itineraryId === publicId));
 		});
 		await loadDays();
 	}
