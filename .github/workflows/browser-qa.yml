@@ -1,0 +1,68 @@
+name: Browser QA desktop and mobile
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start clean WordPress and MySQL
+        run: |
+          cp .env.example .env
+          docker compose up -d --wait --wait-timeout 180
+
+      - name: Install WordPress CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /tmp/wp-cli.phar
+          container_id="$(docker compose ps -q wordpress)"
+          test -n "$container_id"
+          docker cp /tmp/wp-cli.phar "$container_id:/tmp/wp-cli.phar"
+
+      - name: Install WordPress and activate DealZ
+        run: |
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root core install \
+            --url=http://127.0.0.1:8080 \
+            --title="DealZ Browser QA" \
+            --admin_user=dealz-ci-admin \
+            --admin_password=ci-only-password-not-for-reuse \
+            --admin_email=dealz-ci@example.invalid \
+            --skip-email
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm install --prefix tests/browser --no-audit --no-fund
+          tests/browser/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Run desktop and mobile browser scenarios
+        run: |
+          mkdir -p artifacts
+          tests/browser/node_modules/.bin/playwright test tests/browser/itinerary.spec.cjs --reporter=line
+
+      - name: Upload browser screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dealz-browser-qa
+          path: |
+            artifacts/
+            test-results/
+          if-no-files-found: warn
+
+      - name: Stop stack and remove ephemeral volumes
+        if: always()
+        run: docker compose down -v
