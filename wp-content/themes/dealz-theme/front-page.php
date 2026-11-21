@@ -300,6 +300,23 @@ get_header();
 			<?php endif; ?>
 		</div>
 	</section>
+	<section id="rental-workspace" class="rental-workspace page-container" hidden aria-labelledby="rental-workspace-title">
+		<div class="workspace-toolbar">
+			<a id="rental-back-link" class="text-link" href="#trips"><?php esc_html_e( '← Quay lại điểm dừng', 'dealz-theme' ); ?></a>
+			<span class="workspace-label"><?php esc_html_e( 'Khám phá đồ thuê', 'dealz-theme' ); ?></span>
+		</div>
+		<div class="workspace-heading">
+			<p class="eyebrow"><?php esc_html_e( 'Theo điểm dừng trong hành trình', 'dealz-theme' ); ?></p>
+			<h2 id="rental-workspace-title"><?php esc_html_e( 'Thuê đồ cho điểm dừng', 'dealz-theme' ); ?></h2>
+			<p id="rental-stop-context"></p>
+		</div>
+		<div class="rental-empty-state" role="status" aria-live="polite">
+			<div class="rental-empty-state__symbol" aria-hidden="true">⌁</div>
+			<h3><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h3>
+			<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
+			<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
+		</div>
+	</section>
 </main>
 <nav class="mobile-nav" aria-label="<?php esc_attr_e( 'Điều hướng nhanh', 'dealz-theme' ); ?>">
 	<a href="#explore"><span aria-hidden="true">⌂</span><span><?php esc_html_e( 'Khám phá', 'dealz-theme' ); ?></span></a>
