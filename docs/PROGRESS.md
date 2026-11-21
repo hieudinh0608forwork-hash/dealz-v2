@@ -35,3 +35,12 @@ Last reconciled: 2026-11-22 (UTC)
 ## Verification boundary
 - Green CI is evidence only for the commit and workflows linked above; it does not establish Safari, Firefox, physical-device, production or whole-system verification.
 - All later commits must update this file in the same commit and push immediately.
+
+
+## Latest continuation note (2026-11-22)
+- Latest pushed head before this note: `008a55287af5829e7a5b140b7b7758e453a9d734`.
+- Fixed badge aggregation to use a per-day cache; only missing days are fetched after the active day read, preventing the badge request from racing the loading/error UI tests.
+- Styleguide skeleton uses `role=status` with `aria-busy` and `aria-label`, correcting the axe `aria-prohibited-attr` finding.
+- Browser QA follow-up fixes: exclude the 27×24px WordPress core admin-bar search input from DealZ control-size assertions; vi-VN 24-hour formatter returns localized `09 giờ`, so the test checks the 24-hour hour prefix; home create-trip submit action is secondary so the hero CTA remains the only primary action.
+- Re-run all four workflows after this commit. Do not mark T7 Verified until axe, all six viewports, CLS, primary CTA and screenshot matrix pass on a green Browser QA run.
+- Outstanding: no confirmed Master Handoff document; Be Vietnam Pro `tnum` absent and WOFF2 total 272.74 KiB; no real destination photos/licenses or Zalo URL; owner confirmation still needed for meal exclusion and badge definition.

@@ -362,7 +362,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await time.fill('09:30');
   await expect(time).toHaveValue('09:30');
   const hours = await page.evaluate(() => { const d = new Date('2027-04-01T09:30:00Z'); return ['en-US','vi-VN'].map(locale => new Intl.DateTimeFormat(locale, { hour: '2-digit', hour12: false, timeZone: 'UTC' }).format(d)); });
-  expect(hours).toEqual(['09','09']);
+  expect(hours.every(value => value.startsWith('09'))).toBe(true);
   await page.keyboard.press('Tab');
   const focus = await page.evaluate(() => ({ style: getComputedStyle(document.activeElement).outlineStyle, width: getComputedStyle(document.activeElement).outlineWidth }));
   expect(focus.style).not.toBe('none');

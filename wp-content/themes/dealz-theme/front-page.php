@@ -323,7 +323,7 @@ get_header();
 						<input id="trip-budget" name="budget_amount_minor" type="number" min="0" step="1" placeholder="<?php esc_attr_e( 'Chưa cần nhập', 'dealz-theme' ); ?>">
 					</div>
 					<div class="form-field form-field--wide form-actions">
-						<button class="button button--primary" type="submit" id="create-trip-submit"><?php esc_html_e( 'Lưu chuyến đi', 'dealz-theme' ); ?></button>
+						<button class="button button--secondary" type="submit" id="create-trip-submit"><?php esc_html_e( 'Lưu chuyến đi', 'dealz-theme' ); ?></button>
 						<p class="form-footnote"><?php esc_html_e( 'Chuyến đi mới được lưu ở chế độ riêng tư.', 'dealz-theme' ); ?></p>
 					</div>
 				</form>
