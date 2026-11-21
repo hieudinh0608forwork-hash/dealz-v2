@@ -30,3 +30,11 @@
 - Added WordPress integration test for overlapping stop windows and expanded the OpenAPI contract.
 
 - Connected the day schedule-validation endpoint to the manual itinerary workspace. The UI reports explicit overlap findings and the validator's limitations; it does not claim travel feasibility without routing data.
+
+- Registered the implemented FinanceController in the plugin REST bootstrap; budget and expense routes were present in source but previously were not registered.
+- Added finance API integration test cases for server-calculated budget totals, owner scoping, UTC normalization and invalid calendar dates.
+- Hardened expense timestamp parsing so invalid calendar dates are rejected rather than silently normalized; Zulu timestamps are normalized before strict parsing.
+- Finance responses now serialize monetary minor-unit fields as JSON integers and normalize grouped budget summary values.
+- Rebuilt the OpenAPI 3.1 file as a valid, concise contract for the implemented health, Trip, itinerary, budget and expense routes. Added correct partial-update schemas.
+- Updated schema documentation to v1.2.0, including the expense archival status column.
+- PHP syntax and WordPress integration tests still require an observed CI/runtime run; no passing test result is claimed.
