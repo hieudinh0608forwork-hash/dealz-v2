@@ -26,10 +26,10 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Freeze MVP vertical slice and acceptance criteria.
 
 ## Phase 2 – Data, API and security contracts
-- [ ] ERD with field types, constraints, indexes and deletion policy.
+- [x] Initial MVP physical schema/migration v1.0.0 for trip planning (7 tables); [ ] full commerce ERD, retention and deletion policy.
 - [ ] Permission matrix.
 - [ ] Booking/Order/Payment state transition table.
-- [ ] JSON Schemas/OpenAPI for MVP endpoints.
+- [x] OpenAPI 3.1 contract for health and Trip CRUD; [ ] expand schemas for itinerary, budget and commerce endpoints.
 - [ ] AI itinerary schema and validation contract.
 - [ ] Places/geocoding/routing provider contract.
 - [ ] Budget and expense calculation specification.
@@ -41,11 +41,11 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Confirm WordPress/PHP/MySQL compatibility.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
-- [ ] Add migrations and automated test runner.
+- [x] Add additive v1.0.0 WordPress dbDelta migration for 7 trip-planning tables; [ ] add automated WordPress integration test runner.
 - [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
-- [ ] Trip CRUD and manual itinerary CRUD.
+- [x] Implement authenticated, owner-scoped Trip CRUD REST endpoints (runtime verification pending); [ ] manual itinerary CRUD.
 
 ## Phase 4 – Core planning experience
 - [ ] Implement itinerary day/stop cards to exact design rules.
