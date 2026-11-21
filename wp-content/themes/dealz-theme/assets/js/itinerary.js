@@ -208,6 +208,8 @@
 
 	async function selectDay(publicId, date) {
 		activeDay = publicId;
+		const validationResults = document.getElementById('validation-results');
+		if (validationResults) { validationResults.hidden = true; validationResults.classList.remove('validation-results--error'); }
 		daysList.querySelectorAll('.day-chip').forEach(function (button) {
 			button.setAttribute('aria-pressed', String(button.dataset.dayId === publicId));
 		});
@@ -222,6 +224,7 @@
 		const results = document.getElementById('validation-results');
 		const button = document.getElementById('validate-day-btn');
 		results.hidden = false;
+		results.classList.remove('validation-results--error');
 		results.replaceChildren();
 		results.textContent = 'Đang kiểm tra…';
 		button.disabled = true;
