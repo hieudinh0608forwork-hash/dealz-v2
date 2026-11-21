@@ -292,7 +292,9 @@
 		type.textContent = itemTypeLabel(item.item_type);
 		const time = document.createElement('span');
 		time.className = 'item-time';
-		time.textContent = item.start_local ? item.start_local.slice(0, 5) : 'Chưa có giờ';
+		time.textContent = item.start_local
+			? item.start_local.slice(0, 5) + (item.end_local ? ' – ' + item.end_local.slice(0, 5) : '')
+			: 'Chưa có giờ';
 		top.append(type, time);
 
 		const title = document.createElement('h4');
