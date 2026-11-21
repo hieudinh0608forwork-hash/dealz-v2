@@ -3,6 +3,7 @@
 	--dealz-orange: #FD550A;
 	--dealz-primary: #D63F00;
 	--dealz-green: #015D47;
+	--dealz-forest: #015D47;
 	--dealz-lime: #E0F354;
 	--dealz-cream: #FBF7EE;
 	--dealz-ink: #0E2A22;
@@ -24,7 +25,7 @@
 	--dealz-font-heading: "Bricolage Grotesque", "Be Vietnam Pro", sans-serif;
 	--dealz-font-body: "Be Vietnam Pro", "Bricolage Grotesque", sans-serif;
 	/* Component and state color tokens. Keep all presentation colors here. */
-	--dealz-white: #fff;
+	--dealz-white: #FFFFFF;
 	--dealz-primary-hover: #B93400;
 	--dealz-hero-art-bg: #E8F0E7;
 	--dealz-hero-hill: #B8CFC0;
@@ -56,5 +57,5 @@
 	--dealz-mobile-nav-surface: rgba(255,255,255,0.96);
 	--dealz-lime-surface: rgba(224,243,84,0.16);
 	--dealz-surface-shadow: rgba(1,93,71,0.06);
-	--dealz-white-muted-strong: rgba(255,255,255,0.82);	--dealz-white: #FFFFFF;
+	--dealz-white-muted-strong: rgba(255,255,255,0.82);
 }

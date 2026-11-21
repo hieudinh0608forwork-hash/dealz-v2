@@ -383,7 +383,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .button--secondary {
 	min-height: 44px;
 	padding: 0 18px;
-	border: 1.5px solid var(--dealz-border);
+	border: 1.5px solid var(--dealz-input-border);
 	background: var(--dealz-white);
 	color: var(--dealz-green);
 	box-shadow: none;
@@ -439,7 +439,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .itinerary-item-card__details { margin: 8px 0 16px; color: var(--dealz-muted); font-size: 13px; }
 .item-card-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--dealz-border-soft); }
 .item-edit-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 7px; min-width: 0; flex: 1; }
-.item-edit-form input { width: 100%; min-width: 0; height: 38px; padding: 0 9px; border: 1px solid var(--dealz-border); border-radius: 10px; color: var(--dealz-ink); font-size: 12px; }
+.item-edit-form input { width: 100%; min-width: 0; height: 38px; padding: 0 9px; border: 1px solid var(--dealz-input-border); border-radius: 10px; color: var(--dealz-ink); font-size: 12px; }
 .item-edit-form input:first-child, .item-edit-form button { grid-column: 1 / -1; }
 .item-edit-form input:focus { border-color: var(--dealz-orange); outline: 0; box-shadow: 0 0 0 3px var(--dealz-focus-shadow); }
 .text-action { padding: 4px 0; border: 0; background: transparent; color: var(--dealz-green); font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -451,7 +451,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	width: 100%;
 	height: 52px;
 	padding: 0 40px 0 16px;
-	border: 1.5px solid var(--dealz-border);
+	border: 1.5px solid var(--dealz-input-border);
 	border-radius: 14px;
 	background: var(--dealz-white);
 	color: var(--dealz-ink);
@@ -559,7 +559,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	width: 100%;
 	height: 48px;
 	padding: 0 38px 0 14px;
-	border: 1.5px solid var(--dealz-border);
+	border: 1.5px solid var(--dealz-input-border);
 	border-radius: 12px;
 	background: var(--dealz-white);
 	color: var(--dealz-ink);
@@ -573,7 +573,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .finance-form input {
 	min-height: 48px;
 	padding-inline: 13px;
-	border: 1.5px solid var(--dealz-border);
+	border: 1.5px solid var(--dealz-input-border);
 	border-radius: 12px;
 	background: var(--dealz-white);
 	font-size: 14px;
