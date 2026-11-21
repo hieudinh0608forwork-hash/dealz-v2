@@ -39,7 +39,7 @@ async function addStop(page, title, address) {
   await page.locator('#item-start').fill('09:00');
   await page.locator('#item-duration').fill('90');
   await page.locator('#create-item-submit').click();
-  await expect(page.locator('.itinerary-item-card--stop')).toContainText(title);
+  await expect(page.locator('.itinerary-item-card--stop').filter({ hasText: title })).toBeVisible();
 }
 
 test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboard', async ({ page }) => {
