@@ -98,6 +98,10 @@ get_header();
 							<h3 id="day-items-title"><?php esc_html_e( 'Điểm dừng', 'dealz-theme' ); ?></h3>
 						</div>
 					</div>
+					<div class="validation-tools">
+						<button class="button button--secondary" type="button" id="validate-day-btn"><?php esc_html_e( 'Kiểm tra khung giờ', 'dealz-theme' ); ?></button>
+						<div id="validation-results" class="validation-results" role="status" aria-live="polite" hidden></div>
+					</div>
 					<div id="day-items-list" class="itinerary-item-list" aria-live="polite"></div>
 					<form id="create-item-form" class="item-form">
 						<h4><?php esc_html_e( 'Thêm điểm dừng hoặc bữa ăn', 'dealz-theme' ); ?></h4>
