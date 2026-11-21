@@ -106,10 +106,134 @@ add_action( 'wp_head', 'dealz_theme_preload_fonts', 1 );
  * Register the private, noindex design-system reference page.
  */
 function dealz_register_styleguide_route(): void {
-	add_rewrite_rule( '^styleguide/?$', 'index.php?dealz_styleguide=1', 'top' );
-	if ( ! get_option( 'dealz_styleguide_rewrite_ready' ) ) {
+	add_rewrite_rule( '^styleguide/?
+add_action( 'init', 'dealz_register_styleguide_route' );
+
+function dealz_styleguide_query_vars( array $vars ): array {
+	$vars[] = 'dealz_styleguide';
+	$vars[] = 'dealz_legal_draft';
+	return $vars;
+}
+add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+function dealz_render_styleguide_route(): void {
+	if ( ! get_query_var( 'dealz_styleguide' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		status_header( 404 );
+		nocache_headers();
+		include get_404_template();
+		exit;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/styleguide-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );
+, 'index.php?dealz_styleguide=1', 'top' );
+	add_rewrite_rule( '^chinh-sach-coc-va-huy/?
+add_action( 'init', 'dealz_register_styleguide_route' );
+
+function dealz_styleguide_query_vars( array $vars ): array {
+	$vars[] = 'dealz_styleguide';
+	return $vars;
+}
+add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+function dealz_render_styleguide_route(): void {
+	if ( ! get_query_var( 'dealz_styleguide' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		status_header( 404 );
+		nocache_headers();
+		include get_404_template();
+		exit;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/styleguide-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );
+, 'index.php?dealz_legal_draft=deposit-cancellation', 'top' );
+	add_rewrite_rule( '^dieu-khoan/?
+add_action( 'init', 'dealz_register_styleguide_route' );
+
+function dealz_styleguide_query_vars( array $vars ): array {
+	$vars[] = 'dealz_styleguide';
+	return $vars;
+}
+add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+function dealz_render_styleguide_route(): void {
+	if ( ! get_query_var( 'dealz_styleguide' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		status_header( 404 );
+		nocache_headers();
+		include get_404_template();
+		exit;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/styleguide-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );
+, 'index.php?dealz_legal_draft=terms', 'top' );
+	add_rewrite_rule( '^bao-mat/?
+add_action( 'init', 'dealz_register_styleguide_route' );
+
+function dealz_styleguide_query_vars( array $vars ): array {
+	$vars[] = 'dealz_styleguide';
+	return $vars;
+}
+add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+function dealz_render_styleguide_route(): void {
+	if ( ! get_query_var( 'dealz_styleguide' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		status_header( 404 );
+		nocache_headers();
+		include get_404_template();
+		exit;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/styleguide-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );
+, 'index.php?dealz_legal_draft=privacy', 'top' );
+	if ( '2' !== get_option( 'dealz_theme_rewrite_version' ) ) {
 		flush_rewrite_rules( false );
-		update_option( 'dealz_styleguide_rewrite_ready', 1, false );
+		update_option( 'dealz_theme_rewrite_version', '2', false );
 	}
 }
 add_action( 'init', 'dealz_register_styleguide_route' );
@@ -141,3 +265,76 @@ function dealz_render_styleguide_route(): void {
 	exit;
 }
 add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );
+
+
+/**
+ * Sanitize the optional Zalo contact URL; only secure URLs are accepted.
+ *
+ * @param mixed $value Submitted setting.
+ * @return string
+ */
+function dealz_sanitize_zalo_url( $value ): string {
+	$url = esc_url_raw( is_string( $value ) ? trim( $value ) : '' );
+	$parts = wp_parse_url( $url );
+	return is_array( $parts ) && isset( $parts['scheme'] ) && 'https' === strtolower( $parts['scheme'] ) ? $url : '';
+}
+
+function dealz_theme_register_settings(): void {
+	register_setting(
+		'dealz_theme_settings',
+		'dealz_zalo_url',
+		array(
+			'type'              => 'string',
+			'sanitize_callback' => 'dealz_sanitize_zalo_url',
+			'default'           => '',
+		)
+	);
+}
+add_action( 'admin_init', 'dealz_theme_register_settings' );
+
+function dealz_theme_add_settings_page(): void {
+	add_theme_page( 'DealZ Settings', 'DealZ Settings', 'manage_options', 'dealz-settings', 'dealz_theme_render_settings_page' );
+}
+add_action( 'admin_menu', 'dealz_theme_add_settings_page' );
+
+function dealz_theme_render_settings_page(): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'DealZ Settings', 'dealz-theme' ); ?></h1>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'dealz_theme_settings' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="dealz_zalo_url"><?php esc_html_e( 'Zalo URL (tùy chọn)', 'dealz-theme' ); ?></label></th>
+					<td>
+						<input class="regular-text" type="url" id="dealz_zalo_url" name="dealz_zalo_url" value="<?php echo esc_attr( (string) get_option( 'dealz_zalo_url', '' ) ); ?>" placeholder="https://zalo.me/…">
+						<p class="description"><?php esc_html_e( 'Để trống thì ẩn toàn bộ liên kết Zalo trên website. Chỉ lưu URL HTTPS đã được chủ dự án cung cấp.', 'dealz-theme' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<?php submit_button(); ?>
+		</form>
+	</div>
+	<?php
+}
+
+function dealz_render_legal_draft_route(): void {
+	$slug = get_query_var( 'dealz_legal_draft' );
+	$allowed = array( 'deposit-cancellation', 'terms', 'privacy' );
+	if ( ! is_string( $slug ) || ! in_array( $slug, $allowed, true ) ) {
+		return;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/legal-draft-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_legal_draft_route', 0 );
