@@ -239,6 +239,20 @@ final class Schema {
 			}
 		}
 
+		$required_columns = array( 'item_type', 'status' );
+		foreach ( $required_columns as $column ) {
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SHOW COLUMNS FROM ' . $tables['items'] . ' LIKE %s',
+					$column
+				)
+			);
+
+			if ( ! $column_exists ) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
