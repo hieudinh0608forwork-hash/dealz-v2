@@ -97,3 +97,44 @@ function dealz_theme_preload_fonts(): void {
 	}
 }
 add_action( 'wp_head', 'dealz_theme_preload_fonts', 1 );
+
+
+/**
+ * Register the private, noindex design-system reference page.
+ */
+function dealz_register_styleguide_route(): void {
+	add_rewrite_rule( '^styleguide/?$', 'index.php?dealz_styleguide=1', 'top' );
+	if ( ! get_option( 'dealz_styleguide_rewrite_ready' ) ) {
+		flush_rewrite_rules( false );
+		update_option( 'dealz_styleguide_rewrite_ready', 1, false );
+	}
+}
+add_action( 'init', 'dealz_register_styleguide_route' );
+
+function dealz_styleguide_query_vars( array $vars ): array {
+	$vars[] = 'dealz_styleguide';
+	return $vars;
+}
+add_filter( 'query_vars', 'dealz_styleguide_query_vars' );
+
+function dealz_render_styleguide_route(): void {
+	if ( ! get_query_var( 'dealz_styleguide' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		status_header( 404 );
+		nocache_headers();
+		include get_404_template();
+		exit;
+	}
+	nocache_headers();
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+	add_action( 'wp_head', static function (): void {
+		echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+	}, 1 );
+	get_header();
+	include get_theme_file_path( '/styleguide-content.php' );
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'dealz_render_styleguide_route', 0 );

@@ -247,3 +247,18 @@ test('local Vietnamese fonts load with glyph coverage and no external origin req
   expect(proof.total_bytes).toBe(279284);
   expect(proof.be_vietnam_pro_tnum).toBe(false);
 });
+
+
+test('admin-only styleguide is noindex and exposes the component states', async ({ page }) => {
+  await signIn(page);
+  const response = await page.goto(BASE_URL + '/styleguide/');
+  expect(response.status()).toBe(200);
+  await expect(page.locator('h1')).toHaveText('Trang styleguide');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('[data-btn="primary"]')).toBeVisible();
+  await expect(page.locator('.dz-chip--selected')).toBeVisible();
+  await expect(page.locator('.dz-card--budget')).toBeVisible();
+  await expect(page.locator('.dz-toast--error')).toBeVisible();
+  await expect(page.locator('.dz-skeleton[aria-busy="true"]')).toBeVisible();
+  await expect(page.locator('.route-connector')).toContainText('Chưa có đủ dữ liệu tuyến đường');
+});
