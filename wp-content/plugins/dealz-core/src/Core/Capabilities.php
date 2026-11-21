@@ -5,7 +5,7 @@
  * @package DealZ
  */
 
-namespace DealZ\\Core;
+namespace DealZ\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
