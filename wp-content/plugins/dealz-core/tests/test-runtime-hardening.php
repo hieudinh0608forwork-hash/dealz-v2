@@ -26,6 +26,27 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_columns, array_values( $actual ), 'Unexpected columns for index ' . $index_name );
 	}
 
+	private function get_index_snapshot( array $tables ): array {
+		global $wpdb;
+		$snapshot = array();
+		$quote = chr( 96 );
+		foreach ( $tables as $table_key => $table ) {
+			$quoted_table = $quote . str_replace( $quote, $quote . $quote, $table ) . $quote;
+			$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+			$indexes = array();
+			foreach ( (array) $rows as $row ) {
+				$indexes[ $row['Key_name'] ][ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+			foreach ( $indexes as $name => $columns ) {
+				ksort( $columns );
+				$indexes[ $name ] = array_values( $columns );
+			}
+			ksort( $indexes );
+			$snapshot[ $table_key ] = $indexes;
+		}
+		return $snapshot;
+	}
+
 	private function request( string $method, string $route, array $params = array() ): WP_REST_Response {
 		$request = new WP_REST_Request( $method, '/dealz/v1' . $route );
 		if ( ! empty( $params ) ) {
@@ -192,8 +213,12 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assert_index_columns( $tables['itineraries'], 'trip_status', array( 'trip_id', 'status' ) );
 		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$indexes_before_second_run = $this->get_index_snapshot( $tables );
+		$data_before_second_run = $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, title_snapshot, item_type, status, position FROM ' . $tables['items'] . ' WHERE public_id = %s', $item->get_data()['public_id'] ), ARRAY_A );
 		update_option( 'dealz_db_version', '1.1.0' );
 		\DealZ\Database\Schema::maybe_upgrade();
+		$this->assertSame( $indexes_before_second_run, $this->get_index_snapshot( $tables ), 'A repeated 1.0 to 1.2 migration must not change any index.' );
+		$this->assertSame( $data_before_second_run, $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, title_snapshot, item_type, status, position FROM ' . $tables['items'] . ' WHERE public_id = %s', $item->get_data()['public_id'] ), ARRAY_A ), 'A repeated migration must preserve the sample itinerary row.' );
 		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
 	}
@@ -235,9 +260,13 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
 		$this->assertSame( 'active', $preserved->status );
 		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$second_run_tables = array( 'items' => $tables['items'], 'expenses' => $tables['expenses'], 'itineraries' => $tables['itineraries'] );
+		$indexes_before_second_run = $this->get_index_snapshot( $second_run_tables );
+		$data_before_second_run = $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s', $public_id ), ARRAY_A );
 		update_option( 'dealz_db_version', '1.1.0' );
 		\DealZ\Database\Schema::maybe_upgrade();
-		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$this->assertSame( $indexes_before_second_run, $this->get_index_snapshot( $second_run_tables ), 'A repeated 1.1 to 1.2 migration must not change index definitions.' );
+		$this->assertSame( $data_before_second_run, $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s', $public_id ), ARRAY_A ), 'A repeated migration must preserve the sample expense row.' );
 	}
 
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {

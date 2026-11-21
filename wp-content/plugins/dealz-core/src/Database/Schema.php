@@ -233,11 +233,33 @@ final class Schema {
 		) $charset_collate;";
 
 		foreach ( $sql as $index => $statement ) {
+			// dbDelta can mis-detect existing secondary indexes on legacy MySQL schemas.
+			// Keep secondary indexes out of its parser and reconcile them explicitly below.
+			$statement = preg_replace( '/^\s*KEY\s+[A-Za-z0-9_]+\s+\([^\n]+\),?\s*$/m', '', $statement );
+			$statement = preg_replace( '/,\s*\)/', "\n\t\t)", $statement );
 			dbDelta( $statement );
 			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
 
 			if ( $table_names[ $index ] !== $created_table ) {
 				return false;
+			}
+		}
+
+		$required_indexes = array(
+			'trips'         => array( 'owner_status' => array( 'owner_user_id', 'status' ), 'owner_dates' => array( 'owner_user_id', 'start_date', 'end_date' ) ),
+			'collaborators' => array( 'invite_email' => array( 'invite_email' ), 'token_hash' => array( 'token_hash' ), 'user_status' => array( 'user_id', 'invitation_status' ) ),
+			'itineraries'   => array( 'trip_status' => array( 'trip_id', 'status' ) ),
+			'days'          => array( 'itinerary_position' => array( 'itinerary_id', 'position' ) ),
+			'items'         => array( 'day_position' => array( 'day_id', 'position' ), 'day_type_status' => array( 'day_id', 'item_type', 'status' ), 'place_lookup' => array( 'place_provider', 'place_provider_id' ) ),
+			'budget_lines'  => array( 'trip_type' => array( 'trip_id', 'cost_type' ), 'trip_category' => array( 'trip_id', 'category' ) ),
+			'expenses'      => array( 'trip_occurred' => array( 'trip_id', 'occurred_at' ), 'trip_status' => array( 'trip_id', 'status' ), 'payer_user' => array( 'payer_user_id' ) ),
+			'route_legs'    => array( 'itinerary_status' => array( 'itinerary_id', 'status' ) ),
+		);
+		foreach ( $required_indexes as $table_key => $indexes ) {
+			foreach ( $indexes as $index_name => $columns ) {
+				if ( ! self::ensure_secondary_index( $tables[ $table_key ], $index_name, $columns ) ) {
+					return false;
+				}
 			}
 		}
 
@@ -261,6 +283,51 @@ final class Schema {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Ensure a secondary index exists with the declared column order.
+	 *
+	 * @param string        $table      Table name.
+	 * @param string        $index_name Index name.
+	 * @param array<string> $columns    Ordered index columns.
+	 * @return bool
+	 */
+	private static function ensure_secondary_index( string $table, string $index_name, array $columns ): bool {
+		global $wpdb;
+		$quote = chr( 96 );
+		$quoted_table = $quote . str_replace( $quote, $quote . $quote, $table ) . $quote;
+		$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+		$existing = array();
+		foreach ( (array) $rows as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$existing[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $existing );
+		if ( array_values( $existing ) === $columns ) {
+			return true;
+		}
+		if ( ! empty( $existing ) ) {
+			return false;
+		}
+		$quoted_columns = array_map( static function ( string $column ) use ( $quote ): string {
+			return $quote . str_replace( $quote, $quote . $quote, $column ) . $quote;
+		}, $columns );
+		$quoted_index = $quote . str_replace( $quote, $quote . $quote, $index_name ) . $quote;
+		$sql = 'ALTER TABLE ' . $quoted_table . ' ADD KEY ' . $quoted_index . ' (' . implode( ',', $quoted_columns ) . ')';
+		if ( false === $wpdb->query( $sql ) ) {
+			return false;
+		}
+		$verified = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+		$actual = array();
+		foreach ( (array) $verified as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$actual[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $actual );
+		return array_values( $actual ) === $columns;
 	}
 
 	/**
