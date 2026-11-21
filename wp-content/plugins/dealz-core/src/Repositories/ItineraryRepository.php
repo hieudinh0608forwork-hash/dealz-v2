@@ -270,7 +270,24 @@ final class ItineraryRepository {
 	public function create_item( int $day_id, array $data ) {
 		global $wpdb;
 
+		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+			return false;
+		}
+
+		$locked_day = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT id FROM ' . $this->table( 'itinerary_days' ) . ' WHERE id = %d FOR UPDATE',
+				$day_id
+			)
+		);
+
+		if ( ! $locked_day ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
 		if ( 'stop' === $data['item_type'] && $this->count_main_stops( $day_id ) >= 4 ) {
+			$wpdb->query( 'ROLLBACK' );
 			return new \WP_Error( 'dealz_daily_stop_limit', __( 'Mỗi ngày chỉ được có tối đa 4 điểm dừng chính.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
@@ -287,18 +304,24 @@ final class ItineraryRepository {
 		$now       = current_time( 'mysql', true );
 		$insert    = array_merge(
 			array(
-				'public_id'    => $public_id,
-				'day_id'       => $day_id,
-				'status'       => 'active',
-				'created_at'   => $now,
-				'updated_at'   => $now,
+				'public_id'  => $public_id,
+				'day_id'     => $day_id,
+				'status'     => 'active',
+				'created_at' => $now,
+				'updated_at' => $now,
 			),
 			$data
 		);
 
 		$inserted = $wpdb->insert( $this->table( 'itinerary_items' ), $insert );
 
-		return false === $inserted ? false : $public_id;
+		if ( false === $inserted ) {
+			$wpdb->query( 'ROLLBACK' );
+			return false;
+		}
+
+		$wpdb->query( 'COMMIT' );
+		return $public_id;
 	}
 
 	/**
