@@ -26,10 +26,10 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Freeze MVP vertical slice and acceptance criteria.
 
 ## Phase 2 – Data, API and security contracts
-- [x] Initial MVP physical schema/migration v1.1.0 for trip planning (8 tables); [ ] full commerce ERD, retention and deletion policy.
+- [x] Initial MVP physical schema/migration v1.2.0 for trip planning and finance (8 tables); [ ] full commerce ERD, retention and deletion policy.
 - [x] Initial permission matrix for current roles; [ ] executable permission tests and resource-sharing permissions.
 - [ ] Booking/Order/Payment state transition table.
-- [x] OpenAPI 3.1 contract for health, Trip CRUD and manual itinerary/day/stop endpoints; [ ] expand schemas for budget and commerce endpoints.
+- [x] OpenAPI 3.1 contract for health, Trip, itinerary, budget and expense endpoints; [ ] expand schemas for commerce endpoints.
 - [ ] AI itinerary schema and validation contract.
 - [ ] Places/geocoding/routing provider contract.
 - [ ] Budget and expense calculation specification.
@@ -41,7 +41,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Confirm WordPress/PHP/MySQL compatibility in a running environment.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
-- [x] Add additive v1.1.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] configure and execute automated WordPress integration test runner.
+- [x] Add additive v1.2.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] configure and execute automated WordPress integration test runner.
 - [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
@@ -52,7 +52,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [x] Add initial responsive manual itinerary workspace wired to APIs; [ ] implement full 16:10 stop cards, sourced route connectors and all exact design-rule details.
 - [x] Implement deterministic validation of explicit time overlaps; [ ] route-aware feasibility validation and reorder.
 - [ ] Implement route provider abstraction and map UI.
-- [ ] Implement budget lines and expense records.
+- [x] Implement owner-scoped budget lines and expense records with server-side integer calculations and UTC normalization; [ ] build finance frontend.
 - [ ] Implement save/share/print/PDF only after interaction is functional.
 - [ ] Add outside-pilot warning for destinations beyond Da Nang–Hoi An.
 
