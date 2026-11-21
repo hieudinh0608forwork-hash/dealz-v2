@@ -49,7 +49,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [x] Implement manual itinerary version, day and stop/meal-card APIs with ownership checks and 4-main-stop limit (runtime verification pending).
 
 ## Phase 4 – Core planning experience
-- [ ] Implement itinerary day/stop cards in the frontend to exact design rules (backend APIs exist).
+- [x] Add initial responsive manual itinerary workspace wired to APIs; [ ] implement full 16:10 stop cards, sourced route connectors and all exact design-rule details.
 - [ ] Implement schedule validation and reorder.
 - [ ] Implement route provider abstraction and map UI.
 - [ ] Implement budget lines and expense records.
