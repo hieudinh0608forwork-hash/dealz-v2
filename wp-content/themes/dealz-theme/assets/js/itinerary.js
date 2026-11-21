@@ -128,6 +128,14 @@
 			const trip = await api('trips/' + encodeURIComponent(publicId));
 			if (sequence !== requestSequence) return;
 			activeTripData = trip;
+			const dayDateInput = document.getElementById('itinerary-day-date');
+			if (dayDateInput) {
+				dayDateInput.min = trip.start_date || '';
+				dayDateInput.max = trip.end_date || '';
+				if ( ! dayDateInput.value && trip.start_date ) {
+					dayDateInput.value = trip.start_date;
+				}
+			}
 			const pilotWarning = document.getElementById('pilot-warning');
 			if (pilotWarning) {
 				const destination = String(trip.destination_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
