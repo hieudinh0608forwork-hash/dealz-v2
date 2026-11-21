@@ -14,12 +14,19 @@
 	const dayForm = document.getElementById('create-day-form');
 	const itemForm = document.getElementById('create-item-form');
 	const feedback = document.getElementById('workspace-feedback');
+	const financeFeedback = document.getElementById('finance-feedback');
+	const budgetSummary = document.getElementById('budget-summary');
+	const budgetLinesList = document.getElementById('budget-lines-list');
+	const expensesList = document.getElementById('expenses-list');
+	const budgetForm = document.getElementById('create-budget-form');
+	const expenseForm = document.getElementById('create-expense-form');
 
 	if (!workspace || !config.loggedIn) {
 		return;
 	}
 
 	let activeTrip = null;
+	let activeTripData = null;
 	let activeItinerary = null;
 	let activeDay = null;
 	let requestSequence = 0;
@@ -77,6 +84,7 @@
 		if (sectionHeading) sectionHeading.hidden = false;
 		if (createTripPanel) createTripPanel.hidden = false;
 		activeTrip = null;
+		activeTripData = null;
 		activeItinerary = null;
 		activeDay = null;
 	}
@@ -119,8 +127,10 @@
 		try {
 			const trip = await api('trips/' + encodeURIComponent(publicId));
 			if (sequence !== requestSequence) return;
+			activeTripData = trip;
 			document.getElementById('itinerary-workspace-title').textContent = trip.title || 'Chuyến đi';
 			await loadItineraries();
+			await loadFinance();
 		} catch (error) {
 			showFeedback(error.message, true);
 			versionsList.replaceChildren(makeEmpty('Không tải được chuyến đi này.'));
@@ -358,6 +368,237 @@
 		}
 	}
 
+
+	function showFinanceFeedback(message, isError) {
+		if (!financeFeedback) return;
+		financeFeedback.hidden = false;
+		financeFeedback.textContent = message;
+		financeFeedback.classList.toggle('notice--error', Boolean(isError));
+	}
+
+	function formatMoney(amount, currency) {
+		if (amount === null || typeof amount === 'undefined') return 'Chưa có số tiền';
+		try {
+			return new Intl.NumberFormat('vi-VN', {
+				style: 'currency',
+				currency: currency || 'VND',
+				maximumFractionDigits: 2
+			}).format(Number(amount));
+		} catch (error) {
+			return Number(amount).toLocaleString('vi-VN') + ' ' + (currency || 'VND');
+		}
+	}
+
+	function categoryLabel(category) {
+		const labels = {
+			transport: 'Di chuyển',
+			accommodation: 'Lưu trú',
+			food: 'Ăn uống',
+			rental: 'Thuê đồ',
+			activities: 'Hoạt động',
+			other: 'Khác'
+		};
+		return labels[category] || category || 'Chưa phân nhóm';
+	}
+
+	function costTypeLabel(type) {
+		const labels = {
+			estimate: 'Ước tính',
+			quoted: 'Đã báo giá',
+			confirmed: 'Đã xác nhận',
+			actual: 'Thực tế'
+		};
+		return labels[type] || type;
+	}
+
+	function makeFinanceEmpty(message) {
+		const empty = document.createElement('div');
+		empty.className = 'workspace-empty';
+		const text = document.createElement('p');
+		text.textContent = message;
+		empty.append(text);
+		return empty;
+	}
+
+	function makeFinanceRow(titleText, detailText, amountText, archiveCallback) {
+		const row = document.createElement('article');
+		row.className = 'finance-row';
+		const main = document.createElement('div');
+		main.className = 'finance-row__main';
+		const title = document.createElement('strong');
+		title.textContent = titleText;
+		const detail = document.createElement('p');
+		detail.textContent = detailText || '';
+		main.append(title, detail);
+
+		const side = document.createElement('div');
+		side.className = 'finance-row__side';
+		const amount = document.createElement('strong');
+		amount.textContent = amountText;
+		side.append(amount);
+
+		if (archiveCallback) {
+			const archive = document.createElement('button');
+			archive.type = 'button';
+			archive.className = 'text-action text-action--danger';
+			archive.textContent = 'Lưu trữ';
+			archive.addEventListener('click', archiveCallback);
+			side.append(archive);
+		}
+		row.append(main, side);
+		return row;
+	}
+
+	function formatExpenseDate(value) {
+		if (!value) return '';
+		const date = new Date(String(value).replace(' ', 'T') + 'Z');
+		if (Number.isNaN(date.getTime())) return value + ' UTC';
+		try {
+			return date.toLocaleString('vi-VN', {
+				timeZone: activeTripData && activeTripData.destination_timezone
+					? activeTripData.destination_timezone
+					: 'Asia/Ho_Chi_Minh'
+			});
+		} catch (error) {
+			return value + ' UTC';
+		}
+	}
+
+	function localDateTimeToIso(value, timeZone) {
+		const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+		if (!match) throw new Error('Thời điểm chi không hợp lệ.');
+
+		const parts = match.slice(1).map(Number);
+		const localAsUtc = Date.UTC(parts[0], parts[1] - 1, parts[2], parts[3], parts[4]);
+		const formatter = new Intl.DateTimeFormat('en-CA', {
+			timeZone: timeZone || 'Asia/Ho_Chi_Minh',
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			hourCycle: 'h23'
+		});
+
+		function offsetAt(timestamp) {
+			const formatted = Object.fromEntries(
+				formatter.formatToParts(new Date(timestamp)).map(function (part) {
+					return [part.type, part.value];
+				})
+			);
+			const representedUtc = Date.UTC(
+				Number(formatted.year),
+				Number(formatted.month) - 1,
+				Number(formatted.day),
+				Number(formatted.hour),
+				Number(formatted.minute)
+			);
+			return Math.round((representedUtc - timestamp) / 60000);
+		}
+
+		let offset = offsetAt(localAsUtc);
+		offset = offsetAt(localAsUtc - offset * 60000);
+		const sign = offset >= 0 ? '+' : '-';
+		const absolute = Math.abs(offset);
+		const hours = String(Math.floor(absolute / 60)).padStart(2, '0');
+		const minutes = String(absolute % 60).padStart(2, '0');
+		return value + ':00' + sign + hours + ':' + minutes;
+	}
+
+	async function loadFinance() {
+		if (!activeTrip || !budgetSummary || !budgetLinesList || !expensesList) return;
+		budgetSummary.replaceChildren(makeFinanceEmpty('Đang tải tổng hợp ngân sách…'));
+		budgetLinesList.replaceChildren(makeFinanceEmpty('Đang tải khoản dự kiến…'));
+		expensesList.replaceChildren(makeFinanceEmpty('Đang tải khoản đã chi…'));
+
+		try {
+			const results = await Promise.all([
+				api('trips/' + encodeURIComponent(activeTrip) + '/budget'),
+				api('trips/' + encodeURIComponent(activeTrip) + '/expenses')
+			]);
+			const budget = results[0] || { lines: [], summary: [] };
+			const expenses = results[1] || [];
+			budgetSummary.replaceChildren();
+
+			if (!Array.isArray(budget.summary) || budget.summary.length === 0) {
+				budgetSummary.append(makeFinanceEmpty('Chưa có khoản ngân sách nào được ghi nhận.'));
+			} else {
+				budget.summary.forEach(function (group) {
+					const tile = document.createElement('div');
+					tile.className = 'budget-summary__tile';
+					const label = document.createElement('span');
+					label.textContent = costTypeLabel(group.cost_type) + ' · ' + group.currency;
+					const total = document.createElement('strong');
+					total.textContent = formatMoney(group.total_amount_minor, group.currency);
+					tile.append(label, total);
+					budgetSummary.append(tile);
+				});
+			}
+
+			budgetLinesList.replaceChildren();
+			if (!Array.isArray(budget.lines) || budget.lines.length === 0) {
+				budgetLinesList.append(makeFinanceEmpty('Chưa có khoản dự kiến.'));
+			} else {
+				budget.lines.forEach(function (line) {
+					const detail = [
+						categoryLabel(line.category),
+						line.description,
+						'Số lượng: ' + line.quantity,
+						costTypeLabel(line.cost_type)
+					].filter(Boolean).join(' · ');
+					budgetLinesList.append(makeFinanceRow(
+						line.description || categoryLabel(line.category),
+						detail,
+						formatMoney(line.total_amount_minor, line.currency),
+						async function () {
+							if (!window.confirm('Lưu trữ khoản ngân sách này?')) return;
+							try {
+								await api('budget/lines/' + encodeURIComponent(line.public_id), 'DELETE');
+								showFinanceFeedback('Đã lưu trữ khoản ngân sách.', false);
+								await loadFinance();
+							} catch (error) {
+								showFinanceFeedback(error.message, true);
+							}
+						}
+					));
+				});
+			}
+
+			expensesList.replaceChildren();
+			if (!Array.isArray(expenses) || expenses.length === 0) {
+				expensesList.append(makeFinanceEmpty('Chưa ghi nhận khoản chi thực tế.'));
+			} else {
+				expenses.forEach(function (expense) {
+					const detail = [
+						categoryLabel(expense.category),
+						formatExpenseDate(expense.occurred_at),
+						expense.note
+					].filter(Boolean).join(' · ');
+					expensesList.append(makeFinanceRow(
+						categoryLabel(expense.category),
+						detail,
+						formatMoney(expense.amount_minor, expense.currency),
+						async function () {
+							if (!window.confirm('Lưu trữ khoản chi này?')) return;
+							try {
+								await api('expenses/' + encodeURIComponent(expense.public_id), 'DELETE');
+								showFinanceFeedback('Đã lưu trữ khoản chi.', false);
+								await loadFinance();
+							} catch (error) {
+								showFinanceFeedback(error.message, true);
+							}
+						}
+					));
+				});
+			}
+		} catch (error) {
+			showFinanceFeedback(error.message || 'Không thể tải dữ liệu tài chính.', true);
+			budgetSummary.replaceChildren(makeFinanceEmpty('Không tải được tổng hợp ngân sách.'));
+			budgetLinesList.replaceChildren(makeFinanceEmpty('Không tải được khoản dự kiến.'));
+			expensesList.replaceChildren(makeFinanceEmpty('Không tải được khoản đã chi.'));
+		}
+	}
+
 	document.getElementById('create-itinerary-btn').addEventListener('click', async function () {
 		if (!activeTrip) return;
 		const button = this;
@@ -427,6 +668,70 @@
 			} finally {
 				button.disabled = false;
 				button.textContent = 'Thêm vào ngày này';
+			}
+		});
+	}
+
+
+	if (budgetForm) {
+		budgetForm.addEventListener('submit', async function (event) {
+			event.preventDefault();
+			if (!activeTrip || !budgetForm.reportValidity()) return;
+			const values = new FormData(budgetForm);
+			const unitAmount = String(values.get('unit_amount_minor') || '');
+			const button = document.getElementById('create-budget-submit');
+			button.disabled = true;
+			button.textContent = 'Đang lưu…';
+			try {
+				await api('trips/' + encodeURIComponent(activeTrip) + '/budget/lines', 'POST', {
+					category: String(values.get('category') || ''),
+					description: String(values.get('description') || '').trim(),
+					quantity: String(values.get('quantity') || '1.00'),
+					unit_amount_minor: unitAmount === '' ? null : Number(unitAmount),
+					currency: 'VND',
+					cost_type: String(values.get('cost_type') || 'estimate')
+				});
+				budgetForm.reset();
+				document.getElementById('budget-quantity').value = '1.00';
+				showFinanceFeedback('Đã thêm khoản ngân sách.', false);
+				await loadFinance();
+			} catch (error) {
+				showFinanceFeedback(error.message, true);
+			} finally {
+				button.disabled = false;
+				button.textContent = 'Thêm khoản dự kiến';
+			}
+		});
+	}
+
+	if (expenseForm) {
+		expenseForm.addEventListener('submit', async function (event) {
+			event.preventDefault();
+			if (!activeTrip || !expenseForm.reportValidity()) return;
+			const values = new FormData(expenseForm);
+			const button = document.getElementById('create-expense-submit');
+			button.disabled = true;
+			button.textContent = 'Đang lưu…';
+			try {
+				const timezone = activeTripData && activeTripData.destination_timezone
+					? activeTripData.destination_timezone
+					: 'Asia/Ho_Chi_Minh';
+				const occurredAt = localDateTimeToIso(String(values.get('occurred_at') || ''), timezone);
+				await api('trips/' + encodeURIComponent(activeTrip) + '/expenses', 'POST', {
+					category: String(values.get('category') || ''),
+					amount_minor: Number(values.get('amount_minor')),
+					currency: 'VND',
+					occurred_at: occurredAt,
+					note: String(values.get('note') || '').trim()
+				});
+				expenseForm.reset();
+				showFinanceFeedback('Đã ghi nhận khoản chi.', false);
+				await loadFinance();
+			} catch (error) {
+				showFinanceFeedback(error.message, true);
+			} finally {
+				button.disabled = false;
+				button.textContent = 'Lưu khoản chi';
 			}
 		});
 	}
