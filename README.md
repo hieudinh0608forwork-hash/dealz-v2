@@ -8,7 +8,7 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - Default branch: `main`.
 - Platform direction: fresh WordPress + custom plugin `dealz-core` + custom theme `dealz-theme` + REST API + MySQL.
 - Architecture: modular monolith.
-- Application code/runtime: not yet implemented or verified.
+- Application code: initial WordPress plugin/theme scaffold committed; runtime not yet available or verified.
 
 ## Start here
 1. Read [CLAUDE.md](CLAUDE.md).
@@ -38,4 +38,4 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - Do not claim Tested/Verified/Deployed without evidence.
 
 ## Handoff status
-The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: no WordPress environment, application code, runtime tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
+The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: only the initial WordPress scaffold exists; no WordPress environment, runtime tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
