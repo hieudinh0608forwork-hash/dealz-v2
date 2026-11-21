@@ -1071,7 +1071,6 @@
 		const heading = document.getElementById('rental-workspace-title');
 		const context = document.getElementById('rental-stop-context');
 		const contextChip = document.getElementById('rental-context-chip');
-		const contextChip = document.getElementById('rental-context-chip');
 		const back = document.getElementById('rental-back-link');
 		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
 		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
@@ -1081,13 +1080,6 @@
 			if (params.get('time')) contextParts.push(params.get('time'));
 			contextChip.textContent = contextParts.join(' · ');
 			contextChip.hidden = !params.get('stop');
-		}
-		if (contextChip) {
-			const contextParts = ['Từ hành trình'];
-			if (params.get('day')) contextParts.push(params.get('day'));
-			if (params.get('time')) contextParts.push(params.get('time'));
-			contextChip.textContent = contextParts.join(' · ');
-			contextChip.hidden = !params.has('stop');
 		}
 		if (back) {
 			const returnTarget = params.get('return') || '#trips';

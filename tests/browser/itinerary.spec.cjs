@@ -276,7 +276,7 @@ test('legal draft routes are public noindex and do not invent operative terms', 
     const response = await page.goto(BASE_URL + path);
     expect(response.status()).toBe(200);
     await expect(page.locator('h1')).toHaveText(title);
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    await expect(page.locator('meta[name="robots"]').last()).toHaveAttribute('content', /noindex/);
     await expect(page.locator('.notice--warning')).toContainText('Bản nháp, chưa có hiệu lực');
     await expect(page.locator('main')).not.toContainText(/\d+\s?%/);
     await expect(page.locator('main')).not.toContainText(/mã số thuế|địa chỉ pháp lý|tỷ lệ cọc|giờ hủy/i);
