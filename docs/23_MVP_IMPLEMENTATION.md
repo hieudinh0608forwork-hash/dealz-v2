@@ -10,7 +10,7 @@ The first implementation slice covers authenticated traveler trip records and ma
 - Versioned schema migration: dealz_db_version = 1.1.0.
 - Local environment definition: root compose.yaml and .env.example.
 
-### Database tables created by schema v1.0.0
+### Database tables created by schema v1.1.0
 - {prefix}dealz_trips
 - {prefix}dealz_trip_collaborators
 - {prefix}dealz_itineraries
@@ -19,7 +19,7 @@ The first implementation slice covers authenticated traveler trip records and ma
 - {prefix}dealz_budget_lines
 - {prefix}dealz_expenses
 
-The last six are schema foundations only; their application endpoints and business logic are not yet implemented.
+Trip, itinerary, day and item tables are used by the implemented APIs. Collaborator, route-leg, budget-line and expense tables remain schema foundations; their APIs and business logic are not yet implemented.
 
 ### Implemented REST routes
 
