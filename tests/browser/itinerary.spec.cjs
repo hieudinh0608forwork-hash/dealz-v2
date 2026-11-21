@@ -160,6 +160,8 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
 
   const card = page.locator('.itinerary-item-card--stop').first();
   await expect(card.locator('.itinerary-item-card__media')).toBeVisible();
+  await expect(card.getByRole('button', { name: 'Di chuyển lên' })).toBeDisabled();
+  await expect(card.getByRole('button', { name: 'Di chuyển xuống' })).toBeEnabled();
   await expect(card.getByRole('link', { name: 'Mở mục thuê đồ cho Điểm dừng mobile' })).toBeVisible();
   await expect(card.locator('.item-directions')).toHaveAttribute('href', /google\.com\/maps\/dir/);
   await expect(page.locator('.route-connector').first()).toContainText('Chưa có dữ liệu tuyến đường');
