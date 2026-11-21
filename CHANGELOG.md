@@ -25,3 +25,6 @@
 - Added item input validation, archive semantics, and integration test cases for date range, ownership and the fifth-main-stop rejection.
 - Added the first responsive traveler home / Trip dashboard screen, wired to the Trip list/create REST API. Local WOFF2 assets remain outstanding; browser behavior is not runtime-verified.
 - Expanded OpenAPI 3.1 contract and updated implementation/handoff notes. No passing CI or WordPress runtime test is claimed.
+
+- Added deterministic day schedule validation endpoint. It detects overlapping explicit local time windows and reports missing/invalid ranges without inventing travel times or distances.
+- Added WordPress integration test for overlapping stop windows and expanded the OpenAPI contract.
