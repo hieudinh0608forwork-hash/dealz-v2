@@ -96,7 +96,7 @@ These checks must be performed after starting the compose environment and activa
 - No verified successful CI run is recorded yet.
 - No runtime test has been performed because Docker is unavailable in the current execution environment.
 - Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs; browser/runtime behavior has not been verified.
-- Manual itinerary/day/stop APIs and initial workspace UI are implemented; budget/expense APIs are implemented but have no frontend. Full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
+- Manual itinerary/day/stop APIs and initial workspace UI are implemented; budget/expense APIs are connected to initial frontend forms, lists and archive actions. Full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
 - Collaborator and route-leg tables are currently unused foundations; itinerary/day/item, budget-line and expense tables are used by implemented APIs.
 - No production hosting or deployment is configured.
 
@@ -104,7 +104,7 @@ These checks must be performed after starting the compose environment and activa
 
 1. Execute the local environment and run the WordPress integration tests.
 2. Complete finance API integration tests and verify integer/UTC serialization.
-3. Add budget and expense UI connected to the finance endpoints.
+3. Complete finance editing, empty/error/loading states and responsive visual QA.
 4. Add day/item reorder and schedule editing.
 5. Complete the approved itinerary UI, including 16:10 stop media and sourced route connectors.
 6. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
