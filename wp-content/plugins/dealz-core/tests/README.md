@@ -7,6 +7,9 @@ The Trip API integration tests use the official WordPress PHPUnit test suite and
 - A different authenticated user cannot read the Trip by UUID.
 - Reversed trip date ranges are rejected.
 - DELETE archives the Trip and the archived Trip is no longer readable.
+- A day cannot be added outside the Trip date range.
+- A different user cannot list days in another user's itinerary.
+- A fifth active main stop on one day is rejected.
 
 ## Run
 1. Set up the local WordPress environment using the root README.
