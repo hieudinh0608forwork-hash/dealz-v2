@@ -37,4 +37,5 @@ jobs:
       - name: Run DealZ integration tests
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        working-directory: wp-content/plugins/dealz-core
         run: phpunit -c phpunit.xml.dist
