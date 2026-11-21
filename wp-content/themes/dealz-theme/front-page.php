@@ -51,6 +51,87 @@ get_header();
 				</div>
 			</div>
 
+
+			<section id="itinerary-workspace" class="itinerary-workspace" hidden aria-labelledby="itinerary-workspace-title">
+				<div class="workspace-toolbar">
+					<a class="text-link" href="#trips" id="back-to-trips">← <?php esc_html_e( 'Quay lại hành trình', 'dealz-theme' ); ?></a>
+					<span class="workspace-label"><?php esc_html_e( 'Không gian lập lịch trình', 'dealz-theme' ); ?></span>
+				</div>
+				<div class="workspace-heading">
+					<p class="eyebrow"><?php esc_html_e( 'Chuyến đi đang chọn', 'dealz-theme' ); ?></p>
+					<h2 id="itinerary-workspace-title"><?php esc_html_e( 'Đang tải chuyến đi…', 'dealz-theme' ); ?></h2>
+				</div>
+				<div id="workspace-feedback" class="notice" role="status" aria-live="polite" hidden></div>
+
+				<section class="workspace-panel" aria-labelledby="itinerary-version-title">
+					<div class="workspace-panel__heading">
+						<div>
+							<p class="eyebrow"><?php esc_html_e( 'Bản lịch trình', 'dealz-theme' ); ?></p>
+							<h3 id="itinerary-version-title"><?php esc_html_e( 'Lịch trình thủ công', 'dealz-theme' ); ?></h3>
+						</div>
+						<button class="button button--primary button--compact" type="button" id="create-itinerary-btn"><?php esc_html_e( 'Tạo lịch trình', 'dealz-theme' ); ?></button>
+					</div>
+					<div id="itinerary-versions" class="version-list" aria-live="polite"></div>
+				</section>
+
+				<section id="itinerary-editor" class="workspace-panel" hidden aria-labelledby="days-title">
+					<div class="workspace-panel__heading">
+						<div>
+							<p class="eyebrow"><?php esc_html_e( 'Sắp xếp theo ngày', 'dealz-theme' ); ?></p>
+							<h3 id="days-title"><?php esc_html_e( 'Các ngày trong chuyến đi', 'dealz-theme' ); ?></h3>
+						</div>
+					</div>
+					<form id="create-day-form" class="inline-form">
+						<div class="form-field">
+							<label for="itinerary-day-date"><?php esc_html_e( 'Ngày muốn thêm', 'dealz-theme' ); ?></label>
+							<input id="itinerary-day-date" name="local_date" type="date" required>
+						</div>
+						<button class="button button--primary button--compact" type="submit"><?php esc_html_e( 'Thêm ngày', 'dealz-theme' ); ?></button>
+					</form>
+					<div id="itinerary-days" class="day-list" aria-live="polite"></div>
+				</section>
+
+				<section id="day-items-panel" class="workspace-panel" hidden aria-labelledby="day-items-title">
+					<div class="workspace-panel__heading">
+						<div>
+							<p class="eyebrow"><?php esc_html_e( 'Nội dung trong ngày', 'dealz-theme' ); ?></p>
+							<h3 id="day-items-title"><?php esc_html_e( 'Điểm dừng', 'dealz-theme' ); ?></h3>
+						</div>
+					</div>
+					<div id="day-items-list" class="itinerary-item-list" aria-live="polite"></div>
+					<form id="create-item-form" class="item-form">
+						<h4><?php esc_html_e( 'Thêm điểm dừng hoặc bữa ăn', 'dealz-theme' ); ?></h4>
+						<div class="form-field">
+							<label for="item-title"><?php esc_html_e( 'Tên địa điểm / hoạt động', 'dealz-theme' ); ?></label>
+							<input id="item-title" name="title_snapshot" type="text" maxlength="190" required placeholder="<?php esc_attr_e( 'Nhập tên điểm dừng', 'dealz-theme' ); ?>">
+						</div>
+						<div class="form-field">
+							<label for="item-type"><?php esc_html_e( 'Loại thẻ', 'dealz-theme' ); ?></label>
+							<select id="item-type" name="item_type">
+								<option value="stop"><?php esc_html_e( 'Điểm dừng chính', 'dealz-theme' ); ?></option>
+								<option value="lunch"><?php esc_html_e( 'Bữa trưa', 'dealz-theme' ); ?></option>
+								<option value="dinner"><?php esc_html_e( 'Bữa tối', 'dealz-theme' ); ?></option>
+							</select>
+						</div>
+						<div class="form-field">
+							<label for="item-address"><?php esc_html_e( 'Địa chỉ (nếu có)', 'dealz-theme' ); ?></label>
+							<input id="item-address" name="address_snapshot" type="text" maxlength="255" placeholder="<?php esc_attr_e( 'Chưa có địa chỉ thì có thể bỏ trống', 'dealz-theme' ); ?>">
+						</div>
+						<div class="form-field">
+							<label for="item-start"><?php esc_html_e( 'Giờ đến', 'dealz-theme' ); ?></label>
+							<input id="item-start" name="start_local" type="time">
+						</div>
+						<div class="form-field">
+							<label for="item-duration"><?php esc_html_e( 'Thời lượng gợi ý (phút)', 'dealz-theme' ); ?></label>
+							<input id="item-duration" name="duration_minutes" type="number" min="1" max="1440" step="1" placeholder="<?php esc_attr_e( 'Có thể bổ sung sau', 'dealz-theme' ); ?>">
+						</div>
+						<div class="form-field form-field--wide">
+							<button class="button button--primary" type="submit" id="create-item-submit"><?php esc_html_e( 'Thêm vào ngày này', 'dealz-theme' ); ?></button>
+						</div>
+					</form>
+				</section>
+			</section>
+
 			<div class="create-trip-panel" id="create-trip">
 				<div class="create-trip-panel__intro">
 					<p class="eyebrow"><?php esc_html_e( 'Bắt đầu hành trình mới', 'dealz-theme' ); ?></p>
