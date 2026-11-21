@@ -72,7 +72,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Admin support, audit and notification workflows.
 
 ## Phase 7 – QA and release
-- [x] Author WordPress integration tests for Trip, itinerary and finance ownership/validation; [x] configure MySQL-backed WordPress PHPUnit CI workflow; [x] first CI pass: 14 tests / 51 assertions; [ ] execute browser/runtime visual checks and expand edge-case coverage.
+- [x] Author WordPress integration tests for Trip, itinerary and finance ownership/validation; [x] configure MySQL-backed WordPress PHPUnit CI workflow; [x] first CI pass: 15 tests / 69 assertions, including atomic reorder; [ ] execute browser/runtime visual checks and expand edge-case coverage.
 - [ ] Cross-user and cross-partner access tests.
 - [ ] Responsive, accessibility, Vietnamese font and visual rule QA.
 - [ ] Provider failure, concurrency and webhook replay tests.
