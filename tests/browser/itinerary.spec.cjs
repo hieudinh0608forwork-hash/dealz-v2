@@ -62,12 +62,14 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
     return route.continue();
   });
 
-  // Re-selecting the active day causes a delayed read; assert the busy state is exposed.
-  await page.locator('.day-chip').first().click();
+  // Creating a second day selects it and triggers a delayed read.
+  await page.locator('#itinerary-day-date').fill('2027-04-02');
+  await page.locator('#create-day-form button[type="submit"]').click();
+  await expect(page.locator('.day-chip')).toHaveCount(2);
   await expect(page.locator('#day-items-list')).toHaveAttribute('aria-busy', 'true');
   await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 
-  // A failed read must expose a retry action, and the retry must recover.
+  // Switch to the first day to force a failing read; retry must recover.
   failNextRead = true;
   await page.locator('.day-chip').first().click();
   await expect(page.locator('#day-items-list')).toContainText('Thử tải lại');
