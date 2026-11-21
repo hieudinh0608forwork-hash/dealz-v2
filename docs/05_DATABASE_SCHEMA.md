@@ -97,5 +97,31 @@ Trip is not Order. Order is not Booking. A Trip may contain multiple independent
 - No status transition without a recorded event.
 - Foreign key/index strategy must be verified against selected MySQL version.
 
-## 10. Implementation gate
+## 10. Initial physical MVP schema (implemented as migration v1.0.0)
+
+The first additive WordPress `dbDelta` schema is implemented in `wp-content/plugins/dealz-core/src/Database/Schema.php`. It creates these prefixed tables:
+
+| Table suffix | Purpose |
+|---|---|
+| `dealz_trips` | Traveler-owned trip records |
+| `dealz_trip_collaborators` | Trip invitation and role records (not yet exposed through API) |
+| `dealz_itineraries` | Versioned manual/AI itinerary containers |
+| `dealz_itinerary_days` | Local-date itinerary days |
+| `dealz_itinerary_items` | Ordered stop snapshots and optional coordinates |
+| `dealz_budget_lines` | Estimated/quoted/confirmed/actual planning lines |
+| `dealz_expenses` | Actual trip expense records |
+
+Physical schema decisions:
+- Internal primary keys are unsigned BIGINT; public identifiers are UUID strings.
+- Money columns are unsigned BIGINT minor units; no floating-point amount columns.
+- Date-only trip/day fields use MySQL DATE; local stop start/end use TIME and are interpreted in the trip's destination timezone.
+- Created/updated timestamps are UTC values supplied by WordPress.
+- Ownership, parent-child and status indexes are present for the first MVP use cases.
+- No SQL foreign keys are added in v1 because WordPress `dbDelta` does not provide a reliable cross-version foreign-key migration workflow. Referential integrity and ownership must be enforced by application services; a later migration may add verified constraints after runtime compatibility testing.
+- The migration is additive and non-destructive. It does not drop tables or erase data.
+- The schema version is stored in the non-autoloaded `dealz_db_version` option and upgraded on plugin activation / WordPress init.
+
+Scope note: this first migration does not yet create marketplace, listing, availability, order, booking, payment, refund, ledger, notification or audit tables. Those are deliberately deferred until their domain contracts are frozen.
+
+## 11. Implementation gate
 Before migrations: freeze ERD, field types/nullability, enum/state ownership, indexes, deletion policy, retention/privacy policy, availability model and financial policy dependencies.
