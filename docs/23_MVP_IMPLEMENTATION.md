@@ -51,10 +51,11 @@ All routes require an authenticated WordPress user. Queries scope by both public
 |---|---|---|
 | GET / POST | /trips/{trip_public_id}/itineraries | List or create manual itinerary versions |
 | GET / POST | /itineraries/{public_id}/days | List or add days within trip date range |
+| GET | /days/{public_id}/validation | Check explicit time overlaps for an owned day |
 | GET / POST | /days/{public_id}/items | List or add stops / lunch / dinner cards |
 | PATCH / DELETE | /items/{public_id} | Update or archive an owned item |
 
-A day can contain at most four active main stops (item_type=stop). Lunch and dinner are separate small-card types. The main-stop limit is checked under a day-row lock to protect against concurrent creates. Item deletion is archival, not physical deletion. Route-leg records are a schema foundation only; no routing provider is connected and no travel time/distance is fabricated.
+A day can contain at most four active main stops (item_type=stop). Lunch and dinner are separate small-card types. The main-stop limit is checked under a day-row lock to protect against concurrent creates. Item deletion is archival, not physical deletion. Route-leg records are a schema foundation only; no routing provider is connected and no travel time/distance is fabricated. A deterministic validator reports overlaps only where user-entered start/end times or duration are available.
 
 ## 2. Local environment
 
@@ -99,7 +100,7 @@ These checks must be performed after starting the compose environment and activa
 1. Execute the local environment and fix migration/runtime issues.
 2. Add WordPress integration tests for ownership and validation.
 3. Add itinerary/day/stop CRUD with owner checks and versioning.
-4. Add deterministic itinerary schedule validation and reorder.
+4. Extend schedule validation for travel feasibility after provider-backed route durations exist; add day/item reorder.
 5. Add budget line and expense APIs with server-side calculations.
 6. Complete the approved itinerary UI and responsive states, including 16:10 stop media and route connectors when verified route data exists.
 7. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
