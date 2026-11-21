@@ -593,7 +593,11 @@ final class FinanceController {
 		}
 
 		$fields = array( 'public_id', 'category', 'description', 'quantity', 'unit_amount_minor', 'total_amount_minor', 'currency', 'cost_type', 'source_type', 'source_id', 'status', 'created_at', 'updated_at' );
-		return array_intersect_key( (array) $line, array_flip( $fields ) );
+		$data   = array_intersect_key( (array) $line, array_flip( $fields ) );
+		foreach ( array( 'unit_amount_minor', 'total_amount_minor' ) as $field ) {
+			$data[ $field ] = null === $data[ $field ] ? null : (int) $data[ $field ];
+		}
+		return $data;
 	}
 
 	/**
@@ -608,7 +612,9 @@ final class FinanceController {
 		}
 
 		$fields = array( 'public_id', 'category', 'amount_minor', 'currency', 'occurred_at', 'note', 'split_method', 'created_at' );
-		return array_intersect_key( (array) $expense, array_flip( $fields ) );
+		$data   = array_intersect_key( (array) $expense, array_flip( $fields ) );
+		$data['amount_minor'] = (int) $data['amount_minor'];
+		return $data;
 	}
 
 	/**
