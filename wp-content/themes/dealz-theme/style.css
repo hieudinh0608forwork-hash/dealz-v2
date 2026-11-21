@@ -613,10 +613,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .pilot-warning {
 	margin: 0 0 18px;
 	padding: 14px 17px;
-	border: 1px solid #D7C58A;
+	border: 1px solid var(--dealz-border);
 	border-radius: 14px;
-	background: #FFFBEA;
-	color: #67531A;
+	background: rgba(224, 243, 84, 0.16);
+	color: var(--dealz-green);
 	font-size: 13px;
 	line-height: 1.55;
 }
