@@ -51,7 +51,6 @@ All routes require an authenticated WordPress user. Queries scope by both public
 |---|---|---|
 | GET / POST | /trips/{trip_public_id}/itineraries | List or create manual itinerary versions |
 | GET / POST | /itineraries/{public_id}/days | List or add days within trip date range |
-| GET | /days/{public_id}/validation | Check explicit time overlaps for an owned day |
 | GET | /days/{public_id}/validation | Validate explicit local-time overlaps without estimating travel time |
 | GET / POST | /days/{public_id}/items | List or add stops / lunch / dinner cards |
 | PATCH / DELETE | /items/{public_id} | Update or archive an owned item |
@@ -93,7 +92,7 @@ These checks must be performed after starting the compose environment and activa
 
 ## 4. Known limitations
 
-- No automated WordPress integration test runner yet.
+- Automated WordPress integration test workflow is configured; its first run and test result are pending.
 - No verified successful CI run is recorded yet.
 - No runtime test has been performed because Docker is unavailable in the current execution environment.
 - Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs; browser/runtime behavior has not been verified.
