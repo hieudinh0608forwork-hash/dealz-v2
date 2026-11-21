@@ -56,7 +56,13 @@
 		travelers.textContent = String(trip.traveler_count || 1) + ' người';
 		meta.append(dates, travelers);
 
-		card.append(top, title, destination, meta);
+		const open = document.createElement('button');
+		open.className = 'button button--secondary trip-card__open';
+		open.type = 'button';
+		open.dataset.openTrip = trip.public_id;
+		open.textContent = 'Mở lịch trình';
+
+		card.append(top, title, destination, meta, open);
 		return card;
 	}
 
