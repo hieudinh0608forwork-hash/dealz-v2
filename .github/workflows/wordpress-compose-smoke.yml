@@ -45,25 +45,25 @@ jobs:
         run: |
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
             global $wpdb;
-            $tables = \\DealZ\\Database\\Schema::table_names();
-            if ( count( $tables ) !== 8 ) { fwrite( STDERR, "Expected eight DealZ tables.\\n" ); exit( 1 ); }
+            $tables = \DealZ\Database\Schema::table_names();
+            if ( count( $tables ) !== 8 ) { fwrite( STDERR, "Expected eight DealZ tables.\n" ); exit( 1 ); }
             foreach ( $tables as $table ) {
               $found = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) );
-              if ( $found !== $table ) { fwrite( STDERR, "Missing table: " . $table . "\\n" ); exit( 1 ); }
+              if ( $found !== $table ) { fwrite( STDERR, "Missing table: " . $table . "\n" ); exit( 1 ); }
             }
-            if ( get_option( "dealz_db_version" ) !== \\DealZ\\Database\\Schema::VERSION ) { fwrite( STDERR, "Schema version mismatch.\\n" ); exit( 1 ); }
+            if ( get_option( "dealz_db_version" ) !== \DealZ\Database\Schema::VERSION ) { fwrite( STDERR, "Schema version mismatch.\n" ); exit( 1 ); }
             update_option( "dealz_smoke_sentinel", "preserve-me" );
-            echo "PASS: eight tables and schema version " . get_option( "dealz_db_version" ) . "\\n";
+            echo "PASS: eight tables and schema version " . get_option( "dealz_db_version" ) . "\n";
           '
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin deactivate dealz-core
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
             global $wpdb;
-            foreach ( \\DealZ\\Database\\Schema::table_names() as $table ) {
+            foreach ( \DealZ\Database\Schema::table_names() as $table ) {
               if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) ) !== $table ) { exit( 1 ); }
             }
             if ( get_option( "dealz_smoke_sentinel" ) !== "preserve-me" ) { exit( 1 ); }
-            echo "PASS: repeat activation preserved schema and data.\\n";
+            echo "PASS: repeat activation preserved schema and data.\n";
           '
           curl -fsS http://localhost:8080/wp-json/dealz/v1/health
 
