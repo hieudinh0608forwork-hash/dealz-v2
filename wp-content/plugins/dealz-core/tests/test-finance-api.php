@@ -87,10 +87,18 @@ class DealZ_Finance_API_Test extends WP_UnitTestCase {
 		$this->assertSame( 201, $created->get_status() );
 		$this->assertSame( 250000, (int) $created->get_data()['total_amount_minor'] );
 
+		$updated = $this->request(
+			'PATCH',
+			'/budget/lines/' . $created->get_data()['public_id'],
+			array( 'quantity' => '3.00' )
+		);
+		$this->assertSame( 200, $updated->get_status() );
+		$this->assertSame( 300000, (int) $updated->get_data()['total_amount_minor'] );
+
 		$summary = $this->request( 'GET', '/trips/' . $trip_id . '/budget' );
 		$this->assertSame( 200, $summary->get_status() );
 		$this->assertCount( 1, $summary->get_data()['lines'] );
-		$this->assertSame( 250000, (int) $summary->get_data()['summary'][0]['total_amount_minor'] );
+		$this->assertSame( 300000, (int) $summary->get_data()['summary'][0]['total_amount_minor'] );
 	}
 
 	/**
