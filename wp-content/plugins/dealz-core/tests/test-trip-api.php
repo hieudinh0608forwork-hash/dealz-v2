@@ -130,6 +130,52 @@ class DealZ_Trip_API_Test extends WP_UnitTestCase {
 		$this->assertSame( 404, $read->get_status() );
 	}
 
+
+	/**
+	 * Verify a different user cannot mutate or archive an owned Trip.
+	 */
+	public function test_other_user_cannot_update_or_archive_trip(): void {
+		$owner_id  = self::factory()->user->create();
+		$other_id  = self::factory()->user->create();
+		$public_id = $this->create_trip_for_user( $owner_id );
+
+		wp_set_current_user( $other_id );
+		$update = $this->dispatch_request( 'PATCH', '/trips/' . $public_id, array( 'title' => 'Không được phép' ) );
+		$delete = $this->dispatch_request( 'DELETE', '/trips/' . $public_id );
+
+		$this->assertSame( 404, $update->get_status() );
+		$this->assertSame( 404, $delete->get_status() );
+	}
+
+	/**
+	 * Verify a partial update cannot make the date range invalid.
+	 */
+	public function test_partial_date_update_preserves_trip_date_order(): void {
+		$user_id = self::factory()->user->create();
+		wp_set_current_user( $user_id );
+
+		$create = $this->dispatch_request(
+			'POST',
+			'/trips',
+			array(
+				'title'      => 'Chuyến đi có ngày',
+				'start_date' => '2027-06-10',
+				'end_date'   => '2027-06-15',
+			)
+		);
+		$this->assertSame( 201, $create->get_status() );
+		$public_id = $create->get_data()->public_id;
+		$this->created_trip_ids[] = $public_id;
+
+		$update = $this->dispatch_request(
+			'PATCH',
+			'/trips/' . $public_id,
+			array( 'end_date' => '2027-06-09' )
+		);
+
+		$this->assertSame( 400, $update->get_status() );
+	}
+
 	/**
 	 * Remove test records from the custom trip table.
 	 */
