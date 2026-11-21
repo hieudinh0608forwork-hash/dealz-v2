@@ -41,7 +41,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Confirm WordPress/PHP/MySQL compatibility in a running environment.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
-- [x] Add additive v1.2.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] execute automated WordPress integration test runner.
+- [x] Add additive v1.2.0 WordPress dbDelta migration for 8 trip-planning tables; [x] execute automated WordPress integration test runner in GitHub Actions (15 tests / 71 assertions on main commit 90e5298); [ ] execute local Docker/WordPress runtime acceptance.
 - [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
@@ -50,7 +50,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 
 ## Phase 4 – Core planning experience
 - [x] Add initial responsive manual itinerary workspace wired to APIs, including editable start/end times and duration; [ ] implement full 16:10 stop cards, sourced route connectors and all exact design-rule details.
-- [x] Implement deterministic validation of explicit time overlaps; [ ] route-aware feasibility validation and reorder.
+- [x] Implement deterministic validation of explicit time overlaps; [x] transactional manual item reorder; [ ] route-aware feasibility validation.
 - [ ] Implement route provider abstraction and map UI.
 - [x] Implement owner-scoped budget lines and expense records with server-side integer calculations and UTC normalization; [x] add initial responsive budget/expense forms and lists; [ ] complete finance editing and visual QA.
 - [ ] Implement save/share/print/PDF only after interaction is functional.
@@ -82,3 +82,18 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 
 ## Governance
 Do not mark a feature implemented because a document describes it. Do not mark tested without test output. Do not mark verified without evidence in a real environment. Do not deploy production or incur paid API charges without approval.
+## Governance
+Do not mark a feature implemented because a document describes it. Do not mark tested without test output. Do not mark verified without evidence in a real environment. Do not deploy production or incur paid API charges without approval.
+
+
+## 2026-11-22 repository audit checkpoint
+
+- [x] Confirm current main head `90e5298cf530595a6b6dddeab83d92deed290e9c`.
+- [x] Inspect current docs inventory, plugin/theme top-level structure, theme font directory and CI workflows.
+- [x] Verify current-main WordPress integration CI: run `44947029698`, 15 tests / 71 assertions.
+- [x] Verify current-main PHP/JavaScript/OpenAPI CI: run `44947029701`; OpenAPI 14 paths / 24 operations / internal references resolved.
+- [x] Record that local Docker, browser QA, approved WOFF2 assets, providers, staging and production remain unverified or unavailable.
+- [ ] Complete local WordPress activation and manual runtime acceptance.
+- [ ] Complete approved local-font assets and full design-rule UI acceptance.
+- [ ] Complete browser responsive/accessibility QA and any required regression fixes.
+- [ ] Resolve provider, commercial, legal and deployment dependencies before integrations or release.

@@ -91,21 +91,23 @@ These checks must be performed after starting the compose environment and activa
 - [ ] Repeated plugin activation does not delete data or duplicate schema.
 - [ ] Theme activates and renders without fatal errors.
 
-## 4. Known limitations
+## 4. Known limitations (audited 2026-11-22)
 
-- Automated WordPress integration test workflow is configured; its first run and test result are pending.
-- PHP syntax, JavaScript syntax and OpenAPI YAML checks passed on commit `8139ac1d64e05d420e1ac7926f68df109f92f188`.
-- The GitHub Actions WordPress 6.8 / MySQL 8.0 integration suite passed 15 tests and 71 assertions on commit `318908cc09d3a2ece20ff72f4373480b90320ec0`. A local Docker install and browser acceptance run have not been performed.
-- Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs. Stop cards support editing title, start/end time and duration, plus transactional up/down reordering; browser/runtime behavior has not been verified.
-- Manual itinerary/day/stop APIs and initial workspace UI are implemented; budget/expense APIs are connected to initial frontend forms, lists and archive actions. Full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
-- Collaborator and route-leg tables are currently unused foundations; itinerary/day/item, budget-line and expense tables are used by implemented APIs.
-- No production hosting or deployment is configured.
+- GitHub Actions is not pending: the current `main` commit `90e5298cf530595a6b6dddeab83d92deed290e9c` passed WordPress integration run [44947029698](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44947029698) with **15 tests / 71 assertions**, using the WordPress 6.8 test library and MySQL 8.0 service. The PHP syntax workflow [44947029701](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44947029701) also passed PHP syntax, JavaScript syntax and OpenAPI validation (14 paths, 24 operations, all internal references resolved).
+- The CI run is not a local environment acceptance test. The Docker Compose stack has not been started in a verified local environment; fresh WordPress install, plugin activation, theme rendering and browser acceptance remain unverified.
+- The current theme contains an initial traveler home, Trip dashboard and manual itinerary workspace connected to the implemented REST slice. Stop cards support title/time/duration editing and transactional up/down reordering; budget/expense screens support initial create/list/archive flows. Browser interaction and responsive visual behavior have not been verified.
+- The required licensed local WOFF2 files are not present. `assets/fonts/README.md` documents the required files and the current system-font fallback. Do not substitute remote Google Fonts or invent font assets.
+- The full approved itinerary UI is incomplete: 16:10 stop photography, approved card details/actions, sourced route connectors, map synchronization, save/share/print/PDF and complete interaction states remain open.
+- No map, geocoding, place catalogue, routing, AI LLM, weather, supplier inventory, availability synchronization, marketplace, partner portal, booking lifecycle, checkout, payment gateway, ledger/payout or production notifications are connected.
+- `dealz_trip_collaborators` and `dealz_route_legs` are schema foundations only. Do not expose them as functioning sharing or route features.
+- Hosting, domain, staging and production deployment are not configured or verified. No real supplier, price, availability or transaction data is available in this repository audit.
 
 ## 5. Next build sequence
 
-1. Execute the local environment and run the WordPress integration tests.
-2. Complete finance API integration tests and verify integer/UTC serialization.
-3. Complete finance editing, empty/error/loading states and responsive visual QA.
-4. Add day/item reorder and schedule editing.
-5. Complete the approved itinerary UI, including 16:10 stop media and sourced route connectors.
-6. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
+1. Obtain the approved, redistributable Bricolage Grotesque and Be Vietnam Pro WOFF2 assets; add local font-face definitions only after licensing/source verification.
+2. Execute the documented Docker Compose environment and complete the manual runtime acceptance checklist in this document.
+3. Perform browser-based traveler home, Trip, itinerary and finance acceptance across desktop/tablet/mobile, including keyboard, focus, empty/error/loading/disabled states and long content.
+4. Complete the approved itinerary stop-card UI and its rental-by-stop/navigation contract; keep route estimates absent until a routing provider and data source are approved.
+5. Add a verified destination/place catalogue and provider-backed routing only after provider, licensing, attribution and cost decisions are resolved.
+6. Continue MVP commerce foundation (service catalogue, partner access, availability and booking) only after the relevant schema/API/state contracts are reconciled; do not invent commercial policy.
+7. Keep payment integration sandbox-only until credentials and business/legal policies are explicitly approved.

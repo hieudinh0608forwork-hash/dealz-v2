@@ -55,14 +55,15 @@ The project handoff is considered complete only when all applicable items below 
 9. Exact next steps and ownership.
 
 ## 7. Current status
-As of 2026-11-22:
-- H0 Source intake: substantially complete for the available 2026-11-21 Master Handoff and 2026-11-20 Design Rules; source precedence is recorded in `docs/21_SOURCE_TRACEABILITY.md`.
-- H1 Product definition: baseline documented; screen-by-screen acceptance and final MVP vertical slice remain in progress.
-- H2 UX/design: design rules and screen inventory documented; detailed wireframes and responsive visual verification remain open.
-- H3 Technical blueprint: architecture, logical schema, initial physical schema v1.2.0, permission matrix and OpenAPI contracts for Trip, itinerary and finance APIs exist; full commerce schema, remaining module contracts and final transaction state transitions remain open.
-- H4 Build handoff: contributor instructions, local Docker Compose definition, environment example, migration setup and a MySQL-backed WordPress PHPUnit workflow exist. CI executed successfully; local Docker and browser acceptance remain open.
-- H5 Implementation: in progress; plugin/theme foundation, Trip CRUD, manual itinerary/day/stop APIs, deterministic time-overlap validation, budget/expense APIs, initial finance forms/lists and responsive traveler/itinerary workspace committed. No runtime feature is verified.
-- H6 Verification: WordPress 6.8 / MySQL 8.0 integration suite passed 15 tests and 71 assertions on commit `318908cc09d3a2ece20ff72f4373480b90320ec0`; PHP, JavaScript and OpenAPI checks passed on commit `318908cc09d3a2ece20ff72f4373480b90320ec0`. Browser acceptance, responsive visual checks and staging verification remain open.
-- H7 Release readiness: not started; no staging/production environment verified.
+As of 2026-11-22, audited against repository branch `main` at commit `90e5298cf530595a6b6dddeab83d92deed290e9c` and its GitHub Actions runs:
 
-Therefore the project handoff is **NOT complete**. A scaffold and documentation are not a working application.
+- H0 Source intake: substantially complete for the available 2026-11-21 Master Handoff and 2026-11-20 Design Rules; source precedence is recorded in `docs/21_SOURCE_TRACEABILITY.md`.
+- H1 Product definition: baseline documented; screen-by-screen acceptance, detailed journeys and a frozen MVP vertical slice remain in progress.
+- H2 UX/design: authoritative design rules and screen inventory exist. The theme currently has a basic traveler home, Trip dashboard and itinerary/finance workspace. Required licensed local WOFF2 files are absent (only the font README exists); the exact approved typography is therefore not yet rendered. The complete itinerary stop-card treatment, sourced route connectors and browser-based responsive/visual QA remain open.
+- H3 Technical blueprint: architecture, schema v1.2.0, permission matrix and OpenAPI contracts for implemented Trip, itinerary and finance routes exist. Full commerce schema, remaining module contracts and approved transaction state transitions remain open.
+- H4 Build handoff: README/CLAUDE instructions, Docker Compose definition, environment example, migrations, PHPUnit configuration and GitHub Actions workflows exist. The CI test harness ran successfully in GitHub Actions. Local Docker startup, fresh WordPress installation and browser acceptance remain unverified.
+- H5 Implementation: in progress. Implemented code includes plugin/theme foundation, owner-scoped Trip CRUD, manual itinerary versions/days/items, deterministic explicit-time overlap validation, transactional item reordering, budget lines and expense APIs, plus initial traveler/itinerary/finance UI. These are implementation claims, not proof of local runtime or production behavior.
+- H6 Verification: on the current `main` commit `90e5298cf530595a6b6dddeab83d92deed290e9c`, WordPress 6.8 test library / MySQL 8.0 CI passed **15 tests and 71 assertions** in run [44947029698](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44947029698). PHP syntax, JavaScript syntax and OpenAPI validation passed in run [44947029701](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44947029701); OpenAPI validation reported 14 paths, 24 operations and all internal references resolved. These checks do not cover browser rendering, local Docker acceptance, provider integrations or production deployment.
+- H7 Release readiness: not started; no staging/production environment, backup/restore rehearsal, deployment or rollback has been verified.
+
+Therefore the project handoff is **NOT complete**. CI verifies the tested API slice and static checks only; it does not establish a fully working or deployed application.

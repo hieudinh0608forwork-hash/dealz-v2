@@ -42,3 +42,12 @@
 - Added explicit end-time input when creating itinerary cards and inline editing for title, start/end time and duration. Stop cards now display the complete entered time window.
 - Extended itinerary integration coverage: lunch/dinner cards do not count toward the four-main-stop limit; archiving a main stop frees a slot; editing an overlapping time window can resolve the schedule conflict.
 - Added the initial outside-pilot destination warning for destinations not matching Da Nang or Hoi An.
+
+
+## 2026-11-22 – Repository audit and documentation reconciliation
+- Audited `main` at `90e5298cf530595a6b6dddeab83d92deed290e9c`, including documentation inventory, plugin/theme structure, font assets and CI workflows.
+- Verified current-main WordPress integration CI: 15 tests / 71 assertions (run 44947029698).
+- Verified current-main PHP syntax, JavaScript syntax and OpenAPI validation (run 44947029701; 14 paths, 24 operations, all internal references resolved).
+- Updated MVP, handoff, backlog and implementation-log records to distinguish CI-tested code from local/browser-verified behavior.
+- Confirmed local WOFF2 assets, local runtime acceptance, browser QA, external providers and staging/production remain open.
+- This batch changes documentation only; no application behavior or business policy is changed.
