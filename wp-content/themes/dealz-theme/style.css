@@ -30,6 +30,40 @@ Text Domain: dealz-theme
 	--dealz-radius-card: 26px;
 	--dealz-font-heading: "Bricolage Grotesque", "Be Vietnam Pro", sans-serif;
 	--dealz-font-body: "Be Vietnam Pro", "Bricolage Grotesque", sans-serif;
+	/* Component and state color tokens. Keep all presentation colors here. */
+	--dealz-white: #fff;
+	--dealz-primary-hover: #B93400;
+	--dealz-hero-art-bg: #E8F0E7;
+	--dealz-hero-hill: #B8CFC0;
+	--dealz-surface-green: #EAF2EC;
+	--dealz-chip-bg: #F0F5F1;
+	--dealz-surface-subtle: #FCFEFC;
+	--dealz-panel-bg: #F3F7F3;
+	--dealz-error: #C62828;
+	--dealz-alert-bg: #FFF0EA;
+	--dealz-alert-ink: #9C2E00;
+	--dealz-hover-bg: #F5F9F5;
+	--dealz-note-border: #E8DCA6;
+	--dealz-note-bg: #FFFBEA;
+	--dealz-note-chip-bg: #F3EABF;
+	--dealz-info-bg: #F7FAF7;
+	--dealz-warning-border: #E9B7A4;
+	--dealz-warning-bg: #FFF5F0;
+	--dealz-shadow-color: rgba(1,93,71,0.08);
+	--dealz-focus-outline-soft: rgba(253,85,10,0.35);
+	--dealz-header-surface: rgba(255,255,255,0.94);
+	--dealz-border-soft: rgba(207,224,216,0.7);
+	--dealz-primary-shadow: rgba(214,63,0,0.16);
+	--dealz-primary-shadow-hover: rgba(214,63,0,0.22);
+	--dealz-white-border-soft: rgba(255,255,255,0.6);
+	--dealz-white-surface-soft: rgba(255,255,255,0.9);
+	--dealz-card-shadow: rgba(1,93,71,0.045);
+	--dealz-focus-shadow: rgba(253,85,10,0.12);
+	--dealz-white-muted: rgba(255,255,255,0.78);
+	--dealz-mobile-nav-surface: rgba(255,255,255,0.96);
+	--dealz-lime-surface: rgba(224,243,84,0.16);
+	--dealz-surface-shadow: rgba(1,93,71,0.06);
+	--dealz-white-muted-strong: rgba(255,255,255,0.82);
 }
 
 * { box-sizing: border-box; }
