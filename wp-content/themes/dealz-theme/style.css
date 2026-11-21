@@ -607,3 +607,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	.finance-row__side { align-items: flex-start; }
 	.finance-row__side strong { text-align: left; }
 }
+
+.pilot-warning {
+	margin: 0 0 18px;
+	padding: 14px 17px;
+	border: 1px solid #D7C58A;
+	border-radius: 14px;
+	background: #FFFBEA;
+	color: #67531A;
+	font-size: 13px;
+	line-height: 1.55;
+}
