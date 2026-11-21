@@ -56,12 +56,7 @@
 		travelers.textContent = String(trip.traveler_count || 1) + ' người';
 		meta.append(dates, travelers);
 
-		const action = document.createElement('a');
-		action.className = 'trip-card__action';
-		action.href = '#create-trip';
-		action.textContent = 'Cập nhật thông tin →';
-
-		card.append(top, title, destination, meta, action);
+		card.append(top, title, destination, meta);
 		return card;
 	}
 
