@@ -225,9 +225,38 @@ components:
           pattern: '^[A-Za-z]{3}$'
           default: VND
     TripUpdate:
-      allOf:
-        - $ref: '#/components/schemas/TripCreate'
-      description: At least one editable field must be provided. Fields omitted remain unchanged.
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 190
+        origin_text:
+          type: string
+          maxLength: 255
+        destination_name:
+          type: string
+          maxLength: 255
+        start_date:
+          type: [string, 'null']
+          format: date
+        end_date:
+          type: [string, 'null']
+          format: date
+        destination_timezone:
+          type: string
+        traveler_count:
+          type: integer
+          minimum: 1
+          maximum: 50
+        budget_amount_minor:
+          type: [integer, 'null']
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Za-z]{3}$'
     Error:
       type: object
       properties:
