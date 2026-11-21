@@ -26,10 +26,10 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Freeze MVP vertical slice and acceptance criteria.
 
 ## Phase 2 – Data, API and security contracts
-- [x] Initial MVP physical schema/migration v1.0.0 for trip planning (7 tables); [ ] full commerce ERD, retention and deletion policy.
-- [ ] Permission matrix.
+- [x] Initial MVP physical schema/migration v1.1.0 for trip planning (8 tables); [ ] full commerce ERD, retention and deletion policy.
+- [x] Initial permission matrix for current roles; [ ] executable permission tests and resource-sharing permissions.
 - [ ] Booking/Order/Payment state transition table.
-- [x] OpenAPI 3.1 contract for health and Trip CRUD; [ ] expand schemas for itinerary, budget and commerce endpoints.
+- [x] OpenAPI 3.1 contract for health, Trip CRUD and manual itinerary/day/stop endpoints; [ ] expand schemas for budget and commerce endpoints.
 - [ ] AI itinerary schema and validation contract.
 - [ ] Places/geocoding/routing provider contract.
 - [ ] Budget and expense calculation specification.
@@ -41,14 +41,15 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Confirm WordPress/PHP/MySQL compatibility in a running environment.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
-- [x] Add additive v1.0.0 WordPress dbDelta migration for 7 trip-planning tables; [ ] add automated WordPress integration test runner.
+- [x] Add additive v1.1.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] configure and execute automated WordPress integration test runner.
 - [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
-- [x] Implement authenticated, owner-scoped Trip CRUD REST endpoints (runtime verification pending); [ ] manual itinerary CRUD.
+- [x] Implement authenticated, owner-scoped Trip CRUD REST endpoints (runtime verification pending).
+- [x] Implement manual itinerary version, day and stop/meal-card APIs with ownership checks and 4-main-stop limit (runtime verification pending).
 
 ## Phase 4 – Core planning experience
-- [ ] Implement itinerary day/stop cards to exact design rules.
+- [ ] Implement itinerary day/stop cards in the frontend to exact design rules (backend APIs exist).
 - [ ] Implement schedule validation and reorder.
 - [ ] Implement route provider abstraction and map UI.
 - [ ] Implement budget lines and expense records.
