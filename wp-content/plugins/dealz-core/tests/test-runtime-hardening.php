@@ -307,6 +307,42 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		unlink( $log_path );
 	}
 
+	public function test_daily_limit_rejects_fifth_main_stop_but_allows_meals(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array( 'local_date' => '2027-04-01' ) );
+		$day_id = $day->get_data()['public_id'];
+		for ( $index = 1; $index <= 4; $index++ ) {
+			$response = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm ' . $index ) );
+			$this->assertSame( 201, $response->get_status() );
+		}
+		$fifth = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm thứ năm' ) );
+		$this->assertSame( 400, $fifth->get_status() );
+		$this->assertSame( 'dealz_daily_stop_limit', $fifth->get_data()['code'] );
+		$lunch = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'lunch', 'title_snapshot' => 'Bữa trưa' ) );
+		$this->assertSame( 201, $lunch->get_status(), 'Meal cards do not count toward the four main-stop limit.' );
+		$dinner = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'dinner', 'title_snapshot' => 'Bữa tối' ) );
+		$this->assertSame( 201, $dinner->get_status(), 'Dinner cards do not count toward the four main-stop limit.' );
+	}
+
+	public function test_archived_main_stop_does_not_count_toward_daily_limit(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array( 'local_date' => '2027-04-01' ) );
+		$day_id = $day->get_data()['public_id'];
+		$stop_ids = array();
+		for ( $index = 1; $index <= 4; $index++ ) {
+			$response = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm ' . $index ) );
+			$this->assertSame( 201, $response->get_status() );
+			$stop_ids[] = $response->get_data()['public_id'];
+		}
+		$archived = $this->request( 'DELETE', '/items/' . $stop_ids[0] );
+		$this->assertSame( 200, $archived->get_status() );
+		$this->assertSame( 'archived', $archived->get_data()['status'] );
+		$replacement = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm thay thế' ) );
+		$this->assertSame( 201, $replacement->get_status(), 'Archived stops must be excluded from the active main-stop count.' );
+	}
+
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
 		$trip_id = $this->create_trip();
 

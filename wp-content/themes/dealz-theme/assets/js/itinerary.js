@@ -522,6 +522,19 @@
 		try {
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
 			itemsList.replaceChildren();
+			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop'; }).length : 0;
+			const mainStopOption = document.querySelector('#item-type option[value="stop"]');
+			if (mainStopOption) {
+				mainStopOption.disabled = activeMainStops >= 4;
+				mainStopOption.title = activeMainStops >= 4 ? 'Đã đủ 4 điểm dừng chính trong ngày.' : '';
+			}
+			if (activeMainStops >= 4) {
+				const limitNotice = document.createElement('p');
+				limitNotice.className = 'notice notice--warning';
+				limitNotice.setAttribute('role', 'status');
+				limitNotice.textContent = 'Ngày này đã đủ 4 điểm dừng chính. Bạn vẫn có thể thêm thẻ bữa trưa hoặc bữa tối.';
+				itemsList.append(limitNotice);
+			}
 			if (!Array.isArray(items) || items.length === 0) {
 				const empty = makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.');
 				const action = document.createElement('button');

@@ -833,3 +833,7 @@ body.is-rental-view .rental-workspace { padding-top: 42px; }
 .rental-empty-state__back { margin-top: 16px; }
 body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 @media (max-width: 640px) { .rental-empty-state { width: 100%; min-width: 0; overflow-wrap: anywhere; } }
+
+
+/* Daily main-stop limit feedback. */
+.notice--warning { border: 1px solid var(--dealz-warning-border); background: var(--dealz-warning-bg); color: var(--dealz-ink); }
