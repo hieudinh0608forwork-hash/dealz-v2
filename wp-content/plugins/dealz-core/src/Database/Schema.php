@@ -365,7 +365,10 @@ final class Schema {
 		if ( ! is_string( $message ) || '' === $message ) {
 			return;
 		}
-		echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'DealZ database migration failed:', 'dealz-core' ) . '</strong> ' . esc_html( $message ) . '</p></div>';
+
+		// Keep SQL errors, table names and environment details in the server log only.
+		// The dashboard notice is intentionally generic and escaped.
+		echo '<div class="notice notice-error"><p>' . esc_html__( 'DealZ database migration failed. Check the server error log or contact the site administrator.', 'dealz-core' ) . '</p></div>';
 	}
 
 	/**
