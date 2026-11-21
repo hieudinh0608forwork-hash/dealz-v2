@@ -8,7 +8,7 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - Default branch: `main`.
 - Platform direction: fresh WordPress + custom plugin `dealz-core` + custom theme `dealz-theme` + REST API + MySQL.
 - Architecture: modular monolith.
-- Application code: versioned trip-planning schema, owner-scoped Trip CRUD, manual itinerary/day/stop APIs and initial traveler/itinerary workspace committed; runtime not yet available or verified.
+- Application code: versioned trip-planning/finance schema, owner-scoped Trip and itinerary APIs, budget/expense APIs and initial traveler/itinerary workspace committed; runtime not yet available or verified.
 
 ## Start here
 1. Read [CLAUDE.md](CLAUDE.md).
@@ -52,4 +52,4 @@ Stop the environment with `docker compose down`. To preserve local data, do not 
 The compose environment has been authored but has not been executed or runtime-verified in this work session.
 
 ## Handoff status
-The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: only the initial WordPress scaffold exists; no WordPress environment, runtime tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
+The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: the initial WordPress application slices exist, but no WordPress environment, runtime integration tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
