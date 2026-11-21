@@ -85,7 +85,7 @@ See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the 
 
 ## Verification limits
 
-The source and contracts have been reviewed, but this plugin has not yet been activated in a real WordPress/MySQL environment. Database migration, REST behavior, cross-user access and theme rendering still require runtime tests before any feature can be called verified or production-ready.
+The WordPress 6.8 / MySQL 8.0 integration workflow passed 14 tests and 51 assertions, including schema setup and owner-scoped REST behavior. The plugin has not yet been deployed to an actual site; browser rendering, staging and production behavior remain unverified.
 
 ## Requirements
 
