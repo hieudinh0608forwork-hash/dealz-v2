@@ -130,6 +130,48 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 		$this->assertSame( 404, $response->get_status() );
 	}
 
+
+	/**
+	 * Verify explicit overlapping time windows are reported.
+	 */
+	public function test_schedule_validator_reports_overlapping_items(): void {
+		$fixture = $this->create_itinerary_fixture();
+
+		$day = $this->request(
+			'POST',
+			'/itineraries/' . $fixture['itinerary_id'] . '/days',
+			array( 'local_date' => '2027-04-01' )
+		);
+		$this->assertSame( 201, $day->get_status() );
+		$day_id = $day->get_data()['public_id'];
+
+		$first = $this->request(
+			'POST',
+			'/days/' . $day_id . '/items',
+			array(
+				'title_snapshot' => 'Điểm A',
+				'start_local'    => '09:00',
+				'end_local'      => '10:00',
+			)
+		);
+		$second = $this->request(
+			'POST',
+			'/days/' . $day_id . '/items',
+			array(
+				'title_snapshot' => 'Điểm B',
+				'start_local'    => '09:30',
+				'end_local'      => '10:30',
+			)
+		);
+		$this->assertSame( 201, $first->get_status() );
+		$this->assertSame( 201, $second->get_status() );
+
+		$validation = $this->request( 'GET', '/days/' . $day_id . '/validation' );
+		$this->assertSame( 200, $validation->get_status() );
+		$this->assertFalse( $validation->get_data()['is_valid'] );
+		$this->assertSame( 'time_overlap', $validation->get_data()['issues'][0]['code'] );
+	}
+
 	/**
 	 * Remove test itinerary data and trip rows.
 	 */
