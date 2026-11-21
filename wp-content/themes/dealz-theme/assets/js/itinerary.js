@@ -310,12 +310,33 @@
 		editInput.type = 'text';
 		editInput.value = item.title_snapshot;
 		editInput.maxLength = 190;
+		editInput.required = true;
 		editInput.setAttribute('aria-label', 'Tên điểm dừng');
+
+		const startInput = document.createElement('input');
+		startInput.type = 'time';
+		startInput.value = item.start_local ? item.start_local.slice(0, 5) : '';
+		startInput.setAttribute('aria-label', 'Giờ đến');
+
+		const endInput = document.createElement('input');
+		endInput.type = 'time';
+		endInput.value = item.end_local ? item.end_local.slice(0, 5) : '';
+		endInput.setAttribute('aria-label', 'Giờ kết thúc');
+
+		const durationInput = document.createElement('input');
+		durationInput.type = 'number';
+		durationInput.min = '1';
+		durationInput.max = '1440';
+		durationInput.step = '1';
+		durationInput.placeholder = 'Phút';
+		durationInput.value = item.duration_minutes || '';
+		durationInput.setAttribute('aria-label', 'Thời lượng gợi ý, phút');
+
 		const save = document.createElement('button');
 		save.type = 'submit';
 		save.className = 'text-action';
-		save.textContent = 'Lưu tên';
-		editForm.append(editInput, save);
+		save.textContent = 'Lưu thay đổi';
+		editForm.append(editInput, startInput, endInput, durationInput, save);
 		editForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
 			const titleValue = editInput.value.trim();
@@ -323,9 +344,15 @@
 				showFeedback('Tên điểm dừng không được để trống.', true);
 				return;
 			}
+			const durationValue = durationInput.value.trim();
 			try {
-				await api('items/' + encodeURIComponent(item.public_id), 'PATCH', { title_snapshot: titleValue });
-				showFeedback('Đã cập nhật điểm dừng.', false);
+				await api('items/' + encodeURIComponent(item.public_id), 'PATCH', {
+					title_snapshot: titleValue,
+					start_local: startInput.value || null,
+					end_local: endInput.value || null,
+					duration_minutes: durationValue === '' ? null : Number(durationValue)
+				});
+				showFeedback('Đã cập nhật thông tin điểm dừng.', false);
 				await loadItems();
 			} catch (error) {
 				showFeedback(error.message, true);
@@ -651,11 +678,13 @@
 			const values = new FormData(itemForm);
 			const duration = String(values.get('duration_minutes') || '');
 			const start = String(values.get('start_local') || '');
+			const end = String(values.get('end_local') || '');
 			const payload = {
 				title_snapshot: String(values.get('title_snapshot') || '').trim(),
 				item_type: String(values.get('item_type') || 'stop'),
 				address_snapshot: String(values.get('address_snapshot') || '').trim(),
 				start_local: start || null,
+				end_local: end || null,
 				duration_minutes: duration === '' ? null : Number(duration),
 				currency: 'VND',
 				data_status: 'unverified'
