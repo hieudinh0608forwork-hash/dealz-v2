@@ -256,9 +256,9 @@ final class Schema {
 			'itineraries'   => $wpdb->prefix . 'dealz_itineraries',
 			'days'          => $wpdb->prefix . 'dealz_itinerary_days',
 			'items'         => $wpdb->prefix . 'dealz_itinerary_items',
-			'route_legs'    => $wpdb->prefix . 'dealz_route_legs',
 			'budget_lines'  => $wpdb->prefix . 'dealz_budget_lines',
 			'expenses'      => $wpdb->prefix . 'dealz_expenses',
+			'route_legs'    => $wpdb->prefix . 'dealz_route_legs',
 		);
 	}
 }
