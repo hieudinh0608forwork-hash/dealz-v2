@@ -113,6 +113,7 @@
 			return;
 		}
 		try {
+			const tripAtRequestStart = activeTrip;
 			const itemLists = await Promise.all(days.map(function (day) {
 				return api('days/' + encodeURIComponent(day.public_id) + '/items');
 			}));
@@ -123,6 +124,7 @@
 					return item.item_type === 'stop' && item.status !== 'archived';
 				}).length;
 			});
+			if (tripAtRequestStart !== activeTrip) return;
 			updateBadgeDisplay(count);
 		} catch (error) {
 			// Keep the last confirmed count; a transient read failure must not invent a new count.
@@ -252,7 +254,7 @@
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
 			activeDays = Array.isArray(days) ? days : [];
-			await updateTripStopBadge(activeDays);
+			updateTripStopBadge(activeDays);
 			daysList.replaceChildren();
 
 			if (!Array.isArray(days) || days.length === 0) {

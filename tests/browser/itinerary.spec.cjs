@@ -167,7 +167,7 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await expect(card.getByRole('button', { name: 'Di chuyển xuống' })).toBeEnabled();
   await expect(card.getByRole('link', { name: 'Mở mục thuê đồ cho Điểm dừng mobile' })).toBeVisible();
   await expect(card.locator('.item-directions')).toHaveAttribute('href', /google\.com\/maps\/dir/);
-  await expect(page.locator('.route-connector').first()).toContainText('Chưa có dữ liệu tuyến đường');
+  await expect(page.locator('.route-connector').first()).toContainText('Chưa có đủ dữ liệu tuyến đường');
   await expect(page.locator('.route-connector__number, .route-connector__badge, .route-number')).toHaveCount(0);
 
   const dimensions = await page.evaluate(() => ({
