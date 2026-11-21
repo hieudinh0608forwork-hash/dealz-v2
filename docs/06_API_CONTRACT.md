@@ -1,48 +1,88 @@
 # 06 – API Contract Baseline
 
-## 1. Quy ước
-- Base path dự kiến: `/wp-json/dealz/v1`.
-- JSON request/response.
-- Authentication theo WordPress session/cookie + nonce cho web session; token strategy chỉ quyết định khi có client use case.
-- Mọi endpoint riêng tư phải kiểm tra quyền và ownership.
-- Dùng HTTP status phù hợp; lỗi có code ổn định và message an toàn.
-- Pagination dùng limit/cursor hoặc page thống nhất.
-- Không nhận tổng tiền cuối cùng từ client làm nguồn tin cậy.
+## 1. Namespace and conventions
+Base path: `/wp-json/dealz/v1`.
+JSON request/response; ISO-8601 timestamps; money object `{amount_minor, currency}`; stable public UUIDs; paginated collection; error shape `{code, message, details, request_id}`. Never expose stack traces, secrets or raw provider credentials.
 
-## 2. Endpoint dự kiến
+Authentication initially uses WordPress session/cookie + nonce for same-origin web requests. Token auth is a separate decision if a mobile/external client requires it.
 
-| Method | Endpoint | Mục đích | Quyền |
-|---|---|---|---|
-| GET | /destinations | Danh sách điểm đến | Public |
-| GET | /destinations/{id} | Chi tiết điểm đến | Public |
-| GET | /services | Tìm dịch vụ | Public |
-| GET | /services/{id} | Chi tiết dịch vụ | Public |
-| GET | /me | Hồ sơ hiện tại | Authenticated |
-| GET/POST | /trips | Liệt kê/tạo Trip | Traveler |
-| GET/PATCH/DELETE | /trips/{id} | Xem/sửa/xóa Trip | Owner/Admin |
-| POST | /trips/{id}/itineraries/generate | Yêu cầu AI tạo lịch trình | Owner |
-| GET/POST | /trips/{id}/itineraries | Xem/lưu itinerary | Owner |
-| PATCH/DELETE | /itinerary-items/{id} | Sửa/xóa hoạt động | Owner |
-| POST | /budget/estimate | Tính dự toán | Authenticated/Guest policy TBD |
-| POST | /orders | Khởi tạo order khi module booking được bật | Traveler |
-| GET | /orders/{id} | Xem order | Owner/authorized admin |
-| POST | /webhooks/{provider} | Nhận callback thanh toán | Provider signature |
+Every private endpoint must check capability and resource ownership. Partner endpoints must scope all reads/writes to the active partner organization.
 
-## 3. Response conventions
-Thành công: object dữ liệu có cấu trúc và metadata cần thiết.
-Lỗi: `code`, `message`, `details` (chỉ dữ liệu không nhạy cảm), `request_id`.
+## 2. Public discovery
+- GET /destinations
+- GET /destinations/{id}
+- GET /places/search
+- GET /places/{id}
+- GET /services
+- GET /services/{id}
+Filters must be whitelisted, paginated and backed by published/verified data. Distinguish missing/unverified values.
 
-## 4. AI itinerary request/response
-Request cần có destination, date range, traveler count, budget/currency, preferences và constraints.
-Response phải tuân theo schema itinerary đã version hóa; backend validate ngày, tọa độ, số lượng item, tổng thời lượng và dữ liệu không hợp lệ trước khi lưu.
-AI output là nội dung gợi ý, không phải cam kết giá, tồn chỗ hoặc booking.
+## 3. Account and Trip
+- GET/PATCH /me
+- GET/POST /trips
+- GET/PATCH/DELETE /trips/{id}
+- POST /trips/{id}/duplicate
+- POST /trips/{id}/share
+- DELETE /trips/{id}/share/{share_id}
+- GET/POST /trips/{id}/collaborators
+- PATCH/DELETE /trips/{id}/collaborators/{collaborator_id}
 
-## 5. Idempotency và webhook
-- Các thao tác tạo giao dịch phải hỗ trợ idempotency.
-- Webhook xác minh chữ ký trước khi xử lý.
-- Lưu event/provider reference để chống xử lý trùng.
-- Xử lý bất đồng bộ nếu cần; retry không được tạo bút toán/booking lặp.
-- Không tin redirect từ trình duyệt là bằng chứng thanh toán.
+## 4. Itinerary
+- GET/POST /trips/{id}/itineraries
+- POST /trips/{id}/itineraries/generate (AI capability only when implemented/configured)
+- POST /trips/{id}/itineraries/{itinerary_id}/replan
+- POST /trips/{id}/itineraries/{itinerary_id}/items
+- PATCH/DELETE /itinerary-items/{item_id}
+- POST /trips/{id}/itineraries/{itinerary_id}/reorder
+- POST /trips/{id}/itineraries/{itinerary_id}/validate
+- GET /trips/{id}/itineraries/{itinerary_id}/routes
 
-## 6. Trạng thái
-Đây là contract sơ bộ. Request/response JSON Schema, error catalog, auth details và versioning policy cần hoàn thiện trước khi frontend tích hợp.
+Generation returns a preview with source/warnings; persistence occurs only after explicit user acceptance or a separately approved autosave behavior. Schema and provider status must be explicit.
+
+## 5. Budget and expenses
+- GET /trips/{id}/budget
+- POST /trips/{id}/budget/lines
+- PATCH/DELETE /budget/lines/{line_id}
+- GET/POST /trips/{id}/expenses
+- PATCH/DELETE /expenses/{expense_id}
+Server recalculates totals; client totals are display hints only.
+
+## 6. Partner and listings
+- GET/PATCH /partner/profile
+- GET/POST /partner/listings
+- GET/PATCH/DELETE /partner/listings/{id}
+- POST /partner/listings/{id}/availability
+- GET /partner/bookings
+- POST /partner/bookings/{id}/accept
+- POST /partner/bookings/{id}/reject
+Partner cannot read or modify another partner's resources.
+
+## 7. Quote, order, booking and payment
+- POST /bookings/quote
+- POST /orders
+- GET /orders/{id}
+- GET /bookings/{id}
+- POST /bookings/{id}/cancel
+- POST /payments/intent (only when payment integration is enabled)
+- POST /webhooks/{provider}
+
+Quote response must include fulfillment type, source/status of price, availability status, terms snapshot, expiry and known breakdown. Never trust client-supplied totals. Order may group multiple independent bookings; each booking retains its own status.
+
+## 8. AI and external providers
+- POST /ai/itinerary/generate
+- POST /ai/itinerary/replan
+- POST /routes/estimate
+- POST /places/resolve
+AI and provider endpoints require rate limits, timeout, cost controls, schema validation and safe error handling. AI output cannot set official price, inventory, booking or payment state.
+
+## 9. Security and idempotency
+- Validate request schema and allowed fields.
+- Verify capability and ownership for every object ID.
+- Use nonce/CSRF protection for browser session writes.
+- Use idempotency for order/payment creation.
+- Webhook signature, event ID, amount, currency and provider reference must be verified.
+- Duplicate webhook must not create duplicate state changes or ledger entries.
+- Log request ID and safe event metadata.
+
+## 10. Contract freeze checklist
+For each endpoint record method/path, request/response JSON Schema, auth, capability, ownership, validation, errors, idempotency, rate limits, provider dependencies, data source and test cases. This document is a broad route inventory; it is not yet a frozen executable OpenAPI spec.
