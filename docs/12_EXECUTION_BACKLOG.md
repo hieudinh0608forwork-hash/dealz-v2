@@ -1,47 +1,80 @@
 # 12 – Execution Backlog
 
-## Phase 0 – Discovery & Audit
-- [x] Xác nhận repository DealZ V2 tồn tại, Public, branch main.
-- [x] Xác nhận quyền admin/push.
-- [x] Khởi tạo Project Knowledge Pack baseline.
-- [ ] Kiểm kê theme ZIP tham khảo (nếu người dùng cung cấp).
-- [ ] Kiểm kê hosting/domain/WordPress/PHP/MySQL/SSL/backup.
-- [ ] Xác nhận địa bàn và nhóm dịch vụ MVP từ tài liệu nghiệp vụ.
-- [ ] Xác nhận quyết định Google Drive/GitHub cho từng loại tài sản nếu còn nhu cầu đồng bộ.
+Status labels: Planned / In progress / Implemented / Tested / Verified / Deployed. Checkboxes are only completed with evidence.
 
-## Phase 1 – Product & UX Blueprint
-- [ ] Chốt MVP vertical slice.
-- [ ] Hoàn thiện journey và sitemap.
-- [ ] Wireframe các màn hình cốt lõi.
-- [ ] Chốt design tokens và component inventory.
-- [ ] Viết acceptance criteria chi tiết.
+## Phase 0 – Source & environment audit
+- [x] Confirm repository `hieudinh0608forwork-hash/dealz-v2`, Public, branch main.
+- [x] Confirm connected GitHub account has admin/push permission.
+- [x] Create initial Knowledge Pack.
+- [x] Import and apply DealZ design rules dated 20/11/2026.
+- [x] Retrieve Master Handoff dated 21/11/2026 from Library.
+- [ ] Inventory supplied theme ZIP, if re-supplied; inspect as reference only.
+- [ ] Audit hosting/domain/WordPress/PHP/MySQL/SSL/backup/cron/SMTP/build support.
+- [ ] Inventory current supplier data and proof of availability/pricing.
+- [ ] Record provider/cost constraints.
 
-## Phase 2 – Data & Architecture
-- [ ] Chốt logical ERD và physical schema.
-- [ ] Chốt API JSON Schema.
-- [ ] Chốt permission matrix.
-- [ ] Chốt state machines với chính sách nghiệp vụ.
-- [ ] Thiết kế event, audit và notification.
+## Phase 1 – Product and UX handoff
+- [x] Define product roles and broad full-scope direction from Master Handoff.
+- [x] Apply itinerary card and visual rules.
+- [ ] Complete sitemap and screen inventory.
+- [ ] Complete traveler, partner and operations user journeys.
+- [ ] Wireframe every MVP screen and all states.
+- [ ] Define component inventory and design QA checklist.
+- [ ] Freeze MVP vertical slice and acceptance criteria.
 
-## Phase 3 – Core Platform
-- [ ] Tạo fresh WordPress environment.
-- [ ] Tạo custom plugin dealz-core.
-- [ ] Tạo custom theme dealz-theme.
-- [ ] Authentication/profile/roles.
-- [ ] Destination/service catalog.
-- [ ] Trip CRUD và itinerary CRUD.
+## Phase 2 – Data, API and security contracts
+- [ ] ERD with field types, constraints, indexes and deletion policy.
+- [ ] Permission matrix.
+- [ ] Booking/Order/Payment state transition table.
+- [ ] JSON Schemas/OpenAPI for MVP endpoints.
+- [ ] AI itinerary schema and validation contract.
+- [ ] Places/geocoding/routing provider contract.
+- [ ] Budget and expense calculation specification.
+- [ ] Availability model by service type.
+- [ ] Audit, notifications, idempotency and webhook contracts.
 
-## Phase 4 – AI & Integrations
-- [ ] AI adapter và structured itinerary.
-- [ ] Budget calculator.
-- [ ] Map/geocoding/routing adapter.
-- [ ] Kiểm thử timeout, invalid output, quota và retry.
+## Phase 3 – Fresh WordPress foundation
+- [ ] Provision local environment.
+- [ ] Confirm WordPress/PHP/MySQL compatibility.
+- [ ] Scaffold custom plugin dealz-core.
+- [ ] Scaffold custom theme dealz-theme with local WOFF2 fonts.
+- [ ] Add migrations and automated test runner.
+- [ ] Add CI checks and coding standards.
+- [ ] Authentication, profile and capabilities.
+- [ ] Destination/place and service catalogue.
+- [ ] Trip CRUD and manual itinerary CRUD.
 
-## Phase 5+ – Booking, Finance, QA
-- [ ] Booking/order theo chính sách được duyệt.
-- [ ] Payment adapter và webhook.
-- [ ] Ledger/reconciliation trước payout.
-- [ ] E2E, security, performance và release gates.
+## Phase 4 – Core planning experience
+- [ ] Implement itinerary day/stop cards to exact design rules.
+- [ ] Implement schedule validation and reorder.
+- [ ] Implement route provider abstraction and map UI.
+- [ ] Implement budget lines and expense records.
+- [ ] Implement save/share/print/PDF only after interaction is functional.
+- [ ] Add outside-pilot warning for destinations beyond Da Nang–Hoi An.
 
-## Quy tắc
-Backlog phản ánh trạng thái thực tế. Chỉ đánh dấu hoàn thành khi có bằng chứng kiểm tra tương ứng.
+## Phase 5 – AI and marketplace
+- [ ] AI provider adapter and structured output.
+- [ ] Deterministic validation and safe fallback.
+- [ ] Service search and service detail.
+- [ ] Rental-by-stop flow: filtered rental listing and return link to source stop.
+- [ ] Partner onboarding, listing management and availability.
+- [ ] Quote and booking lifecycle.
+
+## Phase 6 – Finance and operations
+- [ ] Payment adapter in sandbox.
+- [ ] Webhook verification and idempotency.
+- [ ] Ledger and reconciliation.
+- [ ] Deposit/refund/commission/payout only after policy approval.
+- [ ] Admin support, audit and notification workflows.
+
+## Phase 7 – QA and release
+- [ ] Unit/integration/contract/E2E tests.
+- [ ] Cross-user and cross-partner access tests.
+- [ ] Responsive, accessibility, Vietnamese font and visual rule QA.
+- [ ] Provider failure, concurrency and webhook replay tests.
+- [ ] Backup/restore and rollback rehearsal.
+- [ ] Staging acceptance.
+- [ ] Production deployment only after explicit owner approval.
+
+## Governance
+Do not mark a feature implemented because a document describes it. Do not mark tested without test output. Do not mark verified without evidence in a real environment. Do not deploy production or incur paid API charges without approval.
