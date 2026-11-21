@@ -8,6 +8,7 @@
 namespace DealZ\REST;
 
 use DealZ\Repositories\ItineraryRepository;
+use DealZ\Domain\ScheduleValidator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -71,6 +72,16 @@ final class ItineraryController {
 					'callback'            => array( $this, 'create_day' ),
 					'permission_callback' => array( $this, 'is_authenticated' ),
 				),
+			)
+		);
+
+		register_rest_route(
+			'dealz/v1',
+			'/days/(?P<public_id>' . $uuid . ')/validation',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'validate_day' ),
+				'permission_callback' => array( $this, 'is_authenticated' ),
 			)
 		);
 
@@ -229,6 +240,26 @@ final class ItineraryController {
 				'position' => null === $position ? count( $this->repository->list_days( (int) $itinerary->id ) ) - 1 : $position,
 			),
 			201
+		);
+	}
+
+	/**
+	 * Validate time overlap for an owned itinerary day.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function validate_day( \WP_REST_Request $request ) {
+		$day = $this->repository->find_day_owned( (string) $request['public_id'], get_current_user_id() );
+
+		if ( ! $day ) {
+			return $this->not_found();
+		}
+
+		$validator = new ScheduleValidator();
+		return new \WP_REST_Response(
+			$validator->validate( $this->repository->list_items( (int) $day->id ) ),
+			200
 		);
 	}
 
