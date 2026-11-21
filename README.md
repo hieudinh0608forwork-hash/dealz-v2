@@ -45,11 +45,11 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 4. Open `http://localhost:8080` and complete the fresh WordPress installation.
 5. In WordPress Admin, activate **DealZ Core** and optionally activate **DealZ Theme**.
 6. Check `http://localhost:8080/wp-json/dealz/v1/health`; it should report scaffold status, not application readiness.
-7. Use WordPress cookie authentication and an `X-WP-Nonce` REST nonce when testing Trip endpoints.
+7. Use WordPress cookie authentication and an `X-WP-Nonce` REST nonce when testing Trip, itinerary and finance endpoints.
 
 Stop the environment with `docker compose down`. To preserve local data, do not add `-v`. To deliberately reset local data, `docker compose down -v` removes the named WordPress/MySQL volumes; this is destructive and local-only.
 
 The compose environment has been authored but has not been executed or runtime-verified in this work session.
 
 ## Handoff status
-The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: the initial WordPress application slices exist, but no WordPress environment, runtime integration tests or deployment have been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
+The repository currently contains the project knowledge pack and detailed baseline specifications. This is not a completed application handoff: the initial WordPress application slices exist and a MySQL-backed WordPress integration workflow is configured, but no passing workflow run, local runtime or deployment has yet been verified. See [Handoff Completion Standard](docs/13_HANDOFF_COMPLETION.md).
