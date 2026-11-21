@@ -1,6 +1,6 @@
 # DealZ Core tests
 
-The Trip and manual itinerary API integration tests use the official WordPress PHPUnit test suite and require a disposable local WordPress/MySQL database.
+The Trip, manual itinerary and finance API integration tests use the official WordPress PHPUnit test suite and require a disposable local WordPress/MySQL database.
 
 ## Current test coverage
 - Owner can create and read a Trip.
@@ -11,7 +11,10 @@ The Trip and manual itinerary API integration tests use the official WordPress P
 - A different user cannot list days in another user's itinerary.
 - A fifth active main stop on one day is rejected.
 - Explicitly overlapping local time windows are reported by the day validator.
-- Explicitly overlapping local time windows are reported by the day validator.
+- Budget line totals and grouped summaries are calculated using integer minor units.
+- Budget lines are scoped to their Trip owner.
+- Expense timestamps with offsets are normalized to UTC.
+- Invalid calendar dates in expense timestamps are rejected.
 
 ## Run
 1. Set up the local WordPress environment using the root README.
