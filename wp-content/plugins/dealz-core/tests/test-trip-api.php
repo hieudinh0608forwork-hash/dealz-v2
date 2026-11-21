@@ -63,7 +63,7 @@ class DealZ_Trip_API_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 201, $response->get_status() );
 		$data = $response->get_data();
-		$this->created_trip_ids[] = $data['public_id'];
+		$this->created_trip_ids[] = $data->public_id;
 
 		return $data['public_id'];
 	}
