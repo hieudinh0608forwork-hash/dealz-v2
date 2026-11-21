@@ -93,8 +93,8 @@ These checks must be performed after starting the compose environment and activa
 ## 4. Known limitations
 
 - Automated WordPress integration test workflow is configured; its first run and test result are pending.
-- PHP syntax, JavaScript syntax and OpenAPI YAML checks passed on commit `e43610cb45ecac70e2842cacdc14cc4a5667bbef`.
-- The GitHub Actions WordPress 6.8 / MySQL 8.0 integration suite passed 14 tests and 51 assertions on commit `e43610cb45ecac70e2842cacdc14cc4a5667bbef`. A local Docker install and browser acceptance run have not been performed.
+- PHP syntax, JavaScript syntax and OpenAPI YAML checks passed on commit `f7ecbc988c4625ff751d5bd330ac4c31253ad135`.
+- The GitHub Actions WordPress 6.8 / MySQL 8.0 integration suite passed 14 tests and 58 assertions on commit `f7ecbc988c4625ff751d5bd330ac4c31253ad135`. A local Docker install and browser acceptance run have not been performed.
 - Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs. Stop cards support editing title, start/end time and duration; browser/runtime behavior has not been verified.
 - Manual itinerary/day/stop APIs and initial workspace UI are implemented; budget/expense APIs are connected to initial frontend forms, lists and archive actions. Full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
 - Collaborator and route-leg tables are currently unused foundations; itinerary/day/item, budget-line and expense tables are used by implemented APIs.
