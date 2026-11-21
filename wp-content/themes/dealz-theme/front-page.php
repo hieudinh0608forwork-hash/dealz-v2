@@ -14,23 +14,60 @@ get_header();
 <main id="primary" class="site-main">
 	<section class="hero-section" id="explore">
 		<div class="hero-section__content">
-			<p class="eyebrow"><?php esc_html_e( 'Bắt đầu từ Đà Nẵng – Hội An', 'dealz-theme' ); ?></p>
+			<p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span><?php esc_html_e( 'Đang thí điểm tại Đà Nẵng – Hội An', 'dealz-theme' ); ?></p>
 			<h1><?php esc_html_e( 'Lên kế hoạch cho chuyến đi của bạn.', 'dealz-theme' ); ?></h1>
 			<p class="hero-section__description"><?php esc_html_e( 'Tập hợp thông tin chuyến đi và từng bước xây dựng hành trình phù hợp với lịch trình của bạn.', 'dealz-theme' ); ?></p>
-			<?php if ( is_user_logged_in() ) : ?>
 			<a class="button button--primary hero-section__cta" href="#create-trip"><?php esc_html_e( 'Tạo chuyến đi', 'dealz-theme' ); ?><span aria-hidden="true">↗</span></a>
-		<?php else : ?>
-			<a class="button button--primary hero-section__cta" href="<?php echo esc_url( wp_login_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Đăng nhập để bắt đầu', 'dealz-theme' ); ?><span aria-hidden="true">↗</span></a>
-		<?php endif; ?>
 			<p class="hero-section__note"><?php esc_html_e( 'Bạn chủ động lựa chọn và chỉnh sửa thông tin chuyến đi.', 'dealz-theme' ); ?></p>
 		</div>
 		<div class="hero-art" aria-hidden="true">
-			<div class="hero-art__sun"></div>
-			<div class="hero-art__hill hero-art__hill--back"></div>
-			<div class="hero-art__hill hero-art__hill--front"></div>
+			<svg class="hero-art__map" viewBox="0 0 400 500" role="presentation" focusable="false">
+				<g fill="none" stroke="var(--dealz-lime-surface)" stroke-width="1.2">
+					<path d="M-30 92C48 24 114 28 178 72s128 52 252-18"/>
+					<path d="M-32 118C42 52 116 54 182 98s128 50 248-14"/>
+					<path d="M-36 148C48 78 122 82 188 124s132 50 246-10"/>
+					<path d="M-40 178C52 108 130 110 194 154s134 50 242-8"/>
+					<path d="M-44 210C56 140 136 142 202 184s136 50 236-6"/>
+					<path d="M-48 244C62 174 144 174 210 216s136 48 230-4"/>
+					<path d="M-40 430C44 362 118 352 186 384s132 46 252-20"/>
+					<path d="M-38 458C50 390 124 382 192 414s132 46 250-18"/>
+				</g>
+				<circle cx="302" cy="104" r="48" fill="var(--dealz-lime)"/>
+				<path d="M82 356C132 306 166 332 206 274s52-92 104-82 36 92 4 134-80 58-122 48-64-4-110-18" fill="none" stroke="var(--dealz-lime)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 12"/>
+				<g fill="var(--dealz-lime)" stroke="var(--dealz-green)" stroke-width="4">
+					<circle cx="82" cy="356" r="10"/><circle cx="206" cy="274" r="10"/><circle cx="314" cy="192" r="10"/>
+				</g>
+			</svg>
 			<div class="hero-art__label">Đà Nẵng <span>·</span> Hội An</div>
-			<div class="hero-art__pin">D</div>
 		</div>
+	</section>
+
+	<section class="feature-bento page-container" aria-label="<?php esc_attr_e( 'Các tính năng của DealZ', 'dealz-theme' ); ?>">
+		<article class="feature-card feature-card--timeline">
+			<p class="eyebrow"><?php esc_html_e( 'Lịch trình theo ngày', 'dealz-theme' ); ?></p>
+			<h2><?php esc_html_e( 'Sắp xếp chuyến đi theo nhịp của bạn.', 'dealz-theme' ); ?></h2>
+			<p><?php esc_html_e( 'Tạo chuyến đi, thêm ngày và sắp xếp điểm dừng hoặc bữa ăn trong từng ngày.', 'dealz-theme' ); ?></p>
+			<div class="mini-timeline" aria-hidden="true"><span>Điểm dừng</span><i></i><span>Bữa ăn</span><i></i><span>Điểm dừng</span></div>
+			<small><?php esc_html_e( 'Sơ đồ minh họa cấu trúc lịch trình.', 'dealz-theme' ); ?></small>
+		</article>
+		<article class="feature-card feature-card--budget">
+			<p class="eyebrow"><?php esc_html_e( 'Ngân sách', 'dealz-theme' ); ?></p>
+			<h2><?php esc_html_e( 'Theo dõi dự kiến và đã chi.', 'dealz-theme' ); ?></h2>
+			<div class="budget-illustration" aria-hidden="true"><span>Dự kiến</span><i></i><span>Đã chi</span><i></i></div>
+			<small><?php esc_html_e( 'Minh họa, không phải số liệu chuyến đi.', 'dealz-theme' ); ?></small>
+		</article>
+		<article class="feature-card feature-card--maps">
+			<p class="eyebrow"><?php esc_html_e( 'Chỉ đường', 'dealz-theme' ); ?></p>
+			<h2><?php esc_html_e( 'Mở Google Maps từ điểm dừng có địa chỉ.', 'dealz-theme' ); ?></h2>
+			<p><?php esc_html_e( 'Liên kết chỉ đường xuất hiện khi điểm dừng có địa chỉ phù hợp.', 'dealz-theme' ); ?></p>
+			<span class="feature-card__arrow" aria-hidden="true">↗</span>
+		</article>
+		<article class="feature-card feature-card--rental">
+			<p class="eyebrow"><?php esc_html_e( 'Theo điểm dừng', 'dealz-theme' ); ?></p>
+			<h2><?php esc_html_e( 'Thuê đồ theo hành trình.', 'dealz-theme' ); ?></h2>
+			<span class="dz-chip"><?php esc_html_e( 'Sắp có', 'dealz-theme' ); ?></span>
+			<p><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng. DealZ chưa hiển thị sản phẩm, giá hoặc cửa hàng.', 'dealz-theme' ); ?></p>
+		</article>
 	</section>
 
 	<section class="trips-section page-container" id="trips">
