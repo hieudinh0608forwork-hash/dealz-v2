@@ -54,7 +54,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Implement route provider abstraction and map UI.
 - [x] Implement owner-scoped budget lines and expense records with server-side integer calculations and UTC normalization; [x] add initial responsive budget/expense forms and lists; [ ] complete finance editing and visual QA.
 - [ ] Implement save/share/print/PDF only after interaction is functional.
-- [ ] Add outside-pilot warning for destinations beyond Da Nang–Hoi An.
+- [x] Add an initial outside-pilot warning when a destination does not match Da Nang or Hoi An; [ ] refine mixed-destination detection and content QA.
 
 ## Phase 5 – AI and marketplace
 - [ ] AI provider adapter and structured output.
