@@ -70,3 +70,18 @@
 - WordPress integration tests run in a separate MySQL-backed workflow.
 - The workflows are configured but their first results have not yet been observed; no tests are claimed as passing.
 - Local Docker is unavailable in this work context; browser/runtime visual checks remain outstanding.
+
+## 2026-11-22 – Initial trip finance interface
+
+### Added
+- Added budget summary tiles grouped by cost type and currency.
+- Added budget-line list and create form with server-calculated totals.
+- Added actual-expense list and create form; browser-local input is converted to an ISO-8601 timestamp using the Trip destination timezone.
+- Added archive actions for budget lines and expenses.
+- Added responsive finance layout and list states in the theme.
+- Extended PHP lint workflow to check JavaScript syntax with Node.js.
+
+### Verification status
+- Finance interface is connected to the authenticated finance REST endpoints.
+- PHP, JavaScript and OpenAPI checks are running in GitHub Actions; WordPress integration tests are also running after the first test-suite corrections.
+- Browser-level interaction and responsive visual checks remain outstanding.
