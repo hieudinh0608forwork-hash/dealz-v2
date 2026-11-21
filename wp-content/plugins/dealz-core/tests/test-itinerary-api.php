@@ -170,6 +170,21 @@ class DealZ_Itinerary_API_Test extends WP_UnitTestCase {
 		$this->assertSame( 200, $validation->get_status() );
 		$this->assertFalse( $validation->get_data()['is_valid'] );
 		$this->assertSame( 'time_overlap', $validation->get_data()['issues'][0]['code'] );
+
+		$second_id = $second->get_data()['public_id'];
+		$updated   = $this->request(
+			'PATCH',
+			'/items/' . $second_id,
+			array(
+				'start_local' => '10:00',
+				'end_local'   => '11:00',
+			)
+		);
+		$this->assertSame( 200, $updated->get_status() );
+
+		$revalidated = $this->request( 'GET', '/days/' . $day_id . '/validation' );
+		$this->assertSame( 200, $revalidated->get_status() );
+		$this->assertTrue( $revalidated->get_data()['is_valid'] );
 	}
 
 	/**
