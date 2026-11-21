@@ -22,7 +22,7 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - UX/UI: [UX Blueprint](docs/02_UX_BLUEPRINT.md), [Design System](docs/03_DESIGN_SYSTEM.md), [Design Rules](docs/11_DESIGN_RULES.md).
 - Engineering: [Architecture](docs/04_SYSTEM_ARCHITECTURE.md), [Database](docs/05_DATABASE_SCHEMA.md), [API](docs/06_API_CONTRACT.md), [Permissions](docs/14_PERMISSION_MATRIX.md).
 - Domain: [Business Rules](docs/07_BUSINESS_RULES.md), [State Machines](docs/08_STATE_MACHINES.md), [AI Planner](docs/15_AI_PLANNER_SPEC.md), [Maps & Routing](docs/16_MAPS_ROUTING_SPEC.md), [Budget & Finance](docs/17_BUDGET_FINANCE_SPEC.md).
-- Delivery: [Test Plan](docs/09_TEST_PLAN.md), [Risk Register](docs/11_RISK_REGISTER.md), [Execution Backlog](docs/12_EXECUTION_BACKLOG.md), [Handoff Completion](docs/13_HANDOFF_COMPLETION.md), [Agent Workflow](docs/19_AGENT_WORKFLOW.md), [Environment Audit](docs/20_ENVIRONMENT_AUDIT.md), [Source Traceability](docs/21_SOURCE_TRACEABILITY.md), [Implementation Log](docs/22_IMPLEMENTATION_LOG.md).
+- Delivery: [Test Plan](docs/09_TEST_PLAN.md), [Risk Register](docs/11_RISK_REGISTER.md), [Execution Backlog](docs/12_EXECUTION_BACKLOG.md), [Handoff Completion](docs/13_HANDOFF_COMPLETION.md), [Agent Workflow](docs/19_AGENT_WORKFLOW.md), [Environment Audit](docs/20_ENVIRONMENT_AUDIT.md), [Source Traceability](docs/21_SOURCE_TRACEABILITY.md), [Implementation Log](docs/22_IMPLEMENTATION_LOG.md), [MVP Implementation Notes](docs/23_MVP_IMPLEMENTATION.md), [OpenAPI Contract](docs/openapi/dealz-v1.openapi.yaml).
 - Agent prompts: [agents/](agents/README.md) – Architect, Frontend, Backend, Intelligence.
 
 ## Non-negotiable rules
