@@ -62,7 +62,7 @@ As of 2026-11-22:
 - H3 Technical blueprint: architecture, logical schema, initial physical schema v1.2.0, permission matrix and OpenAPI contracts for Trip, itinerary and finance APIs exist; full commerce schema, remaining module contracts and final transaction state transitions remain open.
 - H4 Build handoff: contributor instructions, local Docker Compose definition, environment example, migration setup and a MySQL-backed WordPress PHPUnit workflow exist. CI executed successfully; local Docker and browser acceptance remain open.
 - H5 Implementation: in progress; plugin/theme foundation, Trip CRUD, manual itinerary/day/stop APIs, deterministic time-overlap validation, budget/expense APIs, initial finance forms/lists and responsive traveler/itinerary workspace committed. No runtime feature is verified.
-- H6 Verification: WordPress 6.8 / MySQL 8.0 integration suite passed 14 tests and 58 assertions on commit `f7ecbc988c4625ff751d5bd330ac4c31253ad135`; PHP, JavaScript and OpenAPI checks passed on commit `497c5f517c8410317bed3016412a244c89d68dab`. Browser acceptance, responsive visual checks and staging verification remain open.
+- H6 Verification: WordPress 6.8 / MySQL 8.0 integration suite passed 15 tests and 69 assertions on commit `c798656db30d1a4cb01466eff239d378fbdbc90e`; PHP, JavaScript and OpenAPI checks passed on commit `497c5f517c8410317bed3016412a244c89d68dab`. Browser acceptance, responsive visual checks and staging verification remain open.
 - H7 Release readiness: not started; no staging/production environment verified.
 
 Therefore the project handoff is **NOT complete**. A scaffold and documentation are not a working application.
