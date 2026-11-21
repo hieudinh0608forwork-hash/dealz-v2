@@ -262,3 +262,30 @@ test('admin-only styleguide is noindex and exposes the component states', async 
   await expect(page.locator('.dz-skeleton[aria-busy="true"]')).toBeVisible();
   await expect(page.locator('.route-connector')).toContainText('Chưa có đủ dữ liệu tuyến đường');
 });
+
+
+test('legal draft routes are public noindex and do not invent operative terms', async ({ page }) => {
+  const routes = [
+    ['/chinh-sach-coc-va-huy/', 'Chính sách cọc và hủy'],
+    ['/dieu-khoan/', 'Điều khoản sử dụng'],
+    ['/bao-mat/', 'Chính sách bảo mật']
+  ];
+  for (const [path, title] of routes) {
+    const response = await page.goto(BASE_URL + path);
+    expect(response.status()).toBe(200);
+    await expect(page.locator('h1')).toHaveText(title);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    await expect(page.locator('.notice--warning')).toContainText('Bản nháp, chưa có hiệu lực');
+    await expect(page.locator('main')).not.toContainText(/\d+\s?%/);
+    await expect(page.locator('main')).not.toContainText(/mã số thuế|địa chỉ pháp lý|tỷ lệ cọc|giờ hủy/i);
+  }
+  await page.goto(BASE_URL + '/');
+  await expect(page.locator('.zalo-float')).toHaveCount(0);
+  await expect(page.locator('.site-footer__legal a')).toHaveCount(3);
+});
+
+test('styleguide is not accessible without administrator capability', async ({ page }) => {
+  const response = await page.goto(BASE_URL + '/styleguide/');
+  expect(response.status()).toBe(404);
+  await expect(page.locator('h1')).not.toHaveText('Trang styleguide');
+});
