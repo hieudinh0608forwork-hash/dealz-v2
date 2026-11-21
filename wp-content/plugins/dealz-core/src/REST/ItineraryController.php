@@ -154,7 +154,16 @@ final class ItineraryController {
 		}
 
 		$itinerary = $this->repository->find_itinerary_owned( $public_id, get_current_user_id() );
-		return new \WP_REST_Response( $itinerary, 201 );
+		return new \WP_REST_Response(
+			array(
+				'public_id'  => $itinerary->public_id,
+				'version'    => (int) $itinerary->version,
+				'source'     => $itinerary->source,
+				'status'     => $itinerary->status,
+				'created_at' => $itinerary->created_at,
+			),
+			201
+		);
 	}
 
 	/**
@@ -272,7 +281,7 @@ final class ItineraryController {
 		}
 
 		return new \WP_REST_Response(
-			$this->repository->find_item_owned( $public_id, get_current_user_id() ),
+			$this->serialize_item( $this->repository->find_item_owned( $public_id, get_current_user_id() ) ),
 			201
 		);
 	}
@@ -317,7 +326,7 @@ final class ItineraryController {
 			return new \WP_Error( 'dealz_item_update_failed', __( 'Không thể cập nhật điểm dừng.', 'dealz-core' ), array( 'status' => 500 ) );
 		}
 
-		return new \WP_REST_Response( $this->repository->find_item_owned( $public_id, get_current_user_id() ), 200 );
+		return new \WP_REST_Response( $this->serialize_item( $this->repository->find_item_owned( $public_id, get_current_user_id() ) ), 200 );
 	}
 
 	/**
@@ -339,6 +348,39 @@ final class ItineraryController {
 		}
 
 		return new \WP_REST_Response( array( 'public_id' => $public_id, 'status' => 'archived' ), 200 );
+	}
+
+	/**
+	 * Serialize an item without exposing internal database identifiers.
+	 *
+	 * @param object|null $item Stored item.
+	 * @return array<string,mixed>
+	 */
+	private function serialize_item( ?object $item ): array {
+		if ( ! $item ) {
+			return array();
+		}
+
+		$fields = array(
+			'public_id',
+			'item_type',
+			'title_snapshot',
+			'description',
+			'address_snapshot',
+			'start_local',
+			'end_local',
+			'duration_minutes',
+			'position',
+			'transport_mode',
+			'latitude',
+			'longitude',
+			'estimated_cost_minor',
+			'currency',
+			'data_status',
+			'status',
+		);
+
+		return array_intersect_key( (array) $item, array_flip( $fields ) );
 	}
 
 	/**
