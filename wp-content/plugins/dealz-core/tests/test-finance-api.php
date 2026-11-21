@@ -59,7 +59,7 @@ class DealZ_Finance_API_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( 201, $response->get_status() );
-		$public_id = $response->get_data()['public_id'];
+		$public_id = $response->get_data()->public_id;
 		$this->trip_public_ids[] = $public_id;
 
 		return $public_id;
