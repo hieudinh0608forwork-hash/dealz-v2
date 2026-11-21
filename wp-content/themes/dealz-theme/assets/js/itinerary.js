@@ -82,6 +82,7 @@
 		workspace.hidden = true;
 		const rentalWorkspace = document.getElementById('rental-workspace');
 		if (rentalWorkspace) rentalWorkspace.hidden = true;
+		document.body.classList.remove('is-rental-view');
 		if (tripList) tripList.hidden = false;
 		if (sectionHeading) sectionHeading.hidden = false;
 		if (createTripPanel) createTripPanel.hidden = false;
@@ -932,6 +933,7 @@
 		const rentalWorkspace = document.getElementById('rental-workspace');
 		if (!rentalWorkspace) return;
 		hideWorkspace();
+		document.body.classList.add('is-rental-view');
 		if (tripList) tripList.hidden = true;
 		if (sectionHeading) sectionHeading.hidden = true;
 		if (createTripPanel) createTripPanel.hidden = true;
