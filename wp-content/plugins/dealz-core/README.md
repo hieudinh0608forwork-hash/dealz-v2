@@ -75,7 +75,7 @@ See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the 
 ## Not implemented yet
 
 - The initial manual itinerary workspace is implemented in the theme; full design-rule stop cards, schedule overlap validation, route-provider integrations and maps remain open.
-- Budget and expense frontend screens.
+- Full itinerary stop-card presentation, budget/expense screens beyond the initial forms, route map and sourced route connectors.
 - Collaborator invitations and shared-trip permissions.
 - Destinations and verified place catalogue.
 - Marketplace listings, availability, quotes, orders and bookings.
