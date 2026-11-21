@@ -8,7 +8,7 @@ Nền tảng du lịch tích hợp, kết nối khách du lịch, nhà cung cấ
 - Default branch: `main`.
 - Platform direction: fresh WordPress + custom plugin `dealz-core` + custom theme `dealz-theme` + REST API + MySQL.
 - Architecture: modular monolith.
-- Application code: versioned trip-planning database migration and owner-scoped Trip CRUD API committed; runtime not yet available or verified.
+- Application code: versioned trip-planning schema, owner-scoped Trip CRUD, manual itinerary/day/stop APIs and initial traveler home screen committed; runtime not yet available or verified.
 
 ## Start here
 1. Read [CLAUDE.md](CLAUDE.md).
