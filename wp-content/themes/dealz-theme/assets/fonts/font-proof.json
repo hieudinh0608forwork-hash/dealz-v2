@@ -1,0 +1,124 @@
+{
+  "source": "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap",
+  "files": [
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "400",
+      "subset": "vietnamese",
+      "file": "be-vietnam-pro-400-vietnamese.woff2",
+      "bytes": 11532
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "400",
+      "subset": "latin-ext",
+      "file": "be-vietnam-pro-400-latin-ext.woff2",
+      "bytes": 13056
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "400",
+      "subset": "latin",
+      "file": "be-vietnam-pro-400-latin.woff2",
+      "bytes": 21168
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "600",
+      "subset": "vietnamese",
+      "file": "be-vietnam-pro-600-vietnamese.woff2",
+      "bytes": 12176
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "600",
+      "subset": "latin-ext",
+      "file": "be-vietnam-pro-600-latin-ext.woff2",
+      "bytes": 13608
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "600",
+      "subset": "latin",
+      "file": "be-vietnam-pro-600-latin.woff2",
+      "bytes": 22032
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "700",
+      "subset": "vietnamese",
+      "file": "be-vietnam-pro-700-vietnamese.woff2",
+      "bytes": 12468
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "700",
+      "subset": "latin-ext",
+      "file": "be-vietnam-pro-700-latin-ext.woff2",
+      "bytes": 13852
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "weight": "700",
+      "subset": "latin",
+      "file": "be-vietnam-pro-700-latin.woff2",
+      "bytes": 22152
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "700",
+      "subset": "vietnamese",
+      "file": "bricolage-grotesque-700-vietnamese.woff2",
+      "bytes": 8608
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "700",
+      "subset": "latin-ext",
+      "file": "bricolage-grotesque-700-latin-ext.woff2",
+      "bytes": 18668
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "700",
+      "subset": "latin",
+      "file": "bricolage-grotesque-700-latin.woff2",
+      "bytes": 41344
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "800",
+      "subset": "vietnamese",
+      "file": "bricolage-grotesque-800-vietnamese.woff2",
+      "bytes": 8608
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "800",
+      "subset": "latin-ext",
+      "file": "bricolage-grotesque-800-latin-ext.woff2",
+      "bytes": 18668
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "800",
+      "subset": "latin",
+      "file": "bricolage-grotesque-800-latin.woff2",
+      "bytes": 41344
+    }
+  ],
+  "total_bytes": 279284,
+  "total_kib": 272.74,
+  "be_vietnam_pro_tnum": false,
+  "be_vietnam_pro_features": [
+    "ccmp",
+    "dnom",
+    "frac",
+    "kern",
+    "liga",
+    "locl",
+    "mark",
+    "mkmk",
+    "numr"
+  ]
+}
