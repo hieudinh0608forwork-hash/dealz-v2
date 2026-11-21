@@ -1,6 +1,6 @@
 # DealZ Core tests
 
-The Trip API integration tests use the official WordPress PHPUnit test suite and require a disposable local WordPress/MySQL database.
+The Trip and manual itinerary API integration tests use the official WordPress PHPUnit test suite and require a disposable local WordPress/MySQL database.
 
 ## Current test coverage
 - Owner can create and read a Trip.
