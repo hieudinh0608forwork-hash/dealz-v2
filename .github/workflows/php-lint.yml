@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate OpenAPI YAML syntax
+      - name: Validate OpenAPI contract
         run: |
           python -m pip install --disable-pip-version-check pyyaml
           python scripts/validate_openapi.py
