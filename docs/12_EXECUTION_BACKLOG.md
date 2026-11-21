@@ -32,7 +32,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [x] OpenAPI 3.1 contract for health, Trip, itinerary, budget and expense endpoints; [ ] expand schemas for commerce endpoints.
 - [ ] AI itinerary schema and validation contract.
 - [ ] Places/geocoding/routing provider contract.
-- [ ] Budget and expense calculation specification.
+- [x] Implemented budget and expense calculation logic (integer minor units, quantity precision and UTC timestamps); [ ] finalize broader finance specification and split/settlement policies.
 - [ ] Availability model by service type.
 - [ ] Audit, notifications, idempotency and webhook contracts.
 
@@ -41,7 +41,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Confirm WordPress/PHP/MySQL compatibility in a running environment.
 - [x] Scaffold custom plugin dealz-core (bootstrap, namespace autoloader, capability bootstrap, public non-sensitive health route).
 - [x] Scaffold custom theme dealz-theme shell (header/footer/index/theme setup); [ ] add approved local WOFF2 font assets and implement complete visual system.
-- [x] Add additive v1.2.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] configure and execute automated WordPress integration test runner.
+- [x] Add additive v1.2.0 WordPress dbDelta migration for 8 trip-planning tables; [ ] execute automated WordPress integration test runner.
 - [x] Add PHP syntax CI workflow; [ ] add WordPress Coding Standards / static analysis after dependency and runtime compatibility are confirmed.
 - [ ] Authentication, profile and capabilities.
 - [ ] Destination/place and service catalogue.
@@ -72,7 +72,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [ ] Admin support, audit and notification workflows.
 
 ## Phase 7 – QA and release
-- [x] Author WordPress integration tests for Trip ownership/date validation and itinerary day/stop-limit ownership; [ ] execute tests in a configured WordPress test environment.
+- [x] Author WordPress integration tests for Trip, itinerary and finance ownership/validation; [x] configure MySQL-backed WordPress PHPUnit CI workflow; [ ] obtain first passing CI run and execute browser/runtime checks.
 - [ ] Cross-user and cross-partner access tests.
 - [ ] Responsive, accessibility, Vietnamese font and visual rule QA.
 - [ ] Provider failure, concurrency and webhook replay tests.
