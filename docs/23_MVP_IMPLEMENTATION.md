@@ -52,6 +52,7 @@ All routes require an authenticated WordPress user. Queries scope by both public
 | GET / POST | /trips/{trip_public_id}/itineraries | List or create manual itinerary versions |
 | GET / POST | /itineraries/{public_id}/days | List or add days within trip date range |
 | GET | /days/{public_id}/validation | Check explicit time overlaps for an owned day |
+| GET | /days/{public_id}/validation | Validate explicit local-time overlaps without estimating travel time |
 | GET / POST | /days/{public_id}/items | List or add stops / lunch / dinner cards |
 | PATCH / DELETE | /items/{public_id} | Update or archive an owned item |
 
