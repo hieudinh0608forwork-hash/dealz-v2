@@ -286,7 +286,7 @@ final class Schema {
 	 */
 	private static function remove_legacy_composite_indexes_from_delta( string $statement ): string {
 		$statement = preg_replace( '/^\\s*KEY\\s+(?:trip_status|day_type_status)\\s*\\([^)]+\\),?\\s*$/mi', '', $statement );
-		return preg_replace( '/,\\s*(\\n\\s*\\)\\s*\\$charset_collate;)/', '$1', $statement );
+		return preg_replace( '/,\\s*(\\n\\s*\\)\\s*[^;\\n]+;)/', '$1', $statement );
 	}
 
 	/**
