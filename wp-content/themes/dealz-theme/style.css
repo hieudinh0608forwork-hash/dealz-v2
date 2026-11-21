@@ -344,6 +344,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .site-footer { padding: 28px 24px 40px; border-top: 1px solid var(--dealz-border); color: var(--dealz-muted); text-align: center; font-size: 13px; }
 .site-footer p { margin: 0; }
+.site-footer p + p { margin-top: 5px; font-size: 12px; }
 .mobile-nav { display: none; }
 
 @media (max-width: 900px) {
