@@ -568,9 +568,10 @@ final class FinanceController {
 			return new \WP_Error( 'dealz_invalid_expense_datetime', __( 'Thời điểm phải là ISO-8601 và có múi giờ rõ ràng.', 'dealz-core' ), array( 'status' => 400 ) );
 		}
 
-		$has_seconds = (bool) preg_match( '/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/', $value );
+		$parse_value = 'Z' === substr( $value, -1 ) ? substr( $value, 0, -1 ) . '+00:00' : $value;
+		$has_seconds = (bool) preg_match( '/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/', $parse_value );
 		$format       = $has_seconds ? '!Y-m-d\\TH:i:sP' : '!Y-m-d\\TH:iP';
-		$date         = \\DateTimeImmutable::createFromFormat( $format, $value );
+		$date         = \\DateTimeImmutable::createFromFormat( $format, $parse_value );
 		$errors       = \\DateTimeImmutable::getLastErrors();
 
 		if ( ! $date || ( is_array( $errors ) && ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) ) ) {
