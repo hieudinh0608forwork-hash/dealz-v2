@@ -38,3 +38,7 @@
 - Rebuilt the OpenAPI 3.1 file as a valid, concise contract for the implemented health, Trip, itinerary, budget and expense routes. Added correct partial-update schemas.
 - Updated schema documentation to v1.2.0, including the expense archival status column.
 - PHP syntax and WordPress integration tests still require an observed CI/runtime run; no passing test result is claimed.
+
+- Added explicit end-time input when creating itinerary cards and inline editing for title, start/end time and duration. Stop cards now display the complete entered time window.
+- Extended itinerary integration coverage: lunch/dinner cards do not count toward the four-main-stop limit; archiving a main stop frees a slot; editing an overlapping time window can resolve the schedule conflict.
+- Added the initial outside-pilot destination warning for destinations not matching Da Nang or Hoi An.
