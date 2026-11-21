@@ -61,6 +61,7 @@ get_header();
 					<p class="eyebrow"><?php esc_html_e( 'Chuyến đi đang chọn', 'dealz-theme' ); ?></p>
 					<h2 id="itinerary-workspace-title"><?php esc_html_e( 'Đang tải chuyến đi…', 'dealz-theme' ); ?></h2>
 				</div>
+				<div id="pilot-warning" class="notice pilot-warning" role="status" hidden><?php esc_html_e( 'Điểm đến này nằm ngoài khu thí điểm Đà Nẵng – Hội An. Thông tin dịch vụ và tuyến đường có thể chưa được xác minh.', 'dealz-theme' ); ?></div>
 				<div id="workspace-feedback" class="notice" role="status" aria-live="polite" hidden></div>
 
 				<section class="workspace-panel" aria-labelledby="itinerary-version-title">
