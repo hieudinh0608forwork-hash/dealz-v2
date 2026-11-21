@@ -41,7 +41,10 @@ final class Schema {
 			return;
 		}
 
-		self::create_tables();
+		if ( ! self::create_tables() ) {
+			return;
+		}
+
 		update_option( self::OPTION_NAME, self::VERSION, false );
 	}
 
@@ -50,7 +53,7 @@ final class Schema {
 	 *
 	 * @return void
 	 */
-	private static function create_tables(): void {
+	private static function create_tables(): bool {
 		global $wpdb;
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -201,9 +204,18 @@ final class Schema {
 			KEY payer_user (payer_user_id)
 		) $charset_collate;";
 
-		foreach ( $sql as $statement ) {
+		$table_names = array_values( $tables );
+
+		foreach ( $sql as $index => $statement ) {
 			dbDelta( $statement );
+			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
+
+			if ( $table_names[ $index ] !== $created_table ) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**
