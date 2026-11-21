@@ -13,6 +13,19 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		do_action( 'rest_api_init' );
 	}
 
+	private function assert_index_columns( string $table, string $index_name, array $expected_columns ): void {
+		global $wpdb;
+		$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $table, ARRAY_A );
+		$actual = array();
+		foreach ( (array) $rows as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$actual[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $actual );
+		$this->assertSame( $expected_columns, array_values( $actual ), 'Unexpected columns for index ' . $index_name );
+	}
+
 	private function request( string $method, string $route, array $params = array() ): WP_REST_Response {
 		$request = new WP_REST_Request( $method, '/dealz/v1' . $route );
 		if ( ! empty( $params ) ) {
@@ -176,6 +189,13 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Dữ liệu cũ cần giữ', $preserved->title_snapshot );
 		$this->assertSame( 'stop', $preserved->item_type );
 		$this->assertSame( 'active', $preserved->status );
+		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$create_tables = new ReflectionMethod( \\DealZ\\Database\\Schema::class, 'create_tables' );
+		$create_tables->setAccessible( true );
+		$this->assertTrue( $create_tables->invoke( null ), 'Repeated schema DDL must remain successful.' );
+		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
 	}
 
 	public function test_migration_from_schema_1_1_adds_expense_archive_status_without_data_loss(): void {
@@ -214,6 +234,11 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( '275000', (string) $preserved->amount_minor );
 		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
 		$this->assertSame( 'active', $preserved->status );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$create_tables = new ReflectionMethod( \\DealZ\\Database\\Schema::class, 'create_tables' );
+		$create_tables->setAccessible( true );
+		$this->assertTrue( $create_tables->invoke( null ), 'Repeated schema DDL must remain successful.' );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
 	}
 
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
