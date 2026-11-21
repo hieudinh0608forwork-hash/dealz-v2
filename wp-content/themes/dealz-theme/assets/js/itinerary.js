@@ -216,6 +216,47 @@
 		await loadItems();
 	}
 
+
+	async function validateDay() {
+		if (!activeDay) return;
+		const results = document.getElementById('validation-results');
+		const button = document.getElementById('validate-day-btn');
+		results.hidden = false;
+		results.replaceChildren();
+		results.textContent = 'Đang kiểm tra…';
+		button.disabled = true;
+
+		try {
+			const result = await api('days/' + encodeURIComponent(activeDay) + '/validation');
+			results.replaceChildren();
+			const summary = document.createElement('p');
+			summary.className = result.is_valid ? 'validation-results__success' : 'validation-results__warning';
+			summary.textContent = result.is_valid
+				? 'Chưa phát hiện chồng lấn trong các khung giờ đã nhập.'
+				: 'Có ' + result.issues.length + ' vấn đề về khung giờ cần xem lại.';
+			results.append(summary);
+
+			(result.issues || []).forEach(function (issue) {
+				const row = document.createElement('p');
+				row.className = 'validation-results__issue';
+				row.textContent = issue.message;
+				results.append(row);
+			});
+
+			(result.limitations || []).forEach(function (limitation) {
+				const row = document.createElement('p');
+				row.className = 'validation-results__note';
+				row.textContent = limitation;
+				results.append(row);
+			});
+		} catch (error) {
+			results.textContent = error.message || 'Không thể kiểm tra lịch trình.';
+			results.classList.add('validation-results--error');
+		} finally {
+			button.disabled = false;
+		}
+	}
+
 	function itemTypeLabel(type) {
 		if (type === 'lunch') return 'Bữa trưa';
 		if (type === 'dinner') return 'Bữa tối';
@@ -330,6 +371,9 @@
 			button.textContent = 'Tạo lịch trình';
 		}
 	});
+
+	const validateButton = document.getElementById('validate-day-btn');
+	if (validateButton) validateButton.addEventListener('click', validateDay);
 
 	if (dayForm) {
 		dayForm.addEventListener('submit', async function (event) {
