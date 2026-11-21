@@ -10,6 +10,9 @@ The Trip, manual itinerary and finance API integration tests use the official Wo
 - A day cannot be added outside the Trip date range.
 - A different user cannot list days in another user's itinerary.
 - A fifth active main stop on one day is rejected.
+- Lunch and dinner cards do not count toward the four-main-stop cap.
+- Archiving a main stop frees a slot for a replacement.
+- Reordering requires the complete active item set, preserves owner scope and updates positions atomically.
 - Explicitly overlapping local time windows are reported by the day validator.
 - Budget line totals and grouped summaries are calculated using integer minor units.
 - Budget lines are scoped to their Trip owner.
