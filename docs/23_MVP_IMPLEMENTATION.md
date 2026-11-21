@@ -7,10 +7,10 @@ The first implementation slice covers authenticated traveler trip records and ma
 ### WordPress foundation
 - Custom plugin: wp-content/plugins/dealz-core.
 - Custom theme shell: wp-content/themes/dealz-theme.
-- Versioned schema migration: dealz_db_version = 1.1.0.
+- Versioned schema migration: dealz_db_version = 1.2.0.
 - Local environment definition: root compose.yaml and .env.example.
 
-### Database tables created by schema v1.1.0
+### Database tables created by schema v1.2.0
 - {prefix}dealz_trips
 - {prefix}dealz_trip_collaborators
 - {prefix}dealz_itineraries
@@ -20,7 +20,7 @@ The first implementation slice covers authenticated traveler trip records and ma
 - {prefix}dealz_budget_lines
 - {prefix}dealz_expenses
 
-Trip, itinerary, day and item tables are used by the implemented APIs. Collaborator, route-leg, budget-line and expense tables remain schema foundations; their APIs and business logic are not yet implemented.
+Trip, itinerary, day and item tables are used by the implemented APIs. Collaborator and route-leg tables remain schema foundations; budget-line and expense tables are used by the finance APIs.
 
 ### Implemented REST routes
 
@@ -55,6 +55,11 @@ All routes require an authenticated WordPress user. Queries scope by both public
 | GET | /days/{public_id}/validation | Validate explicit local-time overlaps without estimating travel time |
 | GET / POST | /days/{public_id}/items | List or add stops / lunch / dinner cards |
 | PATCH / DELETE | /items/{public_id} | Update or archive an owned item |
+| GET | /trips/{trip_public_id}/budget | List active budget lines and grouped totals |
+| POST | /trips/{trip_public_id}/budget/lines | Add a budget line; server calculates its total |
+| PATCH / DELETE | /budget/lines/{public_id} | Update or archive an owned budget line |
+| GET / POST | /trips/{trip_public_id}/expenses | List or record actual expenses |
+| PATCH / DELETE | /expenses/{public_id} | Update or archive an owned expense |
 
 A day can contain at most four active main stops (item_type=stop). Lunch and dinner are separate small-card types. The main-stop limit is checked under a day-row lock to protect against concurrent creates. Item deletion is archival, not physical deletion. Route-leg records are a schema foundation only; no routing provider is connected and no travel time/distance is fabricated. A deterministic validator reports overlaps only where user-entered start/end times or duration are available.
 
@@ -76,7 +81,7 @@ These checks must be performed after starting the compose environment and activa
 - [ ] Fresh WordPress install completes.
 - [ ] DealZ Core activates without PHP fatal errors.
 - [ ] Eight expected custom tables exist with the active WordPress prefix.
-- [ ] dealz_db_version equals 1.1.0 only after all tables and required item columns exist.
+- [ ] dealz_db_version equals 1.2.0 only after all tables and required item/expense columns exist.
 - [ ] Health route returns 200 and application_ready: false.
 - [ ] Anonymous Trip API requests are rejected.
 - [ ] Authenticated user A can create, list, read, update and archive their trip.
@@ -92,16 +97,15 @@ These checks must be performed after starting the compose environment and activa
 - No verified successful CI run is recorded yet.
 - No runtime test has been performed because Docker is unavailable in the current execution environment.
 - Initial responsive traveler home, Trip dashboard and manual itinerary workspace are implemented in the theme and connected to Trip/itinerary APIs; browser/runtime behavior has not been verified.
-- Manual itinerary/day/stop APIs and initial workspace UI are implemented; full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
-- Collaborator, route-leg, budget and expense tables are currently unused foundations; itinerary/day/item tables are used by the manual planner APIs.
+- Manual itinerary/day/stop APIs and initial workspace UI are implemented; budget/expense APIs are implemented but have no frontend. Full 16:10 stop cards, route connectors, map provider, AI, service marketplace, partner portal, booking and payment are not implemented.
+- Collaborator and route-leg tables are currently unused foundations; itinerary/day/item, budget-line and expense tables are used by implemented APIs.
 - No production hosting or deployment is configured.
 
 ## 5. Next build sequence
 
-1. Execute the local environment and fix migration/runtime issues.
-2. Add WordPress integration tests for ownership and validation.
-3. Add itinerary/day/stop CRUD with owner checks and versioning.
-4. Extend schedule validation for travel feasibility after provider-backed route durations exist; add day/item reorder.
-5. Add budget line and expense APIs with server-side calculations.
-6. Complete the approved itinerary UI and responsive states, including 16:10 stop media and route connectors when verified route data exists.
-7. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
+1. Execute the local environment and run the WordPress integration tests.
+2. Complete finance API integration tests and verify integer/UTC serialization.
+3. Add budget and expense UI connected to the finance endpoints.
+4. Add day/item reorder and schedule editing.
+5. Complete the approved itinerary UI, including 16:10 stop media and sourced route connectors.
+6. Add verified destination/place catalogue and provider-backed routing only after provider and source decisions are resolved.
