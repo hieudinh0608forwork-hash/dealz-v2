@@ -15,6 +15,10 @@ The Trip, manual itinerary and finance API integration tests use the official Wo
 - Budget lines are scoped to their Trip owner.
 - Expense timestamps with offsets are normalized to UTC.
 - Invalid calendar dates in expense timestamps are rejected.
+- Budget line totals and grouped summaries are calculated using integer minor units.
+- Budget lines are scoped to their Trip owner.
+- Expense timestamps with offsets are normalized to UTC.
+- Invalid calendar dates in expense timestamps are rejected.
 
 ## Run
 1. Set up the local WordPress environment using the root README.
@@ -23,4 +27,4 @@ The Trip, manual itinerary and finance API integration tests use the official Wo
 4. Configure the test bootstrap to load the plugin and this test file.
 5. Run the test class with PHPUnit.
 
-The repository does not yet include the WordPress test library or an automated CI integration-test job. These tests are authored but have not been executed.
+The repository includes a GitHub Actions workflow that provisions MySQL, installs the WordPress 6.8 test library and runs this suite. The first workflow run is pending; these tests must not be described as passing until CI reports a successful result.
