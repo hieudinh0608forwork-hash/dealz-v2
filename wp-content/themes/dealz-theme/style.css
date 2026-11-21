@@ -620,3 +620,27 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-size: 13px;
 	line-height: 1.55;
 }
+
+.item-move-controls {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	flex: 0 0 auto;
+}
+.item-move-controls button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 1px solid var(--dealz-border);
+	border-radius: 10px;
+	background: #fff;
+	color: var(--dealz-green);
+	font-size: 17px;
+	line-height: 1;
+}
+.item-move-controls button:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
