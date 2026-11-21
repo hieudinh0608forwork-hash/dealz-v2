@@ -19,8 +19,9 @@ DealZ Core is the custom application plugin for DealZ V2. It is an early MVP imp
   - `GET|POST /wp-json/dealz/v1/trips/{trip_public_id}/itineraries`
   - `GET|POST /wp-json/dealz/v1/itineraries/{public_id}/days`
   - `GET|POST /wp-json/dealz/v1/days/{public_id}/items`
+  - `GET /wp-json/dealz/v1/days/{public_id}/validation`
   - `PATCH|DELETE /wp-json/dealz/v1/items/{public_id}`
-- Manual itinerary endpoints to create/list itinerary versions, add/list days, add/list stop and meal cards, update and archive items.
+- Manual itinerary endpoints to create/list itinerary versions, add/list days, add/list stop and meal cards, update/archive items, and check explicit time overlaps.
 - Main stop limit of four per day, enforced under a database row lock.
 - PHP syntax CI workflow.
 
