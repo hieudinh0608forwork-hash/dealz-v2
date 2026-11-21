@@ -114,6 +114,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			esc_sql( $first->get_data()['public_id'] )
 		);
 		$this->assertNotFalse( $wpdb->query( $trigger_sql ), 'The rollback test trigger must be created.' );
+		$previous_suppression = $wpdb->suppress_errors( true );
 		try {
 			$this->assertFalse(
 				$repository->reorder_items(
@@ -123,6 +124,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 				'A database error after a partial reorder must fail the transaction.'
 			);
 		} finally {
+			$wpdb->suppress_errors( $previous_suppression );
 			$wpdb->query( 'DROP TRIGGER IF EXISTS `' . $trigger_name . '`' );
 		}
 
