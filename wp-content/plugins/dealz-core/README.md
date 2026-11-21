@@ -1,26 +1,73 @@
-# DealZ Core – Plugin Scaffold
+# DealZ Core – WordPress Plugin
 
-This is the initial WordPress plugin foundation for DealZ V2.
+DealZ Core is the custom application plugin for DealZ V2. It is an early MVP implementation, not a production-ready travel platform.
 
-## Current scope
+## Implemented in repository
+
 - Plugin bootstrap and namespace-based autoloading.
-- Minimal `manage_dealz` capability added to the WordPress Administrator role on activation.
+- Additive, versioned database migration v1.0.0 using WordPress `dbDelta`.
+- Seven initial custom tables for trips, collaborators, itineraries, itinerary days/items, budget lines and expenses.
+- Minimal `manage_dealz` capability added to WordPress Administrators on activation.
 - Public, non-sensitive health endpoint: `GET /wp-json/dealz/v1/health`.
-- Non-destructive uninstall behavior.
+- Authenticated, owner-scoped Trip endpoints:
+  - `GET /wp-json/dealz/v1/trips`
+  - `POST /wp-json/dealz/v1/trips`
+  - `GET /wp-json/dealz/v1/trips/{public_id}`
+  - `PATCH /wp-json/dealz/v1/trips/{public_id}`
+  - `DELETE /wp-json/dealz/v1/trips/{public_id}` (archives; does not hard-delete)
+- PHP syntax CI workflow.
 
-## Health endpoint
-The endpoint deliberately returns `application_ready: false` while application modules are not implemented. It does not expose PHP, database, hosting, plugin or secret details.
+## Local installation
 
-## Install (local/staging only)
-1. Copy `dealz-core` to `wp-content/plugins/`.
-2. Activate **DealZ Core** in WordPress Admin.
-3. Request `/wp-json/dealz/v1/health`.
-4. Confirm the response reports `status: scaffolded` and `application_ready: false`.
+1. Use a fresh WordPress installation (do not import V1 code, database or plugins).
+2. Copy `dealz-core` into `wp-content/plugins/`.
+3. Activate **DealZ Core** in WordPress Admin.
+4. Activation creates/updates the additive v1.0.0 tables. The migration checks that every expected table exists before recording the schema version.
+5. Open `/wp-json/dealz/v1/health`; it reports scaffold status and `application_ready: false`.
+6. Test Trip endpoints while authenticated using WordPress cookie authentication and the `X-WP-Nonce` REST nonce. For same-origin JavaScript, obtain the nonce through a server-rendered/localized value; never disable nonce verification to make requests work.
 
-This is an installation smoke check, not proof of complete application functionality.
+## Trip API example
 
-## Not implemented
-Database migrations, domain entities, authentication flows, traveler/partner endpoints, listings, trips, itinerary, booking, payment, AI, maps and notifications are not implemented yet.
+Create a draft trip:
+
+```http
+POST /wp-json/dealz/v1/trips
+Content-Type: application/json
+X-WP-Nonce: <wordpress-rest-nonce>
+
+{
+  "title": "Đà Nẵng – Hội An",
+  "origin_text": "Đà Nẵng",
+  "destination_name": "Hội An",
+  "start_date": "2027-01-10",
+  "end_date": "2027-01-12",
+  "destination_timezone": "Asia/Ho_Chi_Minh",
+  "traveler_count": 2,
+  "currency": "VND"
+}
+```
+
+Only the authenticated owner can list, read, update or archive their own trips. A lookup by another user's UUID returns 404. DELETE changes status to `archived`; it does not erase data.
+
+## Contract
+
+See [OpenAPI 3.1 contract](../../../docs/openapi/dealz-v1.openapi.yaml) for the implemented health and Trip routes. The contract intentionally excludes unimplemented AI, marketplace, route-provider, booking and payment features.
+
+## Not implemented yet
+
+- Itinerary CRUD, stop scheduling, route legs and map-provider integrations.
+- Budget and expense REST endpoints/calculators.
+- Collaborator invitations and shared-trip permissions.
+- Destinations and verified place catalogue.
+- Marketplace listings, availability, quotes, orders and bookings.
+- Payments, refunds, commissions, payout, ledger and webhooks.
+- AI planner, provider adapters, notifications and operations console.
+- Complete frontend screens and local font assets.
+
+## Verification limits
+
+The source and contracts have been reviewed, but this plugin has not yet been activated in a real WordPress/MySQL environment. Database migration, REST behavior, cross-user access and theme rendering still require runtime tests before any feature can be called verified or production-ready.
 
 ## Requirements
+
 PHP 8.1+ and WordPress 6.5+ are declared in the plugin header. Actual compatibility must be confirmed against the selected hosting/runtime before deployment.
