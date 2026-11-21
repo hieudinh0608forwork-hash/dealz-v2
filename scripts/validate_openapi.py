@@ -73,9 +73,15 @@ def main() -> None:
                 operation_ids.append(operation_id)
 
             declared = path_parameters + list(operation.get("parameters", []))
+            resolved_parameters = [
+                resolve_pointer(document, parameter["$ref"])
+                if isinstance(parameter, dict) and "$ref" in parameter
+                else parameter
+                for parameter in declared
+            ]
             declared_path_names = {
                 parameter.get("name")
-                for parameter in declared
+                for parameter in resolved_parameters
                 if isinstance(parameter, dict) and parameter.get("in") == "path"
             }
             missing = placeholders - declared_path_names
