@@ -127,6 +127,10 @@ get_header();
 							<input id="item-start" name="start_local" type="time">
 						</div>
 						<div class="form-field">
+							<label for="item-end"><?php esc_html_e( 'Giờ kết thúc (nếu đã biết)', 'dealz-theme' ); ?></label>
+							<input id="item-end" name="end_local" type="time">
+						</div>
+						<div class="form-field">
 							<label for="item-duration"><?php esc_html_e( 'Thời lượng gợi ý (phút)', 'dealz-theme' ); ?></label>
 							<input id="item-duration" name="duration_minutes" type="number" min="1" max="1440" step="1" placeholder="<?php esc_attr_e( 'Có thể bổ sung sau', 'dealz-theme' ); ?>">
 						</div>
