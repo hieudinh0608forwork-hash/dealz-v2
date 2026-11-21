@@ -134,6 +134,100 @@ get_header();
 						</div>
 					</form>
 				</section>
+
+				<section id="finance-panel" class="workspace-panel" aria-labelledby="finance-title">
+					<div class="workspace-panel__heading">
+						<div>
+							<p class="eyebrow"><?php esc_html_e( 'Theo dõi chi phí', 'dealz-theme' ); ?></p>
+							<h3 id="finance-title"><?php esc_html_e( 'Ngân sách và khoản chi', 'dealz-theme' ); ?></h3>
+						</div>
+						<span class="workspace-label"><?php esc_html_e( 'Đơn vị tiền tệ theo từng khoản', 'dealz-theme' ); ?></span>
+					</div>
+					<div id="finance-feedback" class="notice" role="status" aria-live="polite" hidden></div>
+					<div id="budget-summary" class="budget-summary" aria-live="polite"></div>
+					<div class="finance-grid">
+						<section class="finance-card" aria-labelledby="budget-lines-title">
+							<div class="finance-card__heading">
+								<h4 id="budget-lines-title"><?php esc_html_e( 'Khoản dự kiến', 'dealz-theme' ); ?></h4>
+							</div>
+							<div id="budget-lines-list" class="finance-list" aria-live="polite"></div>
+							<form id="create-budget-form" class="finance-form">
+								<h5><?php esc_html_e( 'Thêm khoản ngân sách', 'dealz-theme' ); ?></h5>
+								<div class="form-field">
+									<label for="budget-category"><?php esc_html_e( 'Nhóm chi phí', 'dealz-theme' ); ?></label>
+									<select id="budget-category" name="category" required>
+										<option value="transport"><?php esc_html_e( 'Di chuyển', 'dealz-theme' ); ?></option>
+										<option value="accommodation"><?php esc_html_e( 'Lưu trú', 'dealz-theme' ); ?></option>
+										<option value="food"><?php esc_html_e( 'Ăn uống', 'dealz-theme' ); ?></option>
+										<option value="rental"><?php esc_html_e( 'Thuê đồ', 'dealz-theme' ); ?></option>
+										<option value="activities"><?php esc_html_e( 'Hoạt động', 'dealz-theme' ); ?></option>
+										<option value="other"><?php esc_html_e( 'Khác', 'dealz-theme' ); ?></option>
+									</select>
+								</div>
+								<div class="form-field">
+									<label for="budget-description"><?php esc_html_e( 'Mô tả', 'dealz-theme' ); ?></label>
+									<input id="budget-description" name="description" type="text" maxlength="255" placeholder="<?php esc_attr_e( 'Ví dụ: Thuê xe máy', 'dealz-theme' ); ?>">
+								</div>
+								<div class="form-field">
+									<label for="budget-quantity"><?php esc_html_e( 'Số lượng', 'dealz-theme' ); ?></label>
+									<input id="budget-quantity" name="quantity" type="number" min="0.01" max="99999999" step="0.01" value="1.00" required>
+								</div>
+								<div class="form-field">
+									<label for="budget-unit-amount"><?php esc_html_e( 'Đơn giá (đồng)', 'dealz-theme' ); ?></label>
+									<input id="budget-unit-amount" name="unit_amount_minor" type="number" min="0" step="1" placeholder="<?php esc_attr_e( 'Có thể để trống', 'dealz-theme' ); ?>">
+								</div>
+								<div class="form-field">
+									<label for="budget-cost-type"><?php esc_html_e( 'Trạng thái chi phí', 'dealz-theme' ); ?></label>
+									<select id="budget-cost-type" name="cost_type">
+										<option value="estimate"><?php esc_html_e( 'Ước tính', 'dealz-theme' ); ?></option>
+										<option value="quoted"><?php esc_html_e( 'Đã báo giá', 'dealz-theme' ); ?></option>
+										<option value="confirmed"><?php esc_html_e( 'Đã xác nhận', 'dealz-theme' ); ?></option>
+										<option value="actual"><?php esc_html_e( 'Thực tế', 'dealz-theme' ); ?></option>
+									</select>
+								</div>
+								<div class="form-field form-field--wide">
+									<button class="button button--primary" type="submit" id="create-budget-submit"><?php esc_html_e( 'Thêm khoản dự kiến', 'dealz-theme' ); ?></button>
+								</div>
+							</form>
+						</section>
+
+						<section class="finance-card" aria-labelledby="expenses-title">
+							<div class="finance-card__heading">
+								<h4 id="expenses-title"><?php esc_html_e( 'Khoản đã chi', 'dealz-theme' ); ?></h4>
+							</div>
+							<div id="expenses-list" class="finance-list" aria-live="polite"></div>
+							<form id="create-expense-form" class="finance-form">
+								<h5><?php esc_html_e( 'Ghi nhận khoản chi', 'dealz-theme' ); ?></h5>
+								<div class="form-field">
+									<label for="expense-category"><?php esc_html_e( 'Nhóm chi phí', 'dealz-theme' ); ?></label>
+									<select id="expense-category" name="category" required>
+										<option value="transport"><?php esc_html_e( 'Di chuyển', 'dealz-theme' ); ?></option>
+										<option value="accommodation"><?php esc_html_e( 'Lưu trú', 'dealz-theme' ); ?></option>
+										<option value="food"><?php esc_html_e( 'Ăn uống', 'dealz-theme' ); ?></option>
+										<option value="rental"><?php esc_html_e( 'Thuê đồ', 'dealz-theme' ); ?></option>
+										<option value="activities"><?php esc_html_e( 'Hoạt động', 'dealz-theme' ); ?></option>
+										<option value="other"><?php esc_html_e( 'Khác', 'dealz-theme' ); ?></option>
+									</select>
+								</div>
+								<div class="form-field">
+									<label for="expense-amount"><?php esc_html_e( 'Số tiền (đồng)', 'dealz-theme' ); ?></label>
+									<input id="expense-amount" name="amount_minor" type="number" min="1" step="1" required>
+								</div>
+								<div class="form-field">
+									<label for="expense-occurred-at"><?php esc_html_e( 'Thời điểm chi', 'dealz-theme' ); ?></label>
+									<input id="expense-occurred-at" name="occurred_at" type="datetime-local" required>
+								</div>
+								<div class="form-field">
+									<label for="expense-note"><?php esc_html_e( 'Ghi chú', 'dealz-theme' ); ?></label>
+									<input id="expense-note" name="note" type="text" maxlength="1000">
+								</div>
+								<div class="form-field form-field--wide">
+									<button class="button button--primary" type="submit" id="create-expense-submit"><?php esc_html_e( 'Lưu khoản chi', 'dealz-theme' ); ?></button>
+								</div>
+							</form>
+						</section>
+					</div>
+				</section>
 			</section>
 
 			<div class="create-trip-panel" id="create-trip">
