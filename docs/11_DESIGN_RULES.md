@@ -33,10 +33,10 @@
 
 ### 11.3.1 Ô nhập
 - Bo góc 14px, cao 52px, đệm 16px, nền trắng, viền 1.5px `#CFE0D8`, chữ tối thiểu 16px.
-- Focus: viền `#FD550A` + quầng 4px cam nhạt.
+- Focus: viền đặc `#FD550A` (3,24:1 trên trắng) + quầng 4px cam nhạt chỉ để trang trí. Outline ngoài 3px `#D63F00` đặc, offset 3px; trên nền forest dùng lime.
 - Lỗi: chữ đỏ + biểu tượng "!" dưới ô, viền đỏ.
 - Nhãn trên ô: 14px, độ đậm 600, màu `#31483F`.
-- Placeholder: `#7C948A` (thay `#8AA096` vì màu cũ chỉ đạt tương phản 2.8:1).
+- Placeholder: `#5F776D` trên nền input trắng (4,83:1). Viền input riêng `#7C948A`; viền thẻ giữ `#CFE0D8`.
 - Select có mũi tên tự vẽ; chip bo tròn; ô mật khẩu có Hiện/Ẩn; ngày chọn bằng bộ chọn hệ thống.
 
 ### 11.3.2 Nút
@@ -72,12 +72,13 @@
 | Vai trò | Màu |
 |---|---|
 | Cam nhấn | `#FD550A` |
-| Nền nút chính / chữ cam | `#D63F00` |
+| Nền nút chính | `#D63F00` (chữ trắng) |
 | Xanh | `#015D47` |
 | Vàng chanh | `#E0F354` |
 | Kem | `#FBF7EE` |
 | Chữ chính | `#0E2A22` |
 | Chữ phụ | `#4C635A` |
+| Chữ cam trên nền sáng | `#C43A00` |
 | Viền | `#CFE0D8` |
 
 Chữ trên nền vàng chanh luôn dùng xanh đậm. Màu chữ phụ `#4C635A` thay `#5A6E66`.
@@ -112,3 +113,13 @@ Các ghi nhận dưới đây là trạng thái triển khai tại nhánh `work/
 | Browser QA | Có workflow Chromium desktop/mobile và artifact trên GitHub Actions | Chưa có bằng chứng Firefox, Safari, thiết bị thật hoặc screen reader |
 
 Không suy diễn trạng thái `Implemented`, `Tested` hoặc `Verified` ngoài những gì có log hoặc artifact gắn với commit cụ thể.
+
+
+## 11.9 Ma trận tương phản đã chốt
+
+- Ink, ink-2, label đạt ≥4,5:1 trên trắng, kem, mint-50, mint-100, lime-50, orange-50.
+- Placeholder #5F776D chỉ dùng trên input trắng; chữ cam #C43A00 dùng trên trắng/kem/mint-50/lime-50/orange-50, trên mint-100 chỉ khi chữ lớn.
+- Nút chính #D63F00 dùng chữ trắng; không dùng chữ kem trên nền nút (4,30:1). Chữ trắng/kem trên forest lần lượt 7,90:1 / 7,39:1.
+- Viền input #7C948A đạt tối thiểu 3,00095:1 với nền xung quanh mint-50; input có nền trắng. Không đổi sang #6F887D. Viền thẻ #CFE0D8 không đổi.
+- Viền focus input #FD550A đạt 3,24:1 trên trắng; quầng alpha 4px chỉ trang trí. Outline ngoài #D63F00 đặc đạt ≥3,90:1 trên nền sáng; trên forest dùng lime (6,44:1).
+- Xem docs/design-contrast.md và scripts/check-design-contrast.php để có ma trận và gate CI.

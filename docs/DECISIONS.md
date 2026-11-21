@@ -55,3 +55,11 @@ Tài liệu này ghi lại các quyết định do chủ dự án chốt. Không
 - Không tạo dữ liệu giả về sản phẩm, giá, shop, ảnh địa điểm, đánh giá, số km/phút hoặc thống kê.
 - Không thêm phụ thuộc mạng ngoài khi site chạy.
 - Giữ PR #10 ở trạng thái Draft; không merge main và không deploy trong phạm vi công việc này.
+
+## 10. Ma trận tương phản đã đo (22/11/2026)
+- Các cặp đang dùng và ngưỡng CI được liệt kê trong `docs/design-contrast.md`.
+- Placeholder `#5F776D` chỉ dùng trên nền input trắng: 4,83:1.
+- Viền input `#7C948A`: 3,25:1 so với nền input trắng; 3,04:1 so với kem; 3,00095:1 so với mint-50. Đạt ngưỡng 3:1 trên các nền ngoài được phép, không đổi sang `#6F887D`.
+- Viền focus input `#FD550A` trên trắng: 3,24:1. Quầng 4px alpha 0,16 composite thành `#FFE4D8`, 1,21:1; chỉ trang trí, không thay viền đặc.
+- Outline focus `#D63F00` đạt tối thiểu 3,90:1 trên nền sáng; trên forest dùng lime `#E0F354`, đạt 6,44:1.
+- Chữ kem trên nút `#D63F00` chỉ đạt 4,30:1 nên bị loại; nút chính dùng chữ trắng (4,59:1). Chữ cam `#C43A00` trên mint-100 chỉ dùng cho chữ lớn (4,51:1).
