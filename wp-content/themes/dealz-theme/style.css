@@ -782,3 +782,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	.rental-workspace { padding-top: 12px; }
 	.rental-empty-state { margin-top: 20px; border-radius: 20px; }
 }
+
+
+/* Rental handoff is a focused destination, not a second copy of the home hero. */
+body.is-rental-view .hero-section,
+body.is-rental-view .next-step-section,
+body.is-rental-view #trip-feedback { display: none !important; }
+body.is-rental-view .rental-workspace { padding-top: 42px; }
+@media (max-width: 640px) {
+	body.is-rental-view .rental-workspace { padding-top: 20px; }
+}
