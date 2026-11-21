@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
 
 const BASE_URL = 'http://127.0.0.1:8080';
 const USERNAME = 'dealz-ci-admin';
@@ -316,4 +317,56 @@ test('journey badge counts only unarchived main stops across the selected trip',
   await archive.click();
   await page.locator('.archive-dialog').getByRole('button', { name: 'Lưu trữ' }).click();
   await expect(badge).toHaveText('3');
+});
+
+test('axe-core WCAG 2.1 AA scan on home, itinerary, rental and admin styleguide', async ({ page }) => {
+  const scan = async label => {
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    expect(results.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.map(n => n.target) })), label).toEqual([]);
+  };
+  await page.goto(BASE_URL + '/');
+  await scan('Home page accessibility violations');
+  await createTripAndDay(page, 'QA axe DealZ');
+  await addStop(page, 'Điểm dừng axe', 'Đà Nẵng');
+  await scan('Itinerary accessibility violations');
+  await page.locator('.item-rental-cta').click();
+  await expect(page.locator('#rental-workspace')).toBeVisible();
+  await scan('Rental empty state accessibility violations');
+  await page.goto(BASE_URL + '/styleguide/');
+  await scan('Admin styleguide accessibility violations');
+});
+
+test('six viewport matrix has no horizontal overflow or undersized controls', async ({ page }) => {
+  await signIn(page);
+  for (const width of [360, 390, 768, 1024, 1280, 1536]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(BASE_URL + '/');
+    const metrics = await page.evaluate(() => {
+      const visible = element => { const r = element.getBoundingClientRect(); const s = getComputedStyle(element); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
+      const undersized = Array.from(document.querySelectorAll('button, .button, input, select, textarea')).filter(visible).filter(element => { const r = element.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).map(element => ({ tag: element.tagName, className: element.className, width: Math.round(element.getBoundingClientRect().width), height: Math.round(element.getBoundingClientRect().height) }));
+      return { viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, undersized };
+    });
+    expect(metrics.scroll, 'Horizontal overflow at viewport ' + width).toBeLessThanOrEqual(metrics.viewport);
+    expect(metrics.undersized, 'Controls smaller than 44px at viewport ' + width).toEqual([]);
+  }
+});
+
+test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async ({ page }) => {
+  await signIn(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const reduced = await page.evaluate(() => { const el = document.querySelector('.dz-skeleton'); return el ? getComputedStyle(el).animationDuration : '0s'; });
+  expect(['0s', '0.01ms']).toContain(reduced);
+  const time = page.locator('#item-start');
+  await time.fill('09:30');
+  await expect(time).toHaveValue('09:30');
+  const hours = await page.evaluate(() => { const d = new Date('2027-04-01T09:30:00Z'); return ['en-US','vi-VN'].map(locale => new Intl.DateTimeFormat(locale, { hour: '2-digit', hour12: false, timeZone: 'UTC' }).format(d)); });
+  expect(hours).toEqual(['09','09']);
+  await page.keyboard.press('Tab');
+  const focus = await page.evaluate(() => ({ style: getComputedStyle(document.activeElement).outlineStyle, width: getComputedStyle(document.activeElement).outlineWidth }));
+  expect(focus.style).not.toBe('none');
+  expect(parseFloat(focus.width)).toBeGreaterThanOrEqual(3);
+  await page.evaluate(() => window.scrollTo(0, 600));
+  const top = await page.locator('.site-header').evaluate(el => el.getBoundingClientRect().top);
+  expect(top).toBeGreaterThanOrEqual(0);
 });

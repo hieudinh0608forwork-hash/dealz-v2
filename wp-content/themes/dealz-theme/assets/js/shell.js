@@ -2,12 +2,21 @@
 	'use strict';
 
 	const header = document.querySelector('.site-header');
+	const adminBar = document.getElementById('wpadminbar');
 	if (header) {
 		const updateHeader = function () {
 			header.classList.toggle('is-scrolled', window.scrollY > 8);
 		};
 		updateHeader();
-		window.addEventListener('scroll', updateHeader, { passive: true });
+		const updateAdminOffset = function () {
+			if (!adminBar) return;
+			header.classList.toggle('admin-bar-scrolled', adminBar.getBoundingClientRect().bottom <= 0);
+		};
+		window.addEventListener('scroll', function () {
+			updateHeader();
+			updateAdminOffset();
+		}, { passive: true });
+		updateAdminOffset();
 	}
 
 	const navLinks = Array.from(document.querySelectorAll('.mobile-nav a[href*="#"]'));
