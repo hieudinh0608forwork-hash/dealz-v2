@@ -29,6 +29,9 @@ final class Schema {
 	 */
 	private const OPTION_NAME = 'dealz_db_version';
 
+	/** Option containing the most recent schema migration failure. */
+	private const ERROR_OPTION_NAME = 'dealz_schema_migration_error';
+
 	/**
 	 * Run an additive upgrade when required.
 	 *
@@ -42,10 +45,14 @@ final class Schema {
 		}
 
 		if ( ! self::create_tables() ) {
+			if ( ! get_option( self::ERROR_OPTION_NAME, '' ) ) {
+				self::record_migration_error( 'Schema upgrade did not complete; the installed schema version was not changed.' );
+			}
 			return;
 		}
 
 		update_option( self::OPTION_NAME, self::VERSION, false );
+		delete_option( self::ERROR_OPTION_NAME );
 	}
 
 	/**
@@ -241,7 +248,7 @@ final class Schema {
 			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
 
 			if ( $table_names[ $index ] !== $created_table ) {
-				return false;
+				return self::record_migration_error( sprintf( 'Expected table %s was not created.', $table_names[ $index ] ) );
 			}
 		}
 
@@ -309,7 +316,7 @@ final class Schema {
 			return true;
 		}
 		if ( ! empty( $existing ) ) {
-			return false;
+			return self::record_migration_error( sprintf( 'Index %s on table %s has columns (%s); expected (%s). The migration stopped without changing the schema version.', $index_name, $table, implode( ', ', array_values( $existing ) ), implode( ', ', $columns ) ) );
 		}
 		$quoted_columns = array_map( static function ( string $column ) use ( $quote ): string {
 			return $quote . str_replace( $quote, $quote . $quote, $column ) . $quote;
@@ -317,7 +324,7 @@ final class Schema {
 		$quoted_index = $quote . str_replace( $quote, $quote . $quote, $index_name ) . $quote;
 		$sql = 'ALTER TABLE ' . $quoted_table . ' ADD KEY ' . $quoted_index . ' (' . implode( ',', $quoted_columns ) . ')';
 		if ( false === $wpdb->query( $sql ) ) {
-			return false;
+			return self::record_migration_error( sprintf( 'Could not create index %s on table %s: %s', $index_name, $table, $wpdb->last_error ) );
 		}
 		$verified = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
 		$actual = array();
@@ -327,7 +334,38 @@ final class Schema {
 			}
 		}
 		ksort( $actual );
-		return array_values( $actual ) === $columns;
+		if ( array_values( $actual ) !== $columns ) {
+			return self::record_migration_error( sprintf( 'Index %s on table %s failed post-creation verification; expected (%s), found (%s).', $index_name, $table, implode( ', ', $columns ), implode( ', ', array_values( $actual ) ) ) );
+		}
+		return true;
+	}
+
+	/**
+	 * Persist and log a migration failure without advancing the schema version.
+	 *
+	 * @param string $message Failure detail.
+	 * @return false
+	 */
+	private static function record_migration_error( string $message ): bool {
+		update_option( self::ERROR_OPTION_NAME, $message, false );
+		error_log( '[DealZ schema migration] ' . $message );
+		return false;
+	}
+
+	/**
+	 * Display the latest schema migration failure to administrators.
+	 *
+	 * @return void
+	 */
+	public static function render_admin_notice(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$message = get_option( self::ERROR_OPTION_NAME, '' );
+		if ( ! is_string( $message ) || '' === $message ) {
+			return;
+		}
+		echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'DealZ database migration failed:', 'dealz-core' ) . '</strong> ' . esc_html( $message ) . '</p></div>';
 	}
 
 	/**

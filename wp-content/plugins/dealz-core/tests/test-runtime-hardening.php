@@ -269,6 +269,44 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		$this->assertSame( $data_before_second_run, $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s', $public_id ), ARRAY_A ), 'A repeated migration must preserve the sample expense row.' );
 	}
 
+	public function test_migration_rejects_wrong_named_index_logs_notifies_admin_and_keeps_version(): void {
+		global $wpdb;
+		$tables = \DealZ\Database\Schema::table_names();
+		$table = $tables['items'];
+		$quote = chr( 96 );
+		$changed = $wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'status' . $quote . ',' . $quote . 'item_type' . $quote . ')' );
+		$this->assertNotFalse( $changed, 'The test must install an index with the expected name but wrong column order.' );
+		update_option( 'dealz_db_version', '1.1.0' );
+
+		$log_path = tempnam( sys_get_temp_dir(), 'dealz-schema-migration-' );
+		$this->assertNotFalse( $log_path );
+		$previous_error_log = ini_get( 'error_log' );
+		ini_set( 'error_log', $log_path );
+		try {
+			\DealZ\Database\Schema::maybe_upgrade();
+		} finally {
+			ini_set( 'error_log', (string) $previous_error_log );
+		}
+
+		$this->assertSame( '1.1.0', get_option( 'dealz_db_version' ), 'A failed migration must not advance the installed schema version.' );
+		$this->assertStringContainsString( 'day_type_status', (string) get_option( 'dealz_schema_migration_error' ) );
+		$this->assertStringContainsString( 'DealZ schema migration', (string) file_get_contents( $log_path ), 'The mismatch must be written to the PHP error log.' );
+
+		$admin_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+		ob_start();
+		\DealZ\Database\Schema::render_admin_notice();
+		$notice = ob_get_clean();
+		$this->assertStringContainsString( 'notice-error', $notice );
+		$this->assertStringContainsString( 'day_type_status', $notice );
+
+		$wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'day_id' . $quote . ',' . $quote . 'item_type' . $quote . ',' . $quote . 'status' . $quote . ')' );
+		update_option( 'dealz_db_version', '1.2.0' );
+		delete_option( 'dealz_schema_migration_error' );
+		wp_set_current_user( 0 );
+		unlink( $log_path );
+	}
+
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {
 		$trip_id = $this->create_trip();
 

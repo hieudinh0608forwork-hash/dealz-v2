@@ -50,5 +50,6 @@ final class Plugin {
 		add_action( 'rest_api_init', array( new \DealZ\REST\ItineraryController(), 'register_routes' ) );
 		add_action( 'rest_api_init', array( new FinanceController(), 'register_routes' ) );
 		add_action( 'init', array( \DealZ\Database\Schema::class, 'maybe_upgrade' ), 1 );
+		add_action( 'admin_notices', array( \DealZ\Database\Schema::class, 'render_admin_notice' ) );
 	}
 }
