@@ -644,3 +644,100 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	opacity: 0.35;
 	cursor: not-allowed;
 }
+
+
+/* Itinerary card hierarchy and honest route-data states. */
+.itinerary-item-list {
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	gap: 16px;
+}
+.itinerary-item-card--stop {
+	width: min(100%, 900px);
+	padding: 20px;
+	border-radius: 26px;
+	box-shadow: 0 10px 30px rgba(1, 93, 71, 0.06);
+}
+.itinerary-item-card__media {
+	width: 100%;
+	aspect-ratio: 16 / 10;
+	display: grid;
+	place-items: center;
+	margin-bottom: 18px;
+	border: 1px dashed var(--dealz-border);
+	border-radius: 18px;
+	background: linear-gradient(135deg, #F3F7F3 0%, #EAF2EC 100%);
+	color: var(--dealz-muted);
+	text-align: center;
+	overflow: hidden;
+}
+.itinerary-item-card__media-label {
+	max-width: 80%;
+	padding: 8px 14px;
+	border-radius: 999px;
+	background: rgba(255,255,255,0.82);
+	font-size: 13px;
+	font-weight: 600;
+}
+.itinerary-item-card--meal {
+	width: min(100%, 620px);
+	margin-left: clamp(0px, 4vw, 48px);
+	padding: 16px 20px;
+	border-radius: 18px;
+}
+.itinerary-item-card--meal .itinerary-item-card__top { margin-bottom: 8px; }
+.itinerary-item-card--meal h4 { font-size: 18px; }
+.route-connector {
+	width: min(100%, 900px);
+	min-height: 44px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-left: 26px;
+	color: var(--dealz-muted);
+	font-size: 13px;
+	font-weight: 600;
+}
+.route-connector::before {
+	content: "";
+	width: 34px;
+	height: 1px;
+	background: var(--dealz-border);
+}
+.route-connector__icon { font-size: 18px; }
+.item-edit-details {
+	min-width: 0;
+	flex: 1 1 220px;
+}
+.item-edit-details summary {
+	width: fit-content;
+	padding: 6px 0;
+	color: var(--dealz-green);
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+}
+.item-edit-details summary:focus-visible {
+	outline: 3px solid rgba(253,85,10,0.35);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+.item-edit-details[open] .item-edit-form { margin-top: 10px; }
+.item-edit-form input { min-height: 44px; font-size: 14px; }
+.item-edit-form button:disabled,
+.item-card-actions button:disabled { opacity: 0.55; cursor: wait; }
+.item-directions { flex: 0 0 auto; text-decoration: underline; text-underline-offset: 3px; }
+.itinerary-item-list[aria-busy="true"] { opacity: 0.72; }
+.workspace-empty .button { margin-top: 16px; }
+@media (max-width: 640px) {
+	.itinerary-item-card--stop { padding: 14px; border-radius: 20px; }
+	.itinerary-item-card__media { margin-bottom: 14px; border-radius: 14px; }
+	.itinerary-item-card--meal { width: 100%; margin-left: 0; padding: 14px; }
+	.route-connector { min-height: 38px; padding-left: 12px; }
+	.item-card-actions { align-items: stretch; }
+	.item-edit-details { width: 100%; }
+	.item-edit-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.item-edit-form input:first-child,
+	.item-edit-form button { grid-column: 1 / -1; }
+}
