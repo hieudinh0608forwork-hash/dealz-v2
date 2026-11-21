@@ -52,7 +52,7 @@ Status labels: Planned / In progress / Implemented / Tested / Verified / Deploye
 - [x] Add initial responsive manual itinerary workspace wired to APIs; [ ] implement full 16:10 stop cards, sourced route connectors and all exact design-rule details.
 - [x] Implement deterministic validation of explicit time overlaps; [ ] route-aware feasibility validation and reorder.
 - [ ] Implement route provider abstraction and map UI.
-- [x] Implement owner-scoped budget lines and expense records with server-side integer calculations and UTC normalization; [ ] build finance frontend.
+- [x] Implement owner-scoped budget lines and expense records with server-side integer calculations and UTC normalization; [x] add initial responsive budget/expense forms and lists; [ ] complete finance editing and visual QA.
 - [ ] Implement save/share/print/PDF only after interaction is functional.
 - [ ] Add outside-pilot warning for destinations beyond Da Nang–Hoi An.
 
