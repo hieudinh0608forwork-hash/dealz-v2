@@ -48,11 +48,16 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
 
   let delayFirstRead = true;
   let failNextRead = false;
-  await page.route('**/wp-json/dealz/v1/days/*/items', async route => {
+  let releaseFirstRead;
+  let signalFirstRead;
+  const firstReadStarted = new Promise(resolve => { signalFirstRead = resolve; });
+  const firstReadGate = new Promise(resolve => { releaseFirstRead = resolve; });
+  await page.route('**/items**', async route => {
     if (route.request().method() !== 'GET') return route.continue();
     if (delayFirstRead) {
       delayFirstRead = false;
-      await new Promise(resolve => setTimeout(resolve, 900));
+      signalFirstRead();
+      await firstReadGate;
       return route.continue();
     }
     if (failNextRead) {
@@ -62,11 +67,13 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
     return route.continue();
   });
 
-  // Creating a second day selects it and triggers a delayed read.
+  // Creating a second day selects it and triggers a deliberately held read.
   await page.locator('#itinerary-day-date').fill('2027-04-02');
   await page.locator('#create-day-form button[type="submit"]').click();
   await expect(page.locator('.day-chip')).toHaveCount(2);
+  await firstReadStarted;
   await expect(page.locator('#day-items-list')).toHaveAttribute('aria-busy', 'true');
+  releaseFirstRead();
   await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 
   // Switch to the first day to force a failing read; retry must recover.
