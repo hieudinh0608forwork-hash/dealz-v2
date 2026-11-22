@@ -575,8 +575,9 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(BASE_URL + '/#explore');
-    await expect(page.locator('.hero-section')).toBeVisible();
-    await page.screenshot({ path: 'artifacts/home-' + width + '-default.png', fullPage: false });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.locator('.hero-section h1')).toBeInViewport();
+    await page.screenshot({ path: 'artifacts/home-' + width + '-viewport-default.png', fullPage: false });
   }
 
   await createTripAndDay(page, 'QA responsive screenshots DealZ');
@@ -588,18 +589,31 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await expect(page.locator('#itinerary-workspace')).toBeVisible();
-    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-default.png', fullPage: false });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.locator('#itinerary-workspace-title')).toBeInViewport();
+    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-default.png', fullPage: false });
 
     const card = page.locator('.itinerary-item-card--stop').first();
     await card.locator('summary').click();
     await expect(card.locator('.item-edit-details')).toHaveAttribute('open', '');
-    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-edit-open.png', fullPage: false });
+    await card.evaluate(element => {
+      const header = document.querySelector('.site-header');
+      const offset = header ? header.getBoundingClientRect().height : 0;
+      window.scrollTo(0, Math.max(0, element.getBoundingClientRect().top + window.scrollY - offset - 16));
+    });
+    await expect(card.locator('summary')).toBeInViewport();
+    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-edit-open.png', fullPage: false });
     await card.locator('summary').click();
 
     await card.locator('.item-rental-cta').click();
     await expect(page.locator('#rental-workspace')).toBeVisible();
-    await page.screenshot({ path: 'artifacts/rental-' + width + '-empty.png', fullPage: false });
+    await page.locator('#rental-workspace').evaluate(element => {
+      const header = document.querySelector('.site-header');
+      const offset = header ? header.getBoundingClientRect().height : 0;
+      window.scrollTo(0, Math.max(0, element.getBoundingClientRect().top + window.scrollY - offset - 16));
+    });
+    await expect(page.locator('#rental-workspace-title')).toBeInViewport();
+    await page.screenshot({ path: 'artifacts/rental-' + width + '-viewport-empty.png', fullPage: false });
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();
   }
@@ -608,6 +622,8 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
   await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeVisible();
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.screenshot({ path: 'artifacts/styleguide-' + width + '-default.png', fullPage: false });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeInViewport();
+    await page.screenshot({ path: 'artifacts/styleguide-' + width + '-viewport-default.png', fullPage: false });
   }
 });
