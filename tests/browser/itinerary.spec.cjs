@@ -293,6 +293,9 @@ test('local Vietnamese fonts load with glyph coverage and no external origin req
   expect(proof.total_bytes).toBeLessThanOrEqual(300 * 1024);
   expect(proof.files.some(file => file.subset === 'latin-ext')).toBe(false);
   expect(proof.be_vietnam_pro_tnum).toBe(false);
+  expect(proof.be_vietnam_pro_400_units_per_em).toBe(1000);
+  expect(proof.be_vietnam_pro_400_digit_advance_widths).toEqual({ '0': 676, '1': 385, '2': 651, '3': 660, '4': 710, '5': 660, '6': 680, '7': 594, '8': 634, '9': 680 });
+  expect(proof.be_vietnam_pro_400_tabular_by_advance_width).toBe(false);
 });
 
 

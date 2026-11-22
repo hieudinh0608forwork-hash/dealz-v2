@@ -141,3 +141,8 @@ Last reconciled: 2026-11-22 (UTC)
 - Browser run [#44989482181](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989482181) ran on commit `c5381f07ddcf31eed873a18dc27ba2a2feb1015c` and failed 7/12 tests. The failures all timed out filling `#trip-title` because the new route model correctly hides `#trips` on the default Explore route, while `createTripAndDay()` still assumed the trip form was visible immediately after login.
 - Root fix: the test setup now explicitly navigates to `/#trips` and asserts the create-trip panel is visible before creating its fixture. This aligns test setup with the intended user route; no assertion was removed, weakened or bypassed.
 - Rerun required on a new commit before claiming route isolation or other Browser QA fixes verified.
+
+
+## Be Vietnam Pro digit widths measured (2026-11-22)
+- PHP syntax workflow [44989847815](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989847815) ran `fontTools` against `be-vietnam-pro-400-latin.woff2`, unitsPerEm=1000. Advance widths: 0=676, 1=385, 2=651, 3=660, 4=710, 5=660, 6=680, 7=594, 8=634, 9=680; 8 unique widths, not tabular.
+- Kept Be Vietnam Pro. Removed false reliance on `font-variant-numeric: tabular-nums` for these fields; `.item-time`, `.budget-summary__tile strong` and `.finance-row__side strong` now have min-width and right alignment. `font-proof.json`, the font metrics CI script, browser assertions, DECISIONS and design rules record the same measurement.

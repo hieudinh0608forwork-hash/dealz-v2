@@ -125,3 +125,7 @@ Không suy diễn trạng thái `Implemented`, `Tested` hoặc `Verified` ngoài
 - Viền input #7C948A đạt tối thiểu 3,00095:1 với nền xung quanh mint-50; input có nền trắng. Không đổi sang #6F887D. Viền thẻ #CFE0D8 không đổi.
 - Viền focus input #FD550A đạt 3,24:1 trên trắng; quầng alpha 4px chỉ trang trí. Outline ngoài #D63F00 đặc đạt ≥3,90:1 trên nền sáng; trên forest dùng lime (6,44:1).
 - Xem docs/design-contrast.md và scripts/check-design-contrast.php để có ma trận và gate CI.
+
+
+### 11.2.1 Số tiền và giờ – kết quả đo font
+- FontTools đo Be Vietnam Pro 400 Latin WOFF2: `0–9 = 676, 385, 651, 660, 710, 660, 680, 594, 634, 680` (unitsPerEm 1000); không tabular. Giữ Be Vietnam Pro, không đổi font. Cột giờ `.item-time` và cột tiền `.budget-summary__tile strong`, `.finance-row__side strong` phải có `min-width` và căn phải; không dựa vào `tnum`.

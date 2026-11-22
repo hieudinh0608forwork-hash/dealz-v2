@@ -106,3 +106,10 @@ Ma trận hiện hành chỉ đo các cặp thực sự dùng trong UI, theo yê
 ### 16.1 Kết quả đo viền input đã đối chiếu (22/11/2026)
 - Đo lại bằng công thức WCAG relative luminance trên sRGB: `#7C948A` / trắng `#FFFFFF` = **3,25079:1**; / kem `#FBF7EE` = **3,04038:1**; / mint-50 `#F2F7F4` = **3,00095:1**.
 - Thử làm sáng lân cận: `#7D958B` đạt 2,96252:1 trên mint-50; `#7C948B` đạt 2,99825:1. Cả hai không đạt 3:1. Giữ `#7C948A` làm giá trị sáng nhất trong các ứng viên lân cận đã đo; không đổi token.
+
+
+### 14.1 Kết quả đo advance width bằng fontTools (22/11/2026)
+- WOFF2: `be-vietnam-pro-400-latin.woff2`; `unitsPerEm=1000`.
+- Advance width glyph `0–9`: `0=676, 1=385, 2=651, 3=660, 4=710, 5=660, 6=680, 7=594, 8=634, 9=680`.
+- Mười glyph có 8 giá trị advance width khác nhau; Be Vietnam Pro 400 KHÔNG tabular sẵn. Giữ nguyên font; `.item-time`, `.budget-summary__tile strong`, `.finance-row__side strong` dùng `min-width` và căn phải. Không giả định `font-variant-numeric: tabular-nums` có hiệu lực trên file font này.
+- Bằng chứng: PHP syntax workflow [44989847815](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989847815), log `scripts/check-font-metrics.py`.

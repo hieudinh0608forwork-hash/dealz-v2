@@ -431,7 +431,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .itinerary-item-card__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
 .item-type-chip { padding: 5px 10px; border-radius: 999px; background: var(--dealz-surface-green); color: var(--dealz-green); font-size: 11px; font-weight: 700; }
 .itinerary-item-card--meal .item-type-chip { background: var(--dealz-note-chip-bg); }
-.item-time { color: var(--dealz-muted); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.item-time { min-width: 6ch; flex: 0 0 auto; color: var(--dealz-muted); font-size: 13px; font-weight: 700; text-align: right; white-space: nowrap; }
 .itinerary-item-card h4 { margin: 0; font-family: var(--dealz-font-heading); font-size: 22px; line-height: 1.2; }
 .itinerary-item-card__details { margin: 8px 0 16px; color: var(--dealz-muted); font-size: 13px; }
 .item-card-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--dealz-border-soft); }
@@ -522,7 +522,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	background: var(--dealz-panel-bg);
 }
 .budget-summary__tile span { color: var(--dealz-muted); font-size: 12px; font-weight: 700; }
-.budget-summary__tile strong { color: var(--dealz-green); font-size: 19px; font-variant-numeric: tabular-nums; }
+.budget-summary__tile strong { display: block; width: 100%; min-width: 12ch; color: var(--dealz-green); font-size: 19px; text-align: right; white-space: nowrap; }
 .finance-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
 .finance-row {
 	display: flex;
@@ -538,7 +538,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .finance-row__main strong { display: block; color: var(--dealz-ink); font-size: 14px; }
 .finance-row__main p { margin: 5px 0 0; color: var(--dealz-muted); font-size: 12px; line-height: 1.5; }
 .finance-row__side { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-end; gap: 5px; }
-.finance-row__side strong { color: var(--dealz-green); font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; }
+.finance-row__side strong { min-width: 12ch; color: var(--dealz-green); font-size: 14px; text-align: right; white-space: nowrap; }
 .finance-form {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));

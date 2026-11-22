@@ -25,4 +25,12 @@ result = {
     "unique_advance_widths": sorted(set(widths.values())),
     "tabular_by_advance_width": len(set(widths.values())) == 1,
 }
+proof_path = FONT_PATH.parent / "font-proof.json"
+proof = json.loads(proof_path.read_text(encoding="utf-8"))
+if proof.get("be_vietnam_pro_400_digit_advance_widths") != widths:
+    raise SystemExit("Committed font-proof.json digit widths do not match the WOFF2 metrics.")
+if proof.get("be_vietnam_pro_400_units_per_em") != result["units_per_em"]:
+    raise SystemExit("Committed font-proof.json units-per-em do not match the WOFF2 font.")
+if proof.get("be_vietnam_pro_400_tabular_by_advance_width") != result["tabular_by_advance_width"]:
+    raise SystemExit("Committed font-proof.json tabular status does not match the WOFF2 metrics.")
 print(json.dumps(result, ensure_ascii=False, indent=2))
