@@ -33,6 +33,7 @@
 
 ### 11.3.1 Ô nhập
 - Bo góc 14px, cao 52px, đệm 16px, nền trắng, viền 1.5px `#7C948A`, chữ tối thiểu 16px.
+- Đo xác nhận 22/11/2026: `#7C948A` đạt 3,25079:1 trên trắng, 3,04038:1 trên kem và 3,00095:1 trên mint-50. Hai ứng viên sáng lân cận `#7D958B` (2,96252:1) và `#7C948B` (2,99825:1) không đạt trên mint-50; giữ `#7C948A`.
 - Placeholder `#5F776D` chỉ dùng trên nền input trắng (4,83:1). Focus: viền đặc `#FD550A` (3,24:1 trên trắng) + quầng 4px cam nhạt chỉ để trang trí. Outline ngoài 3px `#D63F00` đặc, offset 3px; trên nền forest dùng lime `#E0F354`.
 - Lỗi: chữ đỏ + biểu tượng "!" dưới ô, viền đỏ.
 - Nhãn trên ô: 14px, độ đậm 600, màu `#31483F`.

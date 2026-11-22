@@ -124,3 +124,8 @@ Last reconciled: 2026-11-22 (UTC)
 - Added `scripts/check-font-metrics.py`; the PHP syntax workflow installs the development-only `fonttools` + `brotli` packages and measures Be Vietnam Pro 400 Latin WOFF2 `hmtx` advance widths for digits 0–9, reporting units-per-em, each width and whether all ten are equal.
 - The PHP syntax workflow has NO `paths` filter: `.github/workflows/php-lint.yml` runs on pushes to `main` and pull requests targeting `main`. The new measurement step therefore runs on PR #10 CI.
 - Await the next PHP workflow log before recording the measured widths or deciding whether the UI needs min-width/right-aligned numeric columns. Font family remains unchanged.
+
+
+## Input-border contrast decision verified (2026-11-22)
+- Recalculated `#7C948A` on white/cream/mint-50: 3.25079:1 / 3.04038:1 / 3.00095:1. Nearby lightened candidates `#7D958B` (2.96252:1) and `#7C948B` (2.99825:1) fail on mint-50. Retained `--dealz-input-border: #7C948A`; no token change.
+- Updated `docs/DECISIONS.md`, `docs/design-contrast.md`, and `docs/11_DESIGN_RULES.md` together.

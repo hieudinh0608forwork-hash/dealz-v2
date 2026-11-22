@@ -85,3 +85,16 @@ Phương pháp: WCAG relative luminance, sRGB linearization, ratio (L1 + 0.05) /
 ## Tự động hóa
 
 CI chạy `scripts/check-design-contrast.php` để đọc token thực tế và kiểm tra từng cặp/ngưỡng trong ma trận. CI chạy `scripts/check-css-tokens.php` để cấm mã hex ngoài `assets/css/tokens.css` trong mã nguồn theme. Ma trận không áp dụng cho các cặp không dùng trong UI; ví dụ placeholder trên nền ngoài trắng, chữ kem trên nút cam, input trên forest và viền thẻ mang tính trang trí.
+
+
+## Đo xác nhận viền input – 22/11/2026
+
+| Màu viền | Nền input | Tỷ lệ WCAG | Ngưỡng | Kết quả |
+|---|---|---:|---:|---|
+| `#7C948A` | Trắng `#FFFFFF` | 3,25079:1 | 3:1 | Đạt |
+| `#7C948A` | Kem `#FBF7EE` | 3,04038:1 | 3:1 | Đạt |
+| `#7C948A` | Mint-50 `#F2F7F4` | 3,00095:1 | 3:1 | Đạt sát ngưỡng |
+| `#7D958B` (làm sáng lân cận) | Mint-50 `#F2F7F4` | 2,96252:1 | 3:1 | Không đạt |
+| `#7C948B` (làm sáng lân cận) | Mint-50 `#F2F7F4` | 2,99825:1 | 3:1 | Không đạt |
+
+Phương pháp: chuyển từng kênh sRGB sang linear, tính relative luminance và `(L1 + 0.05) / (L2 + 0.05)`. Kết luận: giữ token `--dealz-input-border: #7C948A`; đây là ứng viên sáng nhất trong các giá trị lân cận đã thử mà vẫn đạt ngưỡng trên cả ba nền. Không đổi token màu.

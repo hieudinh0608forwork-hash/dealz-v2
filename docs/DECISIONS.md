@@ -101,3 +101,8 @@ Ma trận hiện hành chỉ đo các cặp thực sự dùng trong UI, theo yê
 - Đo màu viền thực tế trên cả ba nền input có thể dùng: trắng, kem và mint-50.
 - Chọn giá trị tối thiểu đạt tương phản ít nhất 3:1 trên cả ba nền; `#7C948A` là ứng viên đã có số đo cũ, `#6F887D` chỉ là ước tính cần đo, không được ghi là kết quả.
 - Ghi công thức/giá trị đo, token cuối cùng và cập nhật `docs/design-contrast.md`, `docs/11_DESIGN_RULES.md` trong cùng commit khi đổi token.
+
+
+### 16.1 Kết quả đo viền input đã đối chiếu (22/11/2026)
+- Đo lại bằng công thức WCAG relative luminance trên sRGB: `#7C948A` / trắng `#FFFFFF` = **3,25079:1**; / kem `#FBF7EE` = **3,04038:1**; / mint-50 `#F2F7F4` = **3,00095:1**.
+- Thử làm sáng lân cận: `#7D958B` đạt 2,96252:1 trên mint-50; `#7C948B` đạt 2,99825:1. Cả hai không đạt 3:1. Giữ `#7C948A` làm giá trị sáng nhất trong các ứng viên lân cận đã đo; không đổi token.
