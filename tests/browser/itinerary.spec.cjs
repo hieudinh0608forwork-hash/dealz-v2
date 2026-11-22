@@ -95,7 +95,8 @@ async function createTripAndDay(page, title) {
   await page.locator('#trip-start').fill('2027-04-01');
   await page.locator('#trip-end').fill('2027-04-03');
   await page.locator('#create-trip-submit').click();
-  const tripButton = page.locator('#trip-list [data-open-trip]').first();
+  const tripButton = page.locator('#trip-list [data-open-trip]').filter({ hasText: title });
+  await expect(tripButton).toHaveCount(1);
   await expect(tripButton).toBeVisible();
   await tripButton.click();
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
@@ -190,7 +191,7 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await summary.focus();
   await page.keyboard.press('Enter');
   await expect(details).toHaveAttribute('open', '');
-  await details.locator('input[type="text"]').fill('Điểm B đã sửa');
+  await details.getByRole('textbox', { name: 'Tên điểm dừng' }).fill('Điểm B đã sửa');
   await details.locator('button[type="submit"]').click();
   await expect(cards.nth(0).locator('h4')).toHaveText('Điểm B đã sửa');
 
@@ -277,7 +278,7 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await page.screenshot({ path: 'artifacts/mobile-rental-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/mobile-rental-context.png', fullPage: true });
   await page.locator('#rental-back-link').click();
-  await expect(page).toHaveURL(/#trip\//);
+  await expect(page).toHaveURL(/#route\?trip=/);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
   await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '#rental-workspace']);
 
