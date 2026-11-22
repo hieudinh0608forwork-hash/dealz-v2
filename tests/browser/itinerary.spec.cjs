@@ -571,8 +571,9 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   expect(backLinkFocus.style).not.toBe('none');
   expect(parseFloat(backLinkFocus.width)).toBeGreaterThanOrEqual(3);
   expect(parseFloat(backLinkFocus.offset)).toBeGreaterThanOrEqual(3);
-  const expenseDetails = page.locator('.finance-card').nth(1);
-  await expenseDetails.locator('summary').click();
+  const expenseDetails = page.locator('#finance-panel .finance-card').nth(1).locator('details.finance-form-details');
+  if (!(await expenseDetails.evaluate(element => element.open))) await expenseDetails.locator('summary').click();
+  await expect(expenseDetails).toHaveAttribute('open', '');
   const financeInput = page.locator('#expense-amount');
   await expect(financeInput).toBeVisible();
   await financeInput.focus();
@@ -607,10 +608,31 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
   test.setTimeout(120000);
   await signIn(page);
   const widths = [360, 390, 768, 1024, 1280];
+  const scrollTo = async (top = 0) => {
+    await page.evaluate(target => {
+      const root = document.scrollingElement || document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      root.scrollTop = target;
+      document.body.scrollTop = target;
+      window.scrollTo(0, target);
+      root.style.scrollBehavior = previousBehavior;
+    }, top);
+    await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBe(Math.round(top));
+  };
+  const scrollBelowHeader = async locator => {
+    const targetTop = await locator.evaluate(element => {
+      const header = document.querySelector('.site-header');
+      const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+      return Math.max(0, window.scrollY + element.getBoundingClientRect().top - headerBottom - 16);
+    });
+    await scrollTo(targetTop);
+    await expect(locator).toBeInViewport();
+  };
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(BASE_URL + '/#explore');
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
     await expect(page.locator('.hero-section h1')).toBeInViewport();
     await page.screenshot({ path: 'artifacts/home-' + width + '-viewport-default.png', fullPage: false });
@@ -635,7 +657,7 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
     await expect(page.locator('#itinerary-workspace-title')).toBeInViewport();
     await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-default.png', fullPage: false });
@@ -643,17 +665,15 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     const card = page.locator('.itinerary-item-card--stop').first();
     await card.locator('summary').click();
     await expect(card.locator('.item-edit-details')).toHaveAttribute('open', '');
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await scrollBelowHeader(card.locator('summary'));
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(card.locator('summary')).toBeInViewport();
     await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-edit-open.png', fullPage: false });
     await card.locator('summary').click();
 
     await card.locator('.item-rental-cta').click();
     await expect(page.locator('#rental-workspace')).toBeVisible();
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await scrollBelowHeader(page.locator('#rental-workspace-title'));
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(page.locator('#rental-workspace-title')).toBeInViewport();
     await page.screenshot({ path: 'artifacts/rental-' + width + '-viewport-empty.png', fullPage: false });
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();
@@ -663,7 +683,7 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
   await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeVisible();
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
     await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/styleguide-' + width + '-viewport-default.png', fullPage: false });
