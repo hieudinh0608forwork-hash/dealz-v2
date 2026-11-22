@@ -22,14 +22,12 @@ $zalo_url = dealz_sanitize_zalo_url( get_option( 'dealz_zalo_url', '' ) );
 			<a href="<?php echo esc_url( home_url( '/dieu-khoan/' ) ); ?>"><?php esc_html_e( 'Điều khoản', 'dealz-theme' ); ?></a>
 			<a href="<?php echo esc_url( home_url( '/bao-mat/' ) ); ?>"><?php esc_html_e( 'Bảo mật', 'dealz-theme' ); ?></a>
 		</nav>
-		<div class="site-footer__support">
-			<h2><?php esc_html_e( 'Hỗ trợ', 'dealz-theme' ); ?></h2>
-			<?php if ( $zalo_url ) : ?>
+		<?php if ( $zalo_url ) : ?>
+			<div class="site-footer__support">
+				<h2><?php esc_html_e( 'Hỗ trợ', 'dealz-theme' ); ?></h2>
 				<a href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Liên hệ qua Zalo', 'dealz-theme' ); ?></a>
-			<?php else : ?>
-				<p><?php esc_html_e( 'Kênh Zalo sẽ hiển thị khi được cấu hình.', 'dealz-theme' ); ?></p>
-			<?php endif; ?>
-		</div>
+			</div>
+		<?php endif; ?>
 	</div>
 	<p class="site-footer__disclaimer"><?php esc_html_e( 'Sản phẩm đang trong quá trình phát triển.', 'dealz-theme' ); ?></p>
 </footer>

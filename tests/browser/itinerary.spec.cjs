@@ -314,7 +314,9 @@ test('legal draft routes are public noindex and do not invent operative terms', 
   }
   await page.goto(BASE_URL + '/');
   await expect(page.locator('.zalo-float')).toHaveCount(0);
+  await expect(page.locator('.site-footer__support')).toHaveCount(0);
   await expect(page.locator('.site-footer__legal a')).toHaveCount(3);
+  await expect(page.locator('body')).not.toContainText(/cấu hình|QA/i);
 });
 
 test('styleguide is not accessible without administrator capability', async ({ page }) => {

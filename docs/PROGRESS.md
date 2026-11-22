@@ -92,3 +92,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Pending CI evidence on this commit.
 
 - Follow-up inspection caught over-escaping in the first HH:MM mask commit; corrected the JavaScript digit and hour regex literals in this commit. This is a source correction, not a test change.
+
+
+## UI defect C4 – clean-install footer and Zalo (2026-11-22)
+- The footer Hỗ trợ/Zalo column now renders only when the sanitized `dealz_zalo_url` option contains an HTTPS URL. With no configured URL, the entire column is absent; the floating button was already conditional and remains absent.
+- Browser test for the clean unauthenticated installation now asserts no footer support column, no floating Zalo action, and no user-facing “cấu hình” or “QA” copy. Existing legal footer links remain.
+- No URL or contact detail was invented. Pending CI evidence.
