@@ -1113,3 +1113,7 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 .rental-heading #rental-context-chip[hidden] { display: none; }
 .workspace-heading.rental-heading { margin-top: 20px; }
 .itinerary-layout { margin-top: 20px; }
+
+/* Hero uses a real photo; see docs/media-credits.md. */
+.hero-art__photo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.hero-art__label { z-index: 1; }
