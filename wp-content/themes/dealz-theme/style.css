@@ -1103,3 +1103,10 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 #itinerary-workspace-meta { min-height: 22px; }
 
 .button--compact { min-height: 44px; }
+
+
+/* Mobile stop-card content width: remove the redundant outer panel frame, keep each stop card. */
+@media (max-width: 767px) {
+	#day-items-panel.workspace-panel { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+	#day-items-panel .itinerary-item-card--stop { padding: 16px; }
+}

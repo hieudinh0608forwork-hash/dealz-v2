@@ -186,6 +186,8 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await addStop(page, 'Điểm kế tiếp chưa có địa chỉ', '');
 
   const card = page.locator('.itinerary-item-card--stop').first();
+  const cardContentWidth = await card.evaluate(element => { const style = getComputedStyle(element); return element.getBoundingClientRect().width - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth); });
+  expect(cardContentWidth, 'Stop-card content width at 390px').toBeGreaterThanOrEqual(320);
   const imageSlot = card.locator('.itinerary-item-card__media');
   await expect(imageSlot).toBeVisible();
   await expect(imageSlot).toHaveAttribute('role', 'img');

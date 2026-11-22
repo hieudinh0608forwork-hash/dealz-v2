@@ -112,3 +112,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Rebuilt the empty stop ImageSlot as a compact forest-to-ink gradient with faint inline contour SVG, lime map-pin SVG, Bricolage 700 stop name and “Chưa có ảnh đã xác minh” status aligned at the bottom.
 - Preserved `role="img"` and added the exact accessible label “Chưa có ảnh cho [tên điểm dừng]”. Desktop minimum height is 144px; mobile minimum height is 112px. No stock or AI image is used.
 - Mobile Browser QA now asserts the role, label, title, status, pin and computed minimum height. Pending CI and desktop measurement.
+
+
+## UI defect C7 – reduce nested mobile card framing (2026-11-22)
+- At mobile widths up to 767px, the outer `#day-items-panel` loses redundant padding, border, radius and background while retaining the stop-card component and its own border/padding. Stop cards use 16px internal padding.
+- Mobile Playwright at 390px measures the first stop card's actual content box (border and padding excluded) and requires at least 320px. No itinerary or API behavior changed.
+- Pending CI evidence.
