@@ -530,7 +530,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
         style: style.outlineStyle,
         width: style.outlineWidth,
         color: style.outlineColor,
-        token: getComputedStyle(document.documentElement).getPropertyValue('--dealz-focus-outline').trim(),\n        elementToken: getComputedStyle(element).getPropertyValue('--dealz-focus-outline').trim(),
+        token: getComputedStyle(document.documentElement).getPropertyValue('--dealz-focus-outline').trim(),
+        elementToken: getComputedStyle(element).getPropertyValue('--dealz-focus-outline').trim(),
         inPrimary: Boolean(element.closest('#primary')),
         matchingRules,
         inlineStyle: element.getAttribute('style'),
@@ -539,7 +540,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     });
     expect(focus.visible, 'Control must match :focus-visible: ' + await control.getAttribute('id')).toBe(true);
     expect(focus.style, 'Focus outline style: ' + await control.getAttribute('id')).not.toBe('none');
-    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id') + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);\n    if (await control.getAttribute('id') === 'item-title') expect(focus.color, 'Input focus color: ' + JSON.stringify(focus)).toBe('rgb(214, 63, 0)');
+    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id') + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);
+    if (await control.getAttribute('id') === 'item-title') expect(focus.color, 'Input focus color: ' + JSON.stringify(focus)).toBe('rgb(214, 63, 0)');
     expect(parseFloat(await control.evaluate(element => getComputedStyle(element).outlineOffset)), 'Focus outline offset: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
   }
   const backLink = page.locator('#back-to-trips');
