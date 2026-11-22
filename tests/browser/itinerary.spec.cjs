@@ -32,6 +32,25 @@ function assertNoUnexpectedBrowserErrors(errors, allowExpectedApiAbort = false) 
   expect(errors.pageErrors, 'Uncaught browser page errors').toEqual([]);
 }
 
+async function expectScreenState(page, visibleSelector, hiddenSelectors) {
+  await expect(page.locator(visibleSelector)).toBeVisible();
+  for (const selector of hiddenSelectors) {
+    const root = page.locator(selector);
+    if (await root.count()) {
+      await expect(root).toBeHidden();
+      expect(await root.evaluate(element => element.inert), 'Hidden route must be inert: ' + selector).toBe(true);
+    }
+  }
+  const focusableInHiddenScreens = await page.evaluate(selectors => selectors.flatMap(selector => {
+    const root = document.querySelector(selector);
+    if (!root || (!root.hidden && !root.inert)) return [];
+    return Array.from(root.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'))
+      .filter(element => !element.disabled)
+      .map(element => ({ root: selector, tag: element.tagName, id: element.id }));
+  }), hiddenSelectors);
+  expect(focusableInHiddenScreens, 'Hidden routes must not retain focusable controls').toEqual([]);
+}
+
 async function createTripAndDay(page, title) {
   await signIn(page);
   await page.locator('#trip-title').fill(title);
@@ -44,6 +63,8 @@ async function createTripAndDay(page, title) {
   await expect(tripButton).toBeVisible();
   await tripButton.click();
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  await expect(page).toHaveURL(/#route\?trip=/);
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '.section-heading', '#trip-list', '#create-trip', '#rental-workspace']);
   await page.locator('#create-itinerary-btn').click();
   await expect(page.locator('#itinerary-editor')).toBeVisible();
   await page.locator('#itinerary-day-date').fill('2027-04-01');
@@ -133,14 +154,16 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await rentalLink.click();
   await expect(page).toHaveURL(/#shop\?/);
   await expect(page.locator('#rental-workspace')).toBeVisible();
+  await expectScreenState(page, '#rental-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#trips', '#itinerary-workspace']);
   await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho Điểm B đã sửa');
   await expect(page.locator('#rental-workspace')).toContainText('Danh mục thuê đồ chưa sẵn sàng');
   await page.locator('#rental-workspace').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'artifacts/desktop-rental-viewport.png', fullPage: false });
   await page.screenshot({ path: 'artifacts/desktop-rental-context.png', fullPage: true });
   await page.locator('#rental-back-link').click();
-  await expect(page).toHaveURL(/#trip\//);
+  await expect(page).toHaveURL(/#route\?trip=/);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#rental-workspace']);
 
   await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-archive-action').click();
   const archiveDialog = page.locator('.archive-dialog');
@@ -198,6 +221,12 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await page.locator('#rental-back-link').click();
   await expect(page).toHaveURL(/#trip\//);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#rental-workspace']);
+
+  await page.goto(BASE_URL + '/#trips');
+  await expectScreenState(page, '#trip-list', ['.hero-section', '.feature-bento', '.next-step-section', '#itinerary-workspace', '#rental-workspace']);
+  await page.goto(BASE_URL + '/#explore');
+  await expectScreenState(page, '.hero-section', ['#trips', '#itinerary-workspace', '#rental-workspace']);
 
   await page.goto(BASE_URL + '/#shop');
   await expect(page.locator('#rental-workspace')).toBeVisible();

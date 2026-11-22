@@ -3,6 +3,11 @@
 
 	const config = window.dealzApp || {};
 	const workspace = document.getElementById('itinerary-workspace');
+	const rentalWorkspace = document.getElementById('rental-workspace');
+	const heroSection = document.querySelector('.hero-section');
+	const featureBento = document.querySelector('.feature-bento');
+	const tripsSection = document.getElementById('trips');
+	const nextStepSection = document.querySelector('.next-step-section');
 	const tripList = document.getElementById('trip-list');
 	const sectionHeading = document.querySelector('.trips-section .section-heading');
 	const createTripPanel = document.getElementById('create-trip');
@@ -76,23 +81,51 @@
 		feedback.classList.remove('notice--error');
 	}
 
+	function setScreenElement(element, visible) {
+		if (!element) return;
+		element.hidden = !visible;
+		element.inert = !visible;
+	}
+
+	function setHomeScreen(visible) {
+		setScreenElement(heroSection, visible);
+		setScreenElement(featureBento, visible);
+		setScreenElement(nextStepSection, visible);
+	}
+
+	function showExploreScreen() {
+		document.body.classList.remove('is-trip-view', 'is-rental-view');
+		setHomeScreen(true);
+		setScreenElement(tripsSection, false);
+		setScreenElement(workspace, false);
+		setScreenElement(rentalWorkspace, false);
+	}
+
+	function showTripsScreen() {
+		document.body.classList.remove('is-trip-view', 'is-rental-view');
+		setHomeScreen(false);
+		setScreenElement(tripsSection, true);
+		setScreenElement(sectionHeading, true);
+		setScreenElement(tripList, true);
+		setScreenElement(createTripPanel, true);
+		setScreenElement(workspace, false);
+		setScreenElement(rentalWorkspace, false);
+	}
+
 	function showWorkspace() {
+		document.body.classList.remove('is-rental-view');
 		document.body.classList.add('is-trip-view');
-		workspace.hidden = false;
-		if (tripList) tripList.hidden = true;
-		if (sectionHeading) sectionHeading.hidden = true;
-		if (createTripPanel) createTripPanel.hidden = true;
+		setHomeScreen(false);
+		setScreenElement(tripsSection, true);
+		setScreenElement(sectionHeading, false);
+		setScreenElement(tripList, false);
+		setScreenElement(createTripPanel, false);
+		setScreenElement(workspace, true);
+		setScreenElement(rentalWorkspace, false);
 	}
 
 	function hideWorkspace() {
-		document.body.classList.remove('is-trip-view');
-		workspace.hidden = true;
-		const rentalWorkspace = document.getElementById('rental-workspace');
-		if (rentalWorkspace) rentalWorkspace.hidden = true;
-		document.body.classList.remove('is-rental-view');
-		if (tripList) tripList.hidden = false;
-		if (sectionHeading) sectionHeading.hidden = false;
-		if (createTripPanel) createTripPanel.hidden = false;
+		showTripsScreen();
 		activeTrip = null;
 		activeTripData = null;
 		activeDays = [];
@@ -172,8 +205,9 @@
 
 	async function openTrip(publicId) {
 		if (!publicId) return;
-		if (window.location.hash !== '#trip/' + publicId) {
-			window.location.hash = 'trip/' + publicId;
+		const routeHash = '#route?trip=' + encodeURIComponent(publicId);
+		if (window.location.hash !== routeHash) {
+			window.location.hash = routeHash.slice(1);
 			return;
 		}
 		await loadTrip(publicId);
@@ -1092,14 +1126,13 @@
 	}
 
 	function showRentalWorkspace(query) {
-		const rentalWorkspace = document.getElementById('rental-workspace');
 		if (!rentalWorkspace) return;
 		hideWorkspace();
+		document.body.classList.remove('is-trip-view');
 		document.body.classList.add('is-rental-view');
-		if (tripList) tripList.hidden = true;
-		if (sectionHeading) sectionHeading.hidden = true;
-		if (createTripPanel) createTripPanel.hidden = true;
-		rentalWorkspace.hidden = false;
+		setHomeScreen(false);
+		setScreenElement(tripsSection, false);
+		setScreenElement(rentalWorkspace, true);
 		const params = new URLSearchParams(query || '');
 		const stopName = params.get('name') || 'điểm dừng đã chọn';
 		const heading = document.getElementById('rental-workspace-title');
@@ -1124,29 +1157,41 @@
 		if (nextAction && back) nextAction.href = back.href;
 	}
 
-	window.addEventListener('hashchange', function () {
-		const match = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
-		const shopMatch = window.location.hash.match(/^#shop(?:\?(.*))?$/);
+	function resolveRoute(hash) {
+		const currentHash = hash || '#explore';
+		const shopMatch = currentHash.match(/^#shop(?:\?(.*))?$/);
 		if (shopMatch) {
 			showRentalWorkspace(shopMatch[1] || '');
 			return;
 		}
-		if (match) {
-			loadTrip(match[1]);
-		} else {
-			hideWorkspace();
+		const routeMatch = currentHash.match(/^#route(?:\?(.*))?$/);
+		if (routeMatch) {
+			const routeParams = new URLSearchParams(routeMatch[1] || '');
+			const tripId = routeParams.get('trip');
+			if (tripId && /^[a-f0-9-]{36}$/i.test(tripId)) {
+				loadTrip(tripId);
+			} else {
+				showTripsScreen();
+			}
+			return;
 		}
+		const legacyTripMatch = currentHash.match(/^#trip\/([a-f0-9-]{36})$/i);
+		if (legacyTripMatch) {
+			loadTrip(legacyTripMatch[1]);
+			return;
+		}
+		if (currentHash === '#trips' || currentHash === '#create-trip') {
+			showTripsScreen();
+			return;
+		}
+		showExploreScreen();
+	}
+
+	window.addEventListener('hashchange', function () {
+		resolveRoute(window.location.hash);
 	});
 
 	window.dealzItinerary = { openTrip: openTrip };
 
-	const initialShopMatch = window.location.hash.match(/^#shop(?:\?(.*))?$/);
-	if (initialShopMatch) {
-		showRentalWorkspace(initialShopMatch[1] || '');
-	}
-
-	const initialMatch = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
-	if (initialMatch) {
-		loadTrip(initialMatch[1]);
-	}
+	resolveRoute(window.location.hash);
 })();

@@ -76,3 +76,10 @@ Last reconciled: 2026-11-22 (UTC)
 - Changed the “Thuê đồ theo hành trình” bento card from a row/wrap flex layout to a vertical label → heading → “Sắp có” chip → description stack, with bounded width and safe wrapping.
 - Extended the existing viewport test (no new test removed) to inspect the card and every descendant for `scrollWidth > clientWidth` at 360px and 390px.
 - Pending browser CI evidence on the new commit; no visual pass claimed yet.
+
+
+## UI defect C2 – route screen isolation (2026-11-22)
+- Added explicit route-state visibility and `inert` handling for Explore, Trips, selected itinerary and Rental screens. CSS-only hiding is no longer the state mechanism; hidden screens are also removed from keyboard navigation.
+- Canonical selected-itinerary route is now `#route?trip=<uuid>`; legacy `#trip/<uuid>` remains readable. Rental return URLs preserve the selected route; `#route` without a trip resolves to the Trips list. `#trips` and `#explore` resolve to their own screens.
+- Browser scenarios now assert visible screen, hidden/inert sibling screens and zero enabled focusable descendants in hidden screens across itinerary, rental, trips and explore navigation. Existing flow remains covered; URL expectation changed because the canonical route was introduced.
+- Pending CI proof; no route isolation pass claimed yet.
