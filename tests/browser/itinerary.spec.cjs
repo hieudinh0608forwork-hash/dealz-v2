@@ -63,13 +63,23 @@ async function expectScreenState(page, visibleSelector, hiddenSelectors) {
       expect(await root.evaluate(element => element.inert), 'Hidden route must be inert: ' + selector).toBe(true);
     }
   }
-  const focusableInHiddenScreens = await page.evaluate(selectors => selectors.flatMap(selector => {
-    const root = document.querySelector(selector);
-    if (!root || (!root.hidden && !root.inert)) return [];
-    return Array.from(root.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'))
-      .filter(element => !element.disabled)
-      .map(element => ({ root: selector, tag: element.tagName, id: element.id }));
-  }), hiddenSelectors);
+  const focusableInHiddenScreens = await page.evaluate(selectors => {
+    const focused = [];
+    for (const selector of selectors) {
+      const root = document.querySelector(selector);
+      if (!root || (!root.hidden && !root.inert)) continue;
+      const candidates = Array.from(root.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'));
+      for (const element of candidates) {
+        if (element.disabled) continue;
+        element.focus({ preventScroll: true });
+        if (document.activeElement === element) {
+          focused.push({ root: selector, tag: element.tagName, id: element.id });
+        }
+      }
+    }
+    if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+    return focused;
+  }, hiddenSelectors);
   expect(focusableInHiddenScreens, 'Hidden routes must not retain focusable controls').toEqual([]);
 }
 

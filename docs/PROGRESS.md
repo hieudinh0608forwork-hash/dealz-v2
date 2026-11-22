@@ -171,3 +171,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Found finance form overrides still using a 3px shadow and `outline: 0`; changed finance inputs/selects to the same `#FD550A` border and 4px halo as other inputs, leaving the global 3px `:focus-visible` outline/3px offset in force.
 - Forest-background links in the site footer and rental next-step card now use the lime focus outline. The focus browser test opens budget/expense details, checks computed `:focus-visible` outline width/offset on all itinerary/finance controls, verifies the finance input border and 4px shadow, and verifies lime outline color on a footer link.
 - No focus assertion removed or relaxed. Pending Browser QA rerun.
+
+
+## Hidden-route focus assertion correction (2026-11-22)
+- Browser run [44990231479](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990231479) on commit `7cb5de3929ae2c127c205c62dbf17ce8ced29334` failed 7/12 tests at the shared hidden-route assertion. The product roots were correctly `hidden` and `inert`; the test incorrectly counted every enabled descendant in the DOM as focusable without honoring its inert ancestor.
+- Corrected the assertion to attempt real focus on each enabled descendant and fail only if the browser actually moves `document.activeElement` into a hidden/inert screen. The test still separately requires the screen root to have both `hidden` and `inert`; this verifies browser behavior rather than weakening the condition.
+- Rerun required on the new commit.
