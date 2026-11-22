@@ -616,11 +616,15 @@
 		});
 		archiveActions.append(cancelArchive, confirmArchive);
 		archiveDialog.append(archiveTitle, archiveDescription, archiveActions);
-		archive.addEventListener('click', function () { archiveDialog.showModal(); });
+		archive.addEventListener('click', function () {
+			document.body.append(archiveDialog);
+			archiveDialog.addEventListener('close', function () { archiveDialog.remove(); }, { once: true });
+			archiveDialog.showModal();
+		});
 		actions.append(archive);
 		card.append(top, title, details);
 		if (isMainStop) card.append(photoHint, gearHint);
-		card.append(actions, archiveDialog);
+		card.append(actions);
 		return card;
 	}
 

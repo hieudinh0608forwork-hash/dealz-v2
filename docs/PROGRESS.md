@@ -62,3 +62,11 @@ Last reconciled: 2026-11-22 (UTC)
 - Font budget ≤300 KiB; preload only two files; use unicode-range; test removing latin-ext first while retaining latin and Vietnamese glyph coverage.
 - Input border: measure on white, cream and mint-50; choose minimum color meeting 3:1 on all three. Prior `#7C948A` values remain provisional until verified against the actual three backgrounds; `#6F887D` is only an estimate.
 - Supersedes the earlier owner-input notes: meal exclusion, badge definition and the identity of `13_HANDOFF_COMPLETION.md` are now decided. Zalo URL and licensed destination photography remain owner-supplied.
+
+
+## Browser QA #63 diagnosis and root-cause fixes (2026-11-22)
+- Run [Browser QA QA #63](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44988096279) ran on commit `475cdcf55ebea6481d9cf8020dfd3b1d569ae7f2`; result 9/12 passed, 3 failed. It is NOT the run for any later commit.
+- Failure 1: `tests/browser/itinerary.spec.cjs:115` locator matched both the stop title and archive dialog `h3` because the native dialog was nested in the article. Root fix moves the dialog to `document.body`, removes it on close, and asserts top-level placement.
+- Failure 2: axe reported serious `color-contrast` on `#create-item-submit`. During async reload it is disabled; opacity 0.6 composited white text against the primary background. Root fix removes disabled opacity and applies mint-100 + muted ink to disabled primary buttons.
+- Failure 3: focus outline width 0 because `.item-form select:focus` and `.item-edit-form input:focus` explicitly set `outline: 0`. Root fix removes suppression and adds explicit 3px focus-visible outlines with 3px offset; test checks every itinerary form control against `:focus-visible`.
+- No test deleted or relaxed. Re-run required on this new head.

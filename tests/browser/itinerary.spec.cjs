@@ -145,6 +145,7 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-archive-action').click();
   const archiveDialog = page.locator('.archive-dialog');
   await expect(archiveDialog).toBeVisible();
+  expect(await archiveDialog.evaluate(dialog => dialog.parentElement === document.body), 'Archive dialog must be a top-level modal, not nested inside a stop card').toBe(true);
   await archiveDialog.getByRole('button', { name: 'Lưu trữ' }).click();
   await expect(page.locator('.itinerary-item-card--stop')).toHaveCount(1);
   await expect(page.locator('.itinerary-item-card--stop')).not.toContainText('Điểm A');
@@ -364,9 +365,18 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   const hours = await page.evaluate(() => { const d = new Date('2027-04-01T09:30:00Z'); return ['en-US','vi-VN'].map(locale => new Intl.DateTimeFormat(locale, { hour: '2-digit', hour12: false, timeZone: 'UTC' }).format(d)); });
   expect(hours.every(value => value.startsWith('09'))).toBe(true);
   await page.keyboard.press('Tab');
-  const focus = await page.evaluate(() => ({ style: getComputedStyle(document.activeElement).outlineStyle, width: getComputedStyle(document.activeElement).outlineWidth }));
-  expect(focus.style).not.toBe('none');
-  expect(parseFloat(focus.width)).toBeGreaterThanOrEqual(3);
+  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit');
+  for (let index = 0; index < await focusable.count(); index++) {
+    const control = focusable.nth(index);
+    await control.focus();
+    const focus = await control.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { visible: element.matches(':focus-visible'), style: style.outlineStyle, width: style.outlineWidth };
+    });
+    expect(focus.visible, 'Control must match :focus-visible: ' + await control.getAttribute('id')).toBe(true);
+    expect(focus.style, 'Focus outline style: ' + await control.getAttribute('id')).not.toBe('none');
+    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
+  }
   await page.evaluate(() => window.scrollTo(0, 600));
   const top = await page.locator('.site-header').evaluate(el => el.getBoundingClientRect().top);
   expect(top).toBeGreaterThanOrEqual(0);
