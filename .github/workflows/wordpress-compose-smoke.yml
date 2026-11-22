@@ -159,11 +159,11 @@ jobs:
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
             global $wpdb;
             if ( get_option( "dealz_db_version" ) !== "1.2.0" ) { exit( 1 ); }
-            foreach ( \\DealZ\\Database\\Schema::table_names() as $table ) {
+            foreach ( \DealZ\Database\Schema::table_names() as $table ) {
               if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) ) !== $table ) { exit( 1 ); }
               if ( empty( $wpdb->get_results( "SHOW COLUMNS FROM `" . esc_sql( $table ) . "`", ARRAY_A ) ) ) { exit( 1 ); }
             }
-            echo "PASS: theme reactivation preserves the 1.2.0 schema.\\n";
+            echo "PASS: schema 1.2.0 and all eight tables remain valid.\n";
           '
           echo "PASS: plugin activation cycle completed; health endpoint was verified above."
 

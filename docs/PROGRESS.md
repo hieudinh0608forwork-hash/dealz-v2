@@ -407,3 +407,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Commit `3be36bce1452d2085297e5bda06260456954fa24`: Docker smoke đặt permalink `/%postname%/`, hard flush rewrite rules, in giá trị thực tế; giữ nguyên poll/assertion endpoint chính và thêm assertion phụ `?rest_route=`.
 - Docker run [45039947566](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45039947566) được kích hoạt cho commit này; đang chờ kết quả. Checkout ref run trước xác nhận merge ref `9ad072d187392c838eb303b5492d2e16bef1c4c8` cho HEAD `a59dd5b7a7511f1b1cf98a8e69581adc6a8c338a`.
 - Chưa Verified; cần bốn workflow xanh cùng một HEAD và ghi merge ref của lần chạy tương ứng.
+
+
+## Docker smoke post-permalink failure diagnosis (22/11/2026)
+- Run [45039947566](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45039947566) on head `3be36bce1452d2085297e5bda06260456954fa24` confirms `permalink_structure` was set and the primary `/wp-json/dealz/v1/health` endpoint passed on the first attempt with HTTP 200 and the expected JSON. The secondary `?rest_route=` assertion also completed.
+- The job then failed in the final WP-CLI schema verification: PHP parse error `unexpected token "\\"` at line 4. The workflow source had an over-escaped fully qualified `\\DealZ\\Database\\Schema` name inside a shell single-quoted PHP snippet. Corrected it to the single leading namespace separator required by PHP; updated the success text to describe the eight-table/schema assertion rather than a removed theme lifecycle step.
+- This is the fifth and final authorized repair attempt for the Docker smoke issue. Do not make another Docker smoke code change if the next run remains red; collect logs and ask the owner. No product assertion was relaxed. PR #10 remains Draft; no merge/deploy.
