@@ -177,3 +177,8 @@ Last reconciled: 2026-11-22 (UTC)
 - Browser run [44990231479](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990231479) on commit `7cb5de3929ae2c127c205c62dbf17ce8ced29334` failed 7/12 tests at the shared hidden-route assertion. The product roots were correctly `hidden` and `inert`; the test incorrectly counted every enabled descendant in the DOM as focusable without honoring its inert ancestor.
 - Corrected the assertion to attempt real focus on each enabled descendant and fail only if the browser actually moves `document.activeElement` into a hidden/inert screen. The test still separately requires the screen root to have both `hidden` and `inert`; this verifies browser behavior rather than weakening the condition.
 - Rerun required on the new commit.
+
+
+## Playwright error artifact formatting correction (2026-11-22)
+- Inspected the generated workflow source and found the error-export script used double-escaped `\\n`, which would write literal backslash-n sequences instead of readable line breaks. Corrected to real newline escapes for failure headings, error-context separators and file joins.
+- Artifact still contains both JSON report and `error-context.md` snapshots; the exported `.txt` is now line-oriented and readable. Pending next Browser QA artifact verification.
