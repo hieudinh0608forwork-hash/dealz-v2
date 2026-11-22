@@ -1117,3 +1117,9 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 /* Hero uses a real photo; see docs/media-credits.md. */
 .hero-art__photo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
 .hero-art__label { z-index: 1; }
+
+/* Rental toolbar scrolls beneath the sticky header; keep the header opaque on this focused screen. */
+body.is-rental-view .site-header.is-scrolled {
+	background: var(--dealz-cream);
+	backdrop-filter: none;
+}

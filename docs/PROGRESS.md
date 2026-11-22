@@ -483,8 +483,9 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
-## T8 – chẩn đoán bóng mờ header (23/11/2026)
+## T8 – chẩn đoán và sửa bóng mờ header (23/11/2026)
 - Đã xác nhận PR #10 HEAD trước chẩn đoán: aaad65c79fd431f2c10cc41a98dbe213fbe41217; PR vẫn Draft, chưa merge.
-- Artifact Browser QA hiện tại có ảnh rental-1280-viewport-empty.png. Ảnh cho thấy vùng chữ nền bị nhòe xuyên qua header; đây mới là dấu hiệu thị giác, chưa kết luận nguyên nhân.
-- Commit chẩn đoán chỉ bổ sung Playwright instrumentation ở viewport 1280: ghi computed style của header (background, backdrop-filter, box-shadow, filter, transform, z-index), ::before/::after, các layer giao vùng header và element stack tại (100,85), (200,85), (1130,85), (1200,85). Kết quả được lưu thành artifacts/rental-shadow-diagnostic.json và in vào log.
-- Không sửa CSS/UI, không thay assertion sản phẩm, không đổi selector/ARIA/data-testid. Chờ Browser QA trên commit này để xác định đúng phần tử/lớp gây hiệu ứng.
+- Browser QA chẩn đoán trên HEAD f4e02e91f9bc53209161c19f7b3087c3b476ea4b: 12/12 passed; 5/5 workflow xanh. Merge ref: bd3b09f6c35ac46659b4d2e1ecae25b177484de2.
+- Computed style thật tại 1280px, scrollY=74: header .site-header.is-scrolled, position=sticky, z-index=10, background rgba(255,255,255,0.94), backdrop-filter=blur(14px), box-shadow=none, filter=none; ::before/::after đều content:none.
+- elementsFromPoint xác nhận nội dung nằm dưới header: .rental-back-link ở x=50–310, y=73–98.6 và .workspace-label ở x=1122–1230, y=76.2–95.4. Chúng đúng vị trí các vệt chữ mờ người dùng nhìn thấy. Đây không phải box-shadow; nền header trong suốt 6% kết hợp backdrop blur làm lộ chữ bên dưới.
+- Sửa riêng màn thuê đồ: khi header đã cuộn, nền chuyển sang token cream đặc và tắt backdrop-filter. Giữ nguyên header ở các màn khác. Playwright giữ diagnostic JSON và thêm assertion computed background rgb(251,247,238), backdrop-filter none; không thay assertion sản phẩm, selector/ARIA/data-testid.

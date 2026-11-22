@@ -843,6 +843,8 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
         };
       });
       fs.mkdirSync('artifacts', { recursive: true });
+      expect(diagnostic.header.backgroundColor, 'Rental header must be opaque so the toolbar beneath it cannot bleed through').toBe('rgb(251, 247, 238)');
+      expect(diagnostic.header.backdropFilter, 'Rental header must not blur underlying toolbar content').toBe('none');
       fs.writeFileSync('artifacts/rental-shadow-diagnostic.json', JSON.stringify(diagnostic, null, 2));
       console.log('[rental-shadow-diagnostic] ' + JSON.stringify(diagnostic));
     }
