@@ -194,7 +194,7 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await expect(details).toHaveAttribute('open', '');
   await details.getByRole('textbox', { name: 'Tên điểm dừng' }).fill('Điểm B đã sửa');
   await details.locator('button[type="submit"]').click();
-  await expect(cards.nth(0).locator('h4')).toHaveText('Điểm B đã sửa');
+  await expect(cards.nth(0).locator('h3')).toHaveText('Điểm B đã sửa');
 
   await cards.nth(0).scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'artifacts/desktop-stop-viewport.png', fullPage: false });
@@ -504,7 +504,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.keyboard.press('Tab');
   await page.locator('.finance-card').first().locator('summary').click();
   await page.locator('.finance-card').nth(1).locator('summary').click();
-  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit, #budget-description, #budget-quantity, #budget-unit-amount, #budget-cost-type, #create-budget-submit, #expense-amount, #expense-occurred-at, #expense-note, #create-expense-submit, .workspace-toolbar a');
+  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit, #budget-description, #budget-quantity, #budget-unit-amount, #budget-cost-type, #create-budget-submit, #expense-amount, #expense-occurred-at, #expense-note, #create-expense-submit');
   for (let index = 0; index < await focusable.count(); index++) {
     const control = focusable.nth(index);
     await control.focus();
@@ -517,6 +517,21 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
     expect(parseFloat(await control.evaluate(element => getComputedStyle(element).outlineOffset)), 'Focus outline offset: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
   }
+  const backLink = page.locator('#back-to-trips');
+  await backLink.focus();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(backLink).toBeFocused();
+  const backLinkFocus = await backLink.evaluate(element => ({
+    visible: element.matches(':focus-visible'),
+    style: getComputedStyle(element).outlineStyle,
+    width: getComputedStyle(element).outlineWidth,
+    offset: getComputedStyle(element).outlineOffset
+  }));
+  expect(backLinkFocus.visible, 'Back link must be reached with keyboard modality').toBe(true);
+  expect(backLinkFocus.style).not.toBe('none');
+  expect(parseFloat(backLinkFocus.width)).toBeGreaterThanOrEqual(3);
+  expect(parseFloat(backLinkFocus.offset)).toBeGreaterThanOrEqual(3);
   const financeInput = page.locator('#expense-amount');
   await financeInput.focus();
   const financeFocus = await financeInput.evaluate(element => ({ border: getComputedStyle(element).borderColor, shadow: getComputedStyle(element).boxShadow }));
