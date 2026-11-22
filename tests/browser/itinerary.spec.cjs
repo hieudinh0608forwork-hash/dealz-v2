@@ -286,7 +286,10 @@ test('local Vietnamese fonts load with glyph coverage and no external origin req
     const response = await fetch('/wp-content/themes/dealz-theme/assets/fonts/font-proof.json');
     return response.json();
   });
-  expect(proof.total_bytes).toBe(279284);
+  expect(proof.total_bytes).toBe(201432);
+  expect(proof.total_kib).toBe(196.71);
+  expect(proof.total_bytes).toBeLessThanOrEqual(300 * 1024);
+  expect(proof.files.some(file => file.subset === 'latin-ext')).toBe(false);
   expect(proof.be_vietnam_pro_tnum).toBe(false);
 });
 

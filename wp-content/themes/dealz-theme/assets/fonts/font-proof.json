@@ -11,13 +11,6 @@
     {
       "family": "Be Vietnam Pro",
       "weight": "400",
-      "subset": "latin-ext",
-      "file": "be-vietnam-pro-400-latin-ext.woff2",
-      "bytes": 13056
-    },
-    {
-      "family": "Be Vietnam Pro",
-      "weight": "400",
       "subset": "latin",
       "file": "be-vietnam-pro-400-latin.woff2",
       "bytes": 21168
@@ -28,13 +21,6 @@
       "subset": "vietnamese",
       "file": "be-vietnam-pro-600-vietnamese.woff2",
       "bytes": 12176
-    },
-    {
-      "family": "Be Vietnam Pro",
-      "weight": "600",
-      "subset": "latin-ext",
-      "file": "be-vietnam-pro-600-latin-ext.woff2",
-      "bytes": 13608
     },
     {
       "family": "Be Vietnam Pro",
@@ -53,13 +39,6 @@
     {
       "family": "Be Vietnam Pro",
       "weight": "700",
-      "subset": "latin-ext",
-      "file": "be-vietnam-pro-700-latin-ext.woff2",
-      "bytes": 13852
-    },
-    {
-      "family": "Be Vietnam Pro",
-      "weight": "700",
       "subset": "latin",
       "file": "be-vietnam-pro-700-latin.woff2",
       "bytes": 22152
@@ -70,13 +49,6 @@
       "subset": "vietnamese",
       "file": "bricolage-grotesque-700-vietnamese.woff2",
       "bytes": 8608
-    },
-    {
-      "family": "Bricolage Grotesque",
-      "weight": "700",
-      "subset": "latin-ext",
-      "file": "bricolage-grotesque-700-latin-ext.woff2",
-      "bytes": 18668
     },
     {
       "family": "Bricolage Grotesque",
@@ -95,20 +67,13 @@
     {
       "family": "Bricolage Grotesque",
       "weight": "800",
-      "subset": "latin-ext",
-      "file": "bricolage-grotesque-800-latin-ext.woff2",
-      "bytes": 18668
-    },
-    {
-      "family": "Bricolage Grotesque",
-      "weight": "800",
       "subset": "latin",
       "file": "bricolage-grotesque-800-latin.woff2",
       "bytes": 41344
     }
   ],
-  "total_bytes": 279284,
-  "total_kib": 272.74,
+  "total_bytes": 201432,
+  "total_kib": 196.71,
   "be_vietnam_pro_tnum": false,
   "be_vietnam_pro_features": [
     "ccmp",
@@ -120,5 +85,18 @@
     "mark",
     "mkmk",
     "numr"
-  ]
+  ],
+  "latin_ext_removed": true,
+  "latin_ext_coverage_scan": {
+    "source_files_scanned": 12,
+    "latin_ext_only_required_codepoints": [],
+    "unsupported_characters_already_outside_all_subsets": [
+      "U+2301",
+      "U+2726",
+      "U+2190",
+      "U+2197",
+      "U+2713",
+      "U+FF0B"
+    ]
+  }
 }

@@ -33,3 +33,4 @@ jobs:
           python -m pip install --disable-pip-version-check pyyaml fonttools brotli
           python scripts/validate_openapi.py
           python scripts/check-font-metrics.py
+          python scripts/check-font-subsets.py

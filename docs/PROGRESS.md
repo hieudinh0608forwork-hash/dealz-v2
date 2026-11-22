@@ -129,3 +129,9 @@ Last reconciled: 2026-11-22 (UTC)
 ## Input-border contrast decision verified (2026-11-22)
 - Recalculated `#7C948A` on white/cream/mint-50: 3.25079:1 / 3.04038:1 / 3.00095:1. Nearby lightened candidates `#7D958B` (2.96252:1) and `#7C948B` (2.99825:1) fail on mint-50. Retained `--dealz-input-border: #7C948A`; no token change.
 - Updated `docs/DECISIONS.md`, `docs/design-contrast.md`, and `docs/11_DESIGN_RULES.md` together.
+
+
+## Font subset optimization (2026-11-22)
+- Removed five latin-ext WOFF2 subsets after a source scan of 12 theme files found zero codepoints requiring latin-ext but not covered by Latin or Vietnamese. Added `scripts/check-font-subsets.py` to reproduce this check in PHP syntax CI.
+- Kept Latin + Vietnamese subsets and all required weights. Removed files total 77,852 bytes; payload falls from 279,284 bytes (272.74 KiB) to 201,432 bytes (196.71 KiB), under 300 KiB. `fonts.css` still uses unicode-range; theme preload remains exactly two files.
+- Browser font test now checks the new payload, ≤300 KiB budget and absence of latin-ext. The six already-uncovered decorative symbols remain on fallback fonts; no regression introduced by this subset removal.
