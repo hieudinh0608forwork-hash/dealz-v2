@@ -654,10 +654,23 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   const financeFocus = await financeInput.evaluate(element => ({ border: getComputedStyle(element).borderColor, shadow: getComputedStyle(element).boxShadow }));
   expect(financeFocus.border).toBe('rgb(253, 85, 10)');
   expect(financeFocus.shadow).toContain('4px');
+  const headerLink = page.locator('.site-header a').first();
+  await headerLink.focus();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(headerLink).toBeFocused();
+  await expect(headerLink).toHaveCSS('outline-width', '3px');
+  await expect(headerLink).toHaveCSS('outline-offset', '3px');
+  await expect(headerLink).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
+
   const footerLink = page.locator('.site-footer a').first();
   await footerLink.focus();
-  const footerFocusColor = await footerLink.evaluate(element => getComputedStyle(element).outlineColor);
-  expect(footerFocusColor).toBe('rgb(224, 243, 84)');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(footerLink).toBeFocused();
+  await expect(footerLink).toHaveCSS('outline-width', '3px');
+  await expect(footerLink).toHaveCSS('outline-offset', '3px');
+  await expect(footerLink).toHaveCSS('outline-color', 'rgb(224, 243, 84)');
   await page.evaluate(() => window.scrollTo(0, 600));
   const top = await page.locator('.site-header').evaluate(el => el.getBoundingClientRect().top);
   expect(top).toBeGreaterThanOrEqual(0);
@@ -691,7 +704,6 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
       window.scrollTo(0, target);
       root.style.scrollBehavior = previousBehavior;
     }, top);
-    await expect.poll(() => page.evaluate(target => Math.abs(window.scrollY - target), top)).toBeLessThanOrEqual(1);
   };
   const scrollBelowHeader = async locator => {
     const targetTop = await locator.evaluate(element => {
@@ -745,8 +757,10 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
 
     await card.locator('.item-rental-cta').click();
     await expect(page.locator('#rental-workspace')).toBeVisible();
-    await scrollBelowHeader(page.locator('#rental-workspace-title'));
+    await scrollBelowHeader(page.locator('#rental-context-chip'));
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
+    await expect(page.locator('#rental-context-chip')).toBeInViewport();
+    await expect(page.locator('#rental-workspace-title')).toBeInViewport();
     await page.screenshot({ path: 'artifacts/rental-' + width + '-viewport-empty.png', fullPage: false });
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();

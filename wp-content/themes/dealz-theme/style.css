@@ -30,7 +30,7 @@ a:hover { color: var(--dealz-orange-text); }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
-body #primary :focus-visible {
+body :focus-visible {
 	outline-width: 3px !important;
 	outline-style: solid !important;
 	outline-color: var(--dealz-focus-outline) !important;

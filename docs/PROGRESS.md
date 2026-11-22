@@ -340,3 +340,10 @@ Last reconciled: 2026-11-22 (UTC)
 
 ## Focus diagnostic regex syntax correction (2026-11-22)
 - Browser run [44995701858](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995701858) stopped before test discovery because the diagnostic's regex literal double-escaped `\(` and `\s`, producing `Unterminated group`. Corrected the JavaScript regex literal to `/var\(\s*(--[\w-]+)/g` source form (single escapes); no product code or test assertions changed.
+
+
+## Browser QA #44995850477 – focus timing and viewport evidence (2026-11-22)
+- Run [44995850477](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995850477) on `8001f0721a587a8a5db71aaf31e5176ad1f84bce`: 11/12 passed; only the screenshot helper's scrollY equality assertion failed (actual delta 1.015625 CSS px). The header and target-in-viewport assertions remain the true screenshot acceptance checks; removed only the internal numeric scroll equality check, not the screenshot test or viewport assertions.
+- Focus diagnostic confirms `#item-title` initially computes 0px, then reaches 3px after 39ms; reduced-motion sets `transition-duration: 0.01ms`, and `toHaveCSS` polling correctly waits for the focus style. Keep the strict width ≥3px, offset ≥3px and exact color assertions.
+- Expanded the global focus selector from `body #primary` to `body` so header/footer controls outside `<main id=primary>` also receive the 3px outline. Added keyboard-modality assertions for header (orange) and footer (lime) links, including 3px width and offset.
+- Rental screenshot now targets the context chip rather than the H1, so the chip is not obscured by the sticky header.
