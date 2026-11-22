@@ -90,6 +90,10 @@ jobs:
           unzip -oq "$GITHUB_WORKSPACE/dist/dealz-theme.zip" -d "$GITHUB_WORKSPACE/wp-content/themes"
           test -f wp-content/plugins/dealz-core/dealz-core.php
           test -f wp-content/themes/dealz-theme/style.css
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite structure '/%postname%/' --hard
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite flush --hard
+          echo "WordPress permalink_structure:"
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get permalink_structure
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
 
@@ -149,6 +153,8 @@ jobs:
             docker compose logs --tail 80 >&2 || true
             exit 1
           fi
+          echo "Verifying the query-string REST route as a secondary health assertion"
+          curl -fsS "http://127.0.0.1:8080/?rest_route=/dealz/v1/health" | tee /tmp/health-rest-route.json | jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' >/dev/null
           cat /tmp/health.json
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
             global $wpdb;

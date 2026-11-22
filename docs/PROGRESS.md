@@ -394,3 +394,10 @@ Last reconciled: 2026-11-22 (UTC)
 - Minimal CI-only correction in [`3d251bcd`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/3d251bcdc96951770763052ca9ba3de9d7e2a61a): health polling follows up to three redirects with `curl -sS -L --max-redirs 3`, records both final HTTP status and `url_effective`, and still requires HTTP 200 plus the unchanged three-field JSON assertion. The 30-attempt/two-second poll, `set -o pipefail`, hard `exit 1`, and failure diagnostics remain; no `continue-on-error` and no assertion changes.
 - Corrected the permalink diagnostic to `wp option get permalink_structure`; no change to `home`/`siteurl`, route registration, or application configuration.
 - PR #10 remains Draft; no merge/deploy. C1–C7 remain Implemented pending owner review of QA screenshots. Chromium only; Safari, Firefox and physical devices remain untested.
+
+
+## Pretty permalink correction and secondary health assertion (22/11/2026)
+- Run 45037743426 confirmed the pretty REST URL returned 301 then 200 HTML at the trailing-slash canonical URL; the query-string route returned the expected JSON. Checkout log identifies merge ref `9ad072d187392c838eb303b5492d2e16bef1c4c8` containing head `a59dd5b7a7511f1b1cf98a8e69581adc6a8c338a` into main `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`.
+- Set WordPress permalink structure to `/%postname%/` and hard-flush rewrite rules immediately after fresh core install; print the resulting `permalink_structure`.
+- Keep the primary `/wp-json/dealz/v1/health` poll, redirect-following, HTTP 200 requirement and unchanged JSON contract. Add `?rest_route=` as a separate secondary JSON assertion only; it does not replace the primary endpoint. Keep `set -o pipefail`, bounded retries, diagnostics and hard failure.
+- No product assertions, application code, production settings or merge/deploy state changed. Await CI evidence on the new branch head.
