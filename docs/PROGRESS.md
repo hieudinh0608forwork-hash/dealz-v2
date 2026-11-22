@@ -506,4 +506,4 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 
 ## T8 – bằng chứng chuyển động (23/11/2026)
 - Thêm test riêng bật video Playwright cho hover CTA chính trang chủ; test đo transition-duration=0.16s, xác nhận computed transform đổi khi hover, chờ chuyển động kết thúc, chụp trạng thái mặc định/hover và click kiểm tra liên kết #create-trip.
-- Video WebM do Playwright tự ghi nằm trong test-results của artifact dealz-browser-qa; ảnh đối chiếu: artifacts/motion-primary-default.png và artifacts/motion-primary-hover.png. Chỉ Chromium; không tuyên bố kiểm thử Safari/Firefox.
+- Video WebM được ghi bằng BrowserContext riêng (recordVideo) và lưu tại artifacts/motion-primary-hover.webm; ảnh đối chiếu: artifacts/motion-primary-default.png và artifacts/motion-primary-hover.png. Cách bật video bằng test.use trong describe bị Playwright từ chối vì yêu cầu worker mới; đã thay bằng BrowserContext riêng, không đổi cấu hình cho các test còn lại. Chỉ Chromium; không tuyên bố kiểm thử Safari/Firefox.

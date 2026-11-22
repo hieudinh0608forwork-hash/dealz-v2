@@ -900,11 +900,15 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
   }
 });
 
-test.describe('T8 motion evidence', () => {
-  test.use({ video: 'on' });
-
-  test('records the primary CTA hover transition', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
+test('T8 motion evidence: records the primary CTA hover transition', async ({ browser }) => {
+  fs.mkdirSync('artifacts', { recursive: true });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    recordVideo: { dir: 'artifacts' }
+  });
+  const page = await context.newPage();
+  const video = page.video();
+  try {
     await signIn(page);
     const cta = page.locator('.hero-section__cta');
     await expect(cta).toBeVisible();
@@ -923,6 +927,9 @@ test.describe('T8 motion evidence', () => {
 
     await cta.click();
     await expect(page).toHaveURL(/#create-trip/);
-  });
+  } finally {
+    await context.close();
+  }
+  await video.saveAs('artifacts/motion-primary-hover.webm');
 });
 
