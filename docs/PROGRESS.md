@@ -297,3 +297,8 @@ Last reconciled: 2026-11-22 (UTC)
 ## Screenshot scroll behavior correction (2026-11-22)
 - The 27-image matrix showed the site header still clipped in rental/edit captures after `window.scrollTo(0, 0)`. Root cause: the theme sets `html { scroll-behavior: smooth; }`, so the scroll reset animated and screenshots were captured before the scroll reached 0.
 - Changed all screenshot-matrix top resets to explicit `behavior: 'instant'`; existing assertions still require ≥90% of the site header and active screen title/summary in the viewport. This removes animation timing from evidence capture without adding sleeps or changing production scroll behavior.
+
+
+## Finance input focus test correction (2026-11-22)
+- Browser run [44993898346](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993898346) on `179d160638639e340026134681d0ff426bc046b5`: 11/12 passed. Lint [44993898298](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993898298), Integration [44993898316](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993898316), Fresh install [44993898368](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993898368) passed.
+- Remaining assertion expected #FD550A and 4px halo on `#expense-amount`, but the test helper had collapsed the expense `<details>` after inserting fixtures. The test called `.focus()` on a hidden input, so it remained at its neutral #7C948A border. Open the expense details, assert the input is visible and focused, then retain the exact #FD550A and 4px checks. This corrects the test setup, not the acceptance criteria.

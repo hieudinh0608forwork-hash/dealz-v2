@@ -571,8 +571,12 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   expect(backLinkFocus.style).not.toBe('none');
   expect(parseFloat(backLinkFocus.width)).toBeGreaterThanOrEqual(3);
   expect(parseFloat(backLinkFocus.offset)).toBeGreaterThanOrEqual(3);
+  const expenseDetails = page.locator('.finance-card').nth(1);
+  await expenseDetails.locator('summary').click();
   const financeInput = page.locator('#expense-amount');
+  await expect(financeInput).toBeVisible();
   await financeInput.focus();
+  await expect(financeInput).toBeFocused();
   const financeFocus = await financeInput.evaluate(element => ({ border: getComputedStyle(element).borderColor, shadow: getComputedStyle(element).boxShadow }));
   expect(financeFocus.border).toBe('rgb(253, 85, 10)');
   expect(financeFocus.shadow).toContain('4px');
