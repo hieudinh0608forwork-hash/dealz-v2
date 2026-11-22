@@ -51,7 +51,41 @@ jobs:
       - name: Run desktop and mobile browser scenarios
         run: |
           mkdir -p artifacts
-          tests/browser/node_modules/.bin/playwright test tests/browser/itinerary.spec.cjs --reporter=line
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/playwright-results.json tests/browser/node_modules/.bin/playwright test tests/browser/itinerary.spec.cjs --reporter=line,json
+
+      - name: Export readable Playwright error log
+        if: always()
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          lines = ["DealZ Browser QA error report"]
+          report_path = Path("artifacts/playwright-results.json")
+          if report_path.exists():
+              report = json.loads(report_path.read_text(encoding="utf-8"))
+              def visit(suite):
+                  for spec in suite.get("specs", []):
+                      for test in spec.get("tests", []):
+                          for result in test.get("results", []):
+                              if result.get("status") not in ("passed", "skipped"):
+                                  lines.append(f"\\nFAILED: {spec.get('title', '(unnamed test)')}")
+                                  for error in result.get("errors", []):
+                                      lines.append(error.get("message", str(error)))
+                                      if error.get("stack"):
+                                          lines.append(error["stack"])
+                  for child in suite.get("suites", []):
+                      visit(child)
+              for suite in report.get("suites", []):
+                  visit(suite)
+          for context_file in sorted(Path("test-results").rglob("error-context.md")):
+              lines.append(f"\\n--- {context_file} ---")
+              lines.append(context_file.read_text(encoding="utf-8", errors="replace"))
+          if len(lines) == 1:
+              lines.append("No failed test error records.")
+          Path("artifacts/playwright-errors.txt").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          PY
 
       - name: Upload browser screenshots and report
         if: always()

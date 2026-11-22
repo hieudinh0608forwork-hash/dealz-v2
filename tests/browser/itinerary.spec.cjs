@@ -32,6 +32,28 @@ function assertNoUnexpectedBrowserErrors(errors, allowExpectedApiAbort = false) 
   expect(errors.pageErrors, 'Uncaught browser page errors').toEqual([]);
 }
 
+async function addFinanceFixtures(page) {
+  await page.locator('.finance-card').first().locator('summary').click();
+  await page.locator('#budget-description').fill('Ngân sách xe máy fixture');
+  await page.locator('#budget-unit-amount').fill('450000');
+  await page.locator('#create-budget-submit').click();
+  await expect(page.locator('#budget-lines-list .finance-row')).toHaveCount(1);
+
+  await page.locator('.finance-card').nth(1).locator('summary').click();
+  for (const expense of [
+    { amount: '180000', note: 'Bữa trưa fixture', time: '2027-04-01T12:00' },
+    { amount: '95000', note: 'Nước uống fixture', time: '2027-04-01T14:00' }
+  ]) {
+    await page.locator('#expense-amount').fill(expense.amount);
+    await page.locator('#expense-occurred-at').fill(expense.time);
+    await page.locator('#expense-note').fill(expense.note);
+    await page.locator('#create-expense-submit').click();
+    await expect(page.locator('#expenses-list .finance-row')).toHaveCount(
+      expense.note.startsWith('Bữa') ? 1 : 2
+    );
+  }
+}
+
 async function expectScreenState(page, visibleSelector, hiddenSelectors) {
   await expect(page.locator(visibleSelector)).toBeVisible();
   for (const selector of hiddenSelectors) {
@@ -474,23 +496,46 @@ test('one primary action per active screen and CLS budget', async ({ page }) => 
   expect(cls).toBeLessThan(0.1);
 });
 
-test('capture home, itinerary and rental screenshots at all required viewports', async ({ page }) => {
+test('capture home, itinerary, edit panel, rental and styleguide viewport screenshots at required widths', async ({ page }) => {
+  test.setTimeout(120000);
   await signIn(page);
-  const widths = [360, 390, 768, 1024, 1280, 1536];
+  const widths = [360, 390, 768, 1024, 1280];
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto(BASE_URL + '/');
-    await page.screenshot({ path: 'artifacts/home-' + width + '.png', fullPage: true });
+    await page.goto(BASE_URL + '/#explore');
+    await expect(page.locator('.hero-section')).toBeVisible();
+    await page.screenshot({ path: 'artifacts/home-' + width + '-default.png', fullPage: false });
   }
+
   await createTripAndDay(page, 'QA responsive screenshots DealZ');
-  await addStop(page, 'Điểm dừng ảnh QA', 'Đà Nẵng');
+  await addStop(page, 'Điểm dừng ảnh QA A', 'Đà Nẵng');
+  await addStop(page, 'Điểm dừng ảnh QA B', 'Hội An');
+  await addFinanceFixtures(page);
+  await expect(page.locator('.itinerary-item-card--stop')).toHaveCount(2);
+  await expect(page.locator('#expenses-list .finance-row')).toHaveCount(2);
+
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.screenshot({ path: 'artifacts/itinerary-' + width + '.png', fullPage: true });
-    await page.locator('.item-rental-cta').click();
+    await expect(page.locator('#itinerary-workspace')).toBeVisible();
+    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-default.png', fullPage: false });
+
+    const card = page.locator('.itinerary-item-card--stop').first();
+    await card.locator('summary').click();
+    await expect(card.locator('.item-edit-details')).toHaveAttribute('open', '');
+    await page.screenshot({ path: 'artifacts/itinerary-' + width + '-edit-open.png', fullPage: false });
+    await card.locator('summary').click();
+
+    await card.locator('.item-rental-cta').click();
     await expect(page.locator('#rental-workspace')).toBeVisible();
-    await page.screenshot({ path: 'artifacts/rental-' + width + '.png', fullPage: true });
+    await page.screenshot({ path: 'artifacts/rental-' + width + '-empty.png', fullPage: false });
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  }
+
+  await page.goto(BASE_URL + '/styleguide/');
+  await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeVisible();
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({ path: 'artifacts/styleguide-' + width + '-default.png', fullPage: false });
   }
 });

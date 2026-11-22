@@ -146,3 +146,11 @@ Last reconciled: 2026-11-22 (UTC)
 ## Be Vietnam Pro digit widths measured (2026-11-22)
 - PHP syntax workflow [44989847815](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989847815) ran `fontTools` against `be-vietnam-pro-400-latin.woff2`, unitsPerEm=1000. Advance widths: 0=676, 1=385, 2=651, 3=660, 4=710, 5=660, 6=680, 7=594, 8=634, 9=680; 8 unique widths, not tabular.
 - Kept Be Vietnam Pro. Removed false reliance on `font-variant-numeric: tabular-nums` for these fields; `.item-time`, `.budget-summary__tile strong` and `.finance-row__side strong` now have min-width and right alignment. `font-proof.json`, the font metrics CI script, browser assertions, DECISIONS and design rules record the same measurement.
+
+
+## Browser screenshot and error artifact matrix (2026-11-22)
+- Reworked the screenshot test to capture viewport-only images (not full-page) at 360, 390, 768, 1024 and 1280px for Explore home, itinerary fixture (one day, two main stops, budget and two expenses), open stop-edit panel, empty rental handoff and admin styleguide. Filenames follow `screen-viewport-state.png`, e.g. `itinerary-390-edit-open.png`.
+- Header, mobile navigation and any configured floating action are captured in viewport coordinates; the clean-install Zalo action remains absent because no owner URL was supplied.
+- Browser workflow now emits `artifacts/playwright-results.json` and a readable `artifacts/playwright-errors.txt` including Playwright failures and `error-context.md` snapshots. Artifact upload includes both screenshots and text logs.
+- Screenshot suite timeout is 120 seconds to accommodate the expanded 25-image matrix; assertions and test count remain unchanged.
+- Pending new Browser QA artifact/run evidence.
