@@ -52,3 +52,13 @@ Last reconciled: 2026-11-22 (UTC)
 - Browser failures on run #62: busy-state test was intercepting a badge aggregation GET before the selected-day list request; viewport matrix included WordPress core `.adminbar-input` (27×24px); keyboard focus on form inputs had `outline: 0`; primary CTA count included the still-visible landing-page hero while itinerary workspace was open.
 - This audit supersedes any earlier claim that all follow-up fixes were already present: code inspection found the admin-bar exclusion and per-day badge cache were not in the actual PR head.
 - Follow-up implementation is in progress; do not mark T6/T7 Verified until the new head has all four workflows green and Browser QA passes the complete 12-test suite.
+
+
+## Owner decisions recorded (2026-11-22, part 2)
+- `docs/13_HANDOFF_COMPLETION.md` is a process standard, not the Master Handoff. The future Master Handoff path is `docs/MASTER_HANDOFF.md`; it has not yet been authored.
+- Four-main-stop cap: count only active, unarchived `Điểm dừng chính`; exclude `Bữa ăn` and `Thẻ nhỏ`; preserve legacy over-limit data and block additions only.
+- Itinerary badge: count unarchived stops for the selected trip; hide at zero.
+- Be Vietnam Pro remains unchanged. Measure glyph 0–9 advance widths with fontTools; if not tabular, preserve font and use right-aligned min-width columns for time/money.
+- Font budget ≤300 KiB; preload only two files; use unicode-range; test removing latin-ext first while retaining latin and Vietnamese glyph coverage.
+- Input border: measure on white, cream and mint-50; choose minimum color meeting 3:1 on all three. Prior `#7C948A` values remain provisional until verified against the actual three backgrounds; `#6F887D` is only an estimate.
+- Supersedes the earlier owner-input notes: meal exclusion, badge definition and the identity of `13_HANDOFF_COMPLETION.md` are now decided. Zalo URL and licensed destination photography remain owner-supplied.

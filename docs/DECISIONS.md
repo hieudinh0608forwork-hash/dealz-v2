@@ -66,3 +66,38 @@ Ma trận hiện hành chỉ đo các cặp thực sự dùng trong UI, theo yê
 - Viền focus input `#FD550A` trên trắng: 3,24:1. Quầng 4px alpha 0,16 composite thành `#FFE4D8`, 1,21:1; chỉ trang trí, không thay viền đặc.
 - Outline focus `#D63F00` đạt tối thiểu 3,90:1 trên nền sáng; trên forest dùng lime `#E0F354`, đạt 6,44:1.
 - Chữ kem trên nút `#D63F00` chỉ đạt 4,30:1 nên bị loại; nút chính dùng chữ trắng (4,59:1). Chữ cam `#C43A00` trên mint-100 chỉ dùng cho chữ lớn (4,51:1).
+
+
+## 11. Master Handoff và tiêu chuẩn quy trình (22/11/2026)
+- `docs/13_HANDOFF_COMPLETION.md` là tiêu chuẩn quy trình hoàn thành, KHÔNG phải Master Handoff và KHÔNG được dùng làm nguồn sự thật dự án.
+- Master Handoff chính thức sẽ nằm tại `docs/MASTER_HANDOFF.md`; chưa có file này thì ghi nhận là chưa tạo, không suy diễn nội dung từ tiêu chuẩn quy trình.
+
+## 12. Giới hạn bốn điểm dừng chính mỗi ngày
+- Chỉ đếm mục có loại `Điểm dừng chính`.
+- Mục `Bữa ăn` và `Thẻ nhỏ` không tính vào giới hạn.
+- Mục đã lưu trữ không tính.
+- Dữ liệu cũ vượt giới hạn không bị sửa, xóa hoặc tự lưu trữ; chỉ chặn thao tác thêm mới khi ngày đó đã có từ bốn điểm dừng chính chưa lưu trữ.
+- Áp dụng nhất quán tại REST API, OpenAPI, UI và integration/browser tests.
+
+## 13. Định nghĩa badge Hành trình
+- Badge là tổng số điểm dừng chưa lưu trữ của chuyến đi đang được chọn.
+- Badge ẩn khi tổng bằng 0.
+- Không cộng bữa ăn hoặc thẻ nhỏ nếu chúng không phải loại `Điểm dừng chính`; badge vẫn đếm mọi điểm dừng chưa lưu trữ theo định nghĩa này. (Nếu implementation hiện tại dùng mọi `stop`, phải đối chiếu model và sửa cho đúng định nghĩa loại.)
+
+## 14. Be Vietnam Pro và số tabular
+- Không đổi họ font Be Vietnam Pro chỉ vì thiếu OpenType `tnum`.
+- Dùng fontTools đọc advance width của glyph số 0–9 từ WOFF2 đang dùng và ghi kết quả đo; chỉ kết luận tabular sẵn nếu mười advance width bằng nhau.
+- Nếu advance width không bằng nhau, giữ font; các trường số tiền và giờ phải có cột `min-width` phù hợp và căn phải để ổn định bố cục.
+- Không khai báo hỗ trợ `tnum` giả.
+
+## 15. Ngân sách font và subset
+- Tổng WOFF2 mục tiêu tối đa 300 KiB.
+- Chỉ preload hai tệp font.
+- Dùng `unicode-range` cho subset.
+- Thử loại subset latin-ext trước, giữ latin và vietnamese; kiểm tra toàn bộ ký tự cần dùng trong nội dung, tiêu đề, biểu mẫu và tiếng Việt trước khi chấp nhận thay đổi.
+- Không bỏ glyph cần thiết để đạt ngân sách; nếu thiếu ký tự, giữ subset phù hợp và ghi rõ số đo.
+
+## 16. Viền ô nhập
+- Đo màu viền thực tế trên cả ba nền input có thể dùng: trắng, kem và mint-50.
+- Chọn giá trị tối thiểu đạt tương phản ít nhất 3:1 trên cả ba nền; `#7C948A` là ứng viên đã có số đo cũ, `#6F887D` chỉ là ước tính cần đo, không được ghi là kết quả.
+- Ghi công thức/giá trị đo, token cuối cùng và cập nhật `docs/design-contrast.md`, `docs/11_DESIGN_RULES.md` trong cùng commit khi đổi token.
