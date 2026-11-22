@@ -159,8 +159,6 @@ body :focus-visible {
 	box-shadow: 0 10px 24px var(--dealz-primary-shadow);
 }
 .button--primary:hover { background: var(--dealz-primary-hover); color: var(--dealz-white); box-shadow: 0 12px 28px var(--dealz-primary-shadow-hover); }
-/* This form submit uses the darker primary shade for a larger WCAG contrast margin. */
-#create-item-submit.button--primary:not(:disabled) { background: var(--dealz-primary-hover); color: var(--dealz-white); }
 .button:disabled { opacity: 1; cursor: not-allowed; transform: none; box-shadow: none; }
 .hero-section__note { margin: 14px 0 0; color: var(--dealz-muted); font-size: 13px; }
 

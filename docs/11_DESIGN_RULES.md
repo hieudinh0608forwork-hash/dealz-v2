@@ -121,7 +121,7 @@ Không suy diễn trạng thái `Implemented`, `Tested` hoặc `Verified` ngoài
 
 - Ink, ink-2, label đạt ≥4,5:1 trên trắng, kem, mint-50, mint-100, lime-50, orange-50.
 - Placeholder #5F776D chỉ dùng trên input trắng; chữ cam #C43A00 dùng trên trắng/kem/mint-50/lime-50/orange-50, trên mint-100 chỉ khi chữ lớn.
-- Nút chính #D63F00 dùng chữ trắng; không dùng chữ kem trên nền nút (4,30:1). CTA form `#create-item-submit` dùng nền #B93400 + chữ trắng (5,91:1) để tăng dư địa tương phản. Chữ trắng/kem trên forest lần lượt 7,90:1 / 7,39:1.
+- Nút chính #D63F00 dùng chữ trắng; không dùng chữ kem trên nền nút (4,30:1). Chữ trắng/kem trên forest lần lượt 7,90:1 / 7,39:1.
 - Viền input #7C948A đạt tối thiểu 3,00095:1 với nền xung quanh mint-50; input có nền trắng. Không đổi sang #6F887D. Viền thẻ #CFE0D8 không đổi.
 - Viền focus input #FD550A đạt 3,24:1 trên trắng; quầng alpha 4px chỉ trang trí. Outline ngoài #D63F00 đặc đạt ≥3,90:1 trên nền sáng; trên forest dùng lime (6,44:1).
 - Xem docs/design-contrast.md và scripts/check-design-contrast.php để có ma trận và gate CI.

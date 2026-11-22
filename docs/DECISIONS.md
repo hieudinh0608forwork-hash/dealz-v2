@@ -16,7 +16,6 @@ Tài liệu này ghi lại các quyết định do chủ dự án chốt. Không
 ## 3. Màu cam
 - Chữ cam trên nền kem: `#C43A00`, tỷ lệ tương phản tham chiếu đã chốt 4,97:1.
 - Nền nút chính giữ `#D63F00`; chữ trắng trên nền này có tỷ lệ tương phản tham chiếu 4,59:1.
-- Riêng CTA biểu mẫu `#create-item-submit` dùng `--dealz-primary-hover` `#B93400` với chữ trắng (5,91:1) để tăng dư địa tương phản; không thay đổi token primary toàn cục.
 
 ## 4. Focus của ô nhập
 - Vòng focus bên ngoài: outline đặc 3px `#D63F00`, offset 3px.

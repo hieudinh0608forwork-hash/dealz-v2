@@ -370,3 +370,12 @@ Last reconciled: 2026-11-22 (UTC)
 - Docker smoke sửa đường dẫn kiểm tra ZIP thành `$GITHUB_WORKSPACE/dist/...`; kiểm tra file tồn tại và size >0, nếu thiếu dừng với thông báo FAIL rõ ràng. Unzip dùng đường dẫn tuyệt đối vào hai thư mục bind-mounted WordPress plugin/theme.
 - Cài WordPress sạch; kiểm tra ZIP root/header/loại file phát triển/quét secret; kích hoạt plugin trước theme; health endpoint phải đúng JSON; xác minh chính xác schema 1.2.0, đủ 8 bảng và mỗi bảng có cột; deactivate/activate plugin, deactivate/activate theme, kiểm tra lại schema và health.
 - Đây là đúng một lượt CI bổ sung được chủ dự án cấp cho lỗi Docker ZIP; không rerun nếu có workflow đỏ. PR #10 vẫn Draft; không merge/deploy. C1–C7 vẫn Implemented chờ duyệt ảnh.
+
+
+## Docker smoke health polling correction (22/11/2026)
+- Browser QA trên HEAD `df92eec6aecbcae1b95edebd84d0759da0b28398`: 12/12 passed; focus 3px #D63F00/offset 3px, axe, six viewport/control matrix, overflow, primary action và screenshot capture đều pass. [Artifact ảnh QA](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44997616761/artifacts/14744761160).
+- Docker run `44997616740` exit 4 tại lệnh `curl -fsS http://localhost:8080/wp-json/dealz/v1/health | jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false'`; log cho thấy plugin cycle/schema sentinel đã pass, nhưng không có JSON output cho jq.
+- Thay one-shot request bằng bounded poll 30 vòng tới đúng published WordPress endpoint `http://127.0.0.1:8080/wp-json/dealz/v1/health`, mỗi lần curl có connect/overall timeout, bắt buộc response không rỗng và jq kiểm tra đúng ba field; hết 60 giây sẽ FAIL rõ ràng. Không continue-on-error.
+- Bỏ theme deactivate/reactivate (WP-CLI không có lệnh deactivate theme); không chạy theme lifecycle giả. Giữ plugin deactivate/activate và kiểm tra lại 8 bảng/schema 1.2.0.
+- Hoàn nguyên CSS CTA override và các dòng tài liệu #B93400 từ df92eec. Primary CTA vẫn #D63F00 + chữ trắng; không đổi test/tiêu chí sản phẩm.
+- Đây là lượt Docker smoke bổ sung duy nhất được cấp. PR #10 vẫn Draft; không merge/deploy; C1–C7 chờ chủ dự án duyệt ảnh.

@@ -38,7 +38,6 @@ Phương pháp: WCAG relative luminance, sRGB linearization, ratio (L1 + 0.05) /
 | Trắng #FFFFFF trên forest #015D47 | 7,90:1 | Đạt |
 | Kem #FBF7EE trên forest #015D47 | 7,39:1 | Đạt |
 | Trắng #FFFFFF trên nút #D63F00 | 4,59:1 | Đạt; nút chính dùng chữ trắng |
-| Trắng #FFFFFF trên CTA biểu mẫu #B93400 | 5,91:1 | Đạt; dùng riêng cho `#create-item-submit` để tăng dư địa tương phản |
 | Kem #FBF7EE trên nút #D63F00 | 4,30:1 | Không đạt; loại khỏi cách dùng, không dùng chữ kem trên nút chính |
 
 ### Focus
@@ -71,7 +70,6 @@ Phương pháp: WCAG relative luminance, sRGB linearization, ratio (L1 + 0.05) /
 - Placeholder trên kem/mint/lime/orange: không sử dụng; input bắt buộc nền trắng.
 - Chữ cam trên mint-100 ở cỡ chữ thường: không đạt ngưỡng chữ thường; chỉ cho phép chữ lớn, ratio 4,51:1.
 - Chữ kem trên nút #D63F00: ratio 4,30:1; loại khỏi UI, nút chính dùng chữ trắng.
-- CTA `#create-item-submit` dùng nền `--dealz-primary-hover` `#B93400` và chữ trắng (5,91:1); token primary chung `#D63F00` không thay đổi.
 - Viền thẻ #CFE0D8: viền trang trí, không dùng làm ranh giới duy nhất của control tương tác; không áp ngưỡng 3:1.
 - Quầng focus alpha: không được tính là chỉ báo focus duy nhất; outline/viền focus đặc mới là chỉ báo đạt ngưỡng.
 - Placeholder/viền input trên forest: không có input trên forest trong layout hiện tại; không thuộc cặp đang dùng.
