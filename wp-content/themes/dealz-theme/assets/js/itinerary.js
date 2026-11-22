@@ -416,12 +416,12 @@
 		input.placeholder = 'HH:MM';
 		input.autocomplete = 'off';
 		input.addEventListener('input', function () {
-			const digits = input.value.replace(/\\D/g, '').slice(0, 4);
+			const digits = input.value.replace(/\D/g, '').slice(0, 4);
 			input.value = digits.length > 2 ? digits.slice(0, 2) + ':' + digits.slice(2) : digits;
 			input.setCustomValidity('');
 		});
 		input.addEventListener('blur', function () {
-			const valid = /^(?:[01]\\d|2[0-3]):[0-5]\\d$/.test(input.value);
+			const valid = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(input.value);
 			input.setCustomValidity(input.value && !valid ? 'Nhập giờ theo định dạng HH:MM.' : '');
 		});
 	}

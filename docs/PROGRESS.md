@@ -90,3 +90,5 @@ Last reconciled: 2026-11-22 (UTC)
 - Kept unset time as the explicit card label “Chưa đặt giờ”; added browser assertion for this state.
 - Browser QA now exercises the field in separate `en-US` and `vi-VN` contexts, asserting the input type, mask and stable `09:30` value.
 - Pending CI evidence on this commit.
+
+- Follow-up inspection caught over-escaping in the first HH:MM mask commit; corrected the JavaScript digit and hour regex literals in this commit. This is a source correction, not a test change.
