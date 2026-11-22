@@ -520,11 +520,16 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
       const style = getComputedStyle(element);
       const matchingRules = Array.from(document.styleSheets).flatMap(sheet => {
         try {
-          const collect = (rules, conditions = []) => Array.from(rules).flatMap(rule => {
-            if (rule.cssRules) return collect(rule.cssRules, conditions.concat(rule.conditionText || rule.constructor.name));
-            if (!rule.selectorText || !rule.style || !/outline/i.test(rule.style.cssText) || !element.matches(rule.selectorText)) return [];
-            return [{ href: sheet.href, selector: rule.selectorText, cssText: rule.style.cssText, conditions }];
-          });
+          const collect = (rules, conditions = []) => {
+            const found = [];
+            for (const rule of Array.from(rules)) {
+              if (rule.selectorText && rule.style && element.matches(rule.selectorText) && /outline/i.test(rule.style.cssText)) {
+                found.push({ href: sheet.href, selector: rule.selectorText, cssText: rule.style.cssText, conditions });
+              }
+              if (rule.cssRules) found.push(...collect(rule.cssRules, conditions.concat(rule.conditionText || rule.constructor.name)));
+            }
+            return found;
+          };
           return collect(sheet.cssRules);
         } catch (error) {
           return [{ href: sheet.href, inaccessible: String(error) }];
