@@ -417,11 +417,11 @@ Last reconciled: 2026-11-22 (UTC)
 
 ## Verified CI trên cùng một HEAD (22/11/2026)
 
-- **Tested/Verified code HEAD:** `d3f35b66e6ae129419685a786ce2ebb0acb6f4ae`.
-- **PR merge ref SHA từ log checkout của cả năm run:** `1ed42b73035430db6f5fa3c58d42ef578d796e26`; merge ref này chứa HEAD trên vào base `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`. Đã đối chiếu log checkout của từng run, không suy ra từ PR metadata.
-- **Bốn workflow nghiệm thu: 4/4 xanh trên cùng HEAD và merge ref:** [PHP syntax – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155797) · [WordPress integration – success, 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155802) · [Docker Compose smoke – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155842) · [Browser QA – success, 12/12](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155790).
-- Package ZIP workflow cũng xanh: [Package DealZ installable ZIPs](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155795).
-- Artifact ảnh/log Chromium: [dealz-browser-qa – 4,245,273 bytes](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155790/artifacts/14761945182). ZIP cài đặt: [dealz-installable-zips](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155795/artifacts/14761201876). Bằng chứng ZIP được cài từ thư mục sạch trong Docker: [dealz-zip-install-proof](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155842/artifacts/14760902920).
+- **Tested/Verified code HEAD:** `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7`.
+- **PR merge ref SHA:** `5ac1ddbda3d789acf4b7d6bf3b88ca1b7ba8563a`; commit message xác nhận merge `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7` vào base `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc` (hai parent đúng thứ tự base/head).
+- **Bốn workflow nghiệm thu: 4/4 xanh trên cùng HEAD và merge ref:** [PHP syntax – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532831) · [WordPress integration – success, 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532830) · [Docker Compose smoke – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532892) · [Browser QA – success, 12/12](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532902).
+- Package ZIP workflow cũng xanh trên cùng HEAD: [Package DealZ installable ZIPs](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532848).
+- Artifact ảnh/log Chromium và artifact ZIP/Docker trước đây thuộc các run HEAD d3f35b66, không gắn nhầm chúng cho HEAD 2d1725ab. Run package mới: [Package DealZ installable ZIPs](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040532848).
 - Docker smoke: permalink `/%postname%/` đã được set và hard flush; primary endpoint trả HTTP 200 + JSON đúng ngay lần poll đầu; assertion phụ `?rest_route=` chạy riêng; schema 1.2.0, tám bảng và vòng deactivate/activate plugin đều pass. Lỗi namespace escape trong assertion cuối đã sửa ở commit `d3f35b66`; đây là lần sửa thứ năm, không còn lượt sửa Docker smoke dự phòng.
 
 ## Đối chiếu UI_BRIEF với code tại HEAD đã Verified
@@ -451,3 +451,10 @@ Last reconciled: 2026-11-22 (UTC)
 - T8: Planned, chưa tự chấm; chỉ thực hiện sau khi chủ dự án duyệt ảnh C1–C7.
 - Browser QA chỉ chạy Chromium. Chưa test Safari, Firefox hoặc thiết bị thật; không tuyên bố đã kiểm thử toàn hệ thống.
 - PR #10 vẫn Draft; không merge, không deploy.
+
+
+## Đính chính bằng chứng CI (22/11/2026)
+- Báo cáo trước ghi nhầm code HEAD `d3f35b66` và merge ref `1ed42b73`; không dùng hai giá trị này làm bằng chứng nghiệm thu của đợt cuối.
+- Đã kiểm tra trực tiếp metadata GitHub của cả năm run: tất cả `head_sha` đều là `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7`, trạng thái `completed/success`.
+- Merge ref `5ac1ddbda3d789acf4b7d6bf3b88ca1b7ba8563a` có hai parent theo thứ tự `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc` và `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7`; message: `Merge 2d1725abb35f3cb3ebbdd861487b8cc5caae34a7 into 59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`.
+- PR #10 hiện được API REST xác nhận `state=open`, `draft=true`, `merged=false`; head khớp `2d1725ab`.
