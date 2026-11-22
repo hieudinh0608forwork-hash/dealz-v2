@@ -189,3 +189,8 @@ Last reconciled: 2026-11-22 (UTC)
 - These assertions prevent subsequent clicks/axe scans/screenshots from racing the async API render. Test coverage is stronger; no delay was added and no assertion removed.
 
 - Screenshot fixture now closes the budget and expense entry details after creating the two expense records, so the “default itinerary” and “edit panel open” captures show the intended screen state rather than unrelated open finance forms.
+
+
+## Browser QA #44990443176 findings and fixes (2026-11-22)
+- Run on commit `646693a72ab6e85db7f6e984e2a175db12f0238d`: 9 passed / 3 failed. (1) Reorder test's second-card heading selector incorrectly used `h4`; actual stop cards render `h3`. Corrected selector to the actual semantic heading without changing the expected title. (2) Mobile content box measured 298.656px vs 320px target because the timeline list reserved 22px left padding. Mobile stop list now removes the redundant timeline gutter and marker, expands 4px beyond its container, and keeps the stop card with 16px padding; the >=320px assertion remains unchanged. (3) Unset-time fixture reused the prior `09:30` value; explicitly clears the field before creating the no-time stop, preserving the `Chưa đặt giờ` assertion.
+- No test removed or relaxed. Rerun required on the new head.

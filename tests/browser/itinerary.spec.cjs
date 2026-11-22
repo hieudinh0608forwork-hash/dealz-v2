@@ -182,7 +182,7 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await expect(cards).toHaveCount(2);
   await cards.nth(1).getByRole('button', { name: 'Di chuyển lên' }).click();
   await expect(cards.nth(0).locator('h3')).toHaveText('Điểm B');
-  await expect(cards.nth(1).locator('h4')).toHaveText('Điểm A');
+  await expect(cards.nth(1).locator('h3')).toHaveText('Điểm A');
 
   const firstCard = cards.nth(0);
   const details = firstCard.locator('.item-edit-details');
@@ -473,6 +473,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await expect(time).toHaveAttribute('pattern', '(?:[01][0-9]|2[0-3]):[0-5][0-9]');
   await time.fill('09:30');
   await expect(time).toHaveValue('09:30');
+  await time.fill('');
   await page.locator('#item-title').fill('Điểm chưa đặt giờ');
   await page.locator('#create-item-submit').click();
   const unsetTimeCard = page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm chưa đặt giờ' });

@@ -1108,5 +1108,8 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 /* Mobile stop-card content width: remove the redundant outer panel frame, keep each stop card. */
 @media (max-width: 767px) {
 	#day-items-panel.workspace-panel { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+	#day-items-panel .itinerary-item-list { padding-left: 0; margin-inline: -2px; }
+	#day-items-panel .itinerary-item-list::before,
+	#day-items-panel .itinerary-item-card::before { display: none; }
 	#day-items-panel .itinerary-item-card--stop { padding: 16px; }
 }
