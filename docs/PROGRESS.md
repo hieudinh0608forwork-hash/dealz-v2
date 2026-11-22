@@ -280,3 +280,9 @@ Last reconciled: 2026-11-22 (UTC)
 ## Browser QA #44993280135 – nested rule trace correction (2026-11-22)
 - Run [44993280135](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280135) on `40530779ceeda9dc42bfc972ac6a93fe27593175`: 11/12 passed; PHP [44993280180](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280180), Docker [44993280236](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280236) and Integration [44993280242](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280242) passed.
 - `#item-title` still computes `0px solid rgb(14,42,34)` despite `:focus-visible`, root/element token `#D63F00`, and the global important rule. The recursive diagnostic returned no rules because its traversal skipped parent CSSStyleRules when nested rules existed. Corrected traversal to record each matching style rule before descending into nested/media rules. The 3px width and red-color assertions remain strict.
+
+
+## Screenshot viewport header and bento proof refinement (2026-11-22)
+- Visual inspection of artifact [run 44993280135](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280135/artifacts) confirmed rental and edit content were visible but the sticky site header was clipped after element-offset scrolling.
+- Changed itinerary edit and rental screenshots to reset scroll to the top of the active route, assert ≥90% of `.site-header` is in viewport, and assert the screen title/summary is in viewport. Home, itinerary and styleguide captures also assert the header is ≥90% visible.
+- Added two extra bento proof screenshots at 360px and 390px, with the rental-card heading and “Sắp có” chip visible. Required 25-screen matrix remains viewport-only; artifact now has 27 images.
