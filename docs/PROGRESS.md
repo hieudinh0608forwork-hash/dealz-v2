@@ -269,3 +269,9 @@ Last reconciled: 2026-11-22 (UTC)
 
 ## Diagnostic source correction (2026-11-22)
 - Corrected two literal `\\n` sequences accidentally written into the Browser QA JavaScript diagnostic by the previous patch; replaced them with actual line breaks. No test logic, thresholds or assertions changed.
+
+
+## Browser QA #44992995705 – computed focus cascade diagnostics (2026-11-22)
+- Run [44992995705](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992995705) on `a5137e405e75a0f83040745c39ac77e8b1376231`: 11/12 passed. PHP/lint [44992995708](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992995708), Integration [44992995707](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992995707) and fresh install [44992995699](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992995699) passed.
+- Focus diagnostic: `#item-title` is `:focus-visible`, inside `#primary`; root and element token are `#D63F00`; no inline style; matching global rule is loaded and marked important, yet computed result is `0px solid rgb(14,42,34)`. The viewport screenshots and remaining 11 tests passed.
+- Expanded diagnostic to recursively inspect nested CSS rules/media blocks and all matched rules declaring `outline`, including inline WordPress stylesheets. No threshold or expected color was changed.
