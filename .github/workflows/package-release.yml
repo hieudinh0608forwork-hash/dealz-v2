@@ -1,0 +1,49 @@
+name: Package DealZ installable ZIPs
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  push:
+    branches: [ work/ui-rental-cta-browser-migration-2026-11-22 ]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build plugin and theme installable archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cd "$GITHUB_WORKSPACE/wp-content/plugins"
+          zip -r "$GITHUB_WORKSPACE/dist/dealz-core.zip" dealz-core \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*/README*' '*/phpunit.xml*' '*.md'
+          cd "$GITHUB_WORKSPACE/wp-content/themes"
+          zip -r "$GITHUB_WORKSPACE/dist/dealz-theme.zip" dealz-theme \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*.md'
+          for archive in "$GITHUB_WORKSPACE"/dist/*.zip; do
+            test -s "$archive"
+            if unzip -Z1 "$archive" | grep -E '(^|/)(tests|docs|\.github|node_modules)/'; then
+              echo "Excluded development files found in $archive"
+              exit 1
+            fi
+          done
+          unzip -l "$GITHUB_WORKSPACE/dist/dealz-core.zip"
+          unzip -l "$GITHUB_WORKSPACE/dist/dealz-theme.zip"
+
+      - name: Upload installable ZIP artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dealz-installable-zips
+          path: |
+            dist/dealz-core.zip
+            dist/dealz-theme.zip
+          if-no-files-found: warn
+          retention-days: 14

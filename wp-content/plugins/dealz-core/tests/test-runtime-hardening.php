@@ -13,6 +13,40 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 		do_action( 'rest_api_init' );
 	}
 
+	private function assert_index_columns( string $table, string $index_name, array $expected_columns ): void {
+		global $wpdb;
+		$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $table, ARRAY_A );
+		$actual = array();
+		foreach ( (array) $rows as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$actual[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $actual );
+		$this->assertSame( $expected_columns, array_values( $actual ), 'Unexpected columns for index ' . $index_name );
+	}
+
+	private function get_index_snapshot( array $tables ): array {
+		global $wpdb;
+		$snapshot = array();
+		$quote = chr( 96 );
+		foreach ( $tables as $table_key => $table ) {
+			$quoted_table = $quote . str_replace( $quote, $quote . $quote, $table ) . $quote;
+			$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+			$indexes = array();
+			foreach ( (array) $rows as $row ) {
+				$indexes[ $row['Key_name'] ][ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+			foreach ( $indexes as $name => $columns ) {
+				ksort( $columns );
+				$indexes[ $name ] = array_values( $columns );
+			}
+			ksort( $indexes );
+			$snapshot[ $table_key ] = $indexes;
+		}
+		return $snapshot;
+	}
+
 	private function request( string $method, string $route, array $params = array() ): WP_REST_Response {
 		$request = new WP_REST_Request( $method, '/dealz/v1' . $route );
 		if ( ! empty( $params ) ) {
@@ -114,6 +148,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			esc_sql( $first->get_data()['public_id'] )
 		);
 		$this->assertNotFalse( $wpdb->query( $trigger_sql ), 'The rollback test trigger must be created.' );
+		$previous_suppression = $wpdb->suppress_errors( true );
 		try {
 			$this->assertFalse(
 				$repository->reorder_items(
@@ -123,6 +158,7 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 				'A database error after a partial reorder must fail the transaction.'
 			);
 		} finally {
+			$wpdb->suppress_errors( $previous_suppression );
 			$wpdb->query( 'DROP TRIGGER IF EXISTS `' . $trigger_name . '`' );
 		}
 
@@ -132,6 +168,208 @@ class DealZ_Runtime_Hardening_Test extends WP_UnitTestCase {
 			'active'
 		), OBJECT_K );
 		$this->assertEquals( $before, $after_failure, 'A failed UPDATE must roll back earlier position changes in the transaction.' );
+	}
+
+	public function test_migration_from_schema_1_0_preserves_itinerary_data_and_adds_v1_1_v1_2_fields(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$this->assertSame( 201, $itinerary->get_status() );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array(
+			'local_date' => '2027-04-01',
+		) );
+		$this->assertSame( 201, $day->get_status() );
+		$item = $this->request( 'POST', '/days/' . $day->get_data()['public_id'] . '/items', array(
+			'title_snapshot' => 'Dữ liệu cũ cần giữ',
+		) );
+		$this->assertSame( 201, $item->get_status() );
+
+		global $wpdb;
+		$tables = \DealZ\Database\Schema::table_names();
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['items'] . '` DROP INDEX `day_type_status`, DROP COLUMN `item_type`, DROP COLUMN `status`' ) );
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP INDEX `trip_status`, DROP COLUMN `status`' ) );
+		$this->assertNotFalse( $wpdb->query( 'DROP TABLE IF EXISTS `' . $tables['route_legs'] . '`' ) );
+		update_option( 'dealz_db_version', '1.0.0' );
+
+		\DealZ\Database\Schema::maybe_upgrade();
+
+		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
+		foreach ( array(
+			$tables['items'] . '.item_type',
+			$tables['items'] . '.status',
+			$tables['expenses'] . '.status',
+		) as $qualified_column ) {
+			list( $table, $column ) = explode( '.', $qualified_column, 2 );
+			$this->assertNotFalse( $wpdb->get_var( $wpdb->prepare( 'SHOW COLUMNS FROM `' . $table . '` LIKE %s', $column ) ) );
+		}
+		$this->assertSame( $tables['route_legs'], $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tables['route_legs'] ) ) );
+
+		$preserved = $wpdb->get_row( $wpdb->prepare(
+			'SELECT title_snapshot, item_type, status FROM ' . $tables['items'] . ' WHERE public_id = %s',
+			$item->get_data()['public_id']
+		) );
+		$this->assertSame( 'Dữ liệu cũ cần giữ', $preserved->title_snapshot );
+		$this->assertSame( 'stop', $preserved->item_type );
+		$this->assertSame( 'active', $preserved->status );
+		$this->assert_index_columns( $tables['itineraries'], 'trip_status', array( 'trip_id', 'status' ) );
+		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$indexes_before_second_run = $this->get_index_snapshot( $tables );
+		$data_before_second_run = $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, title_snapshot, item_type, status, position FROM ' . $tables['items'] . ' WHERE public_id = %s', $item->get_data()['public_id'] ), ARRAY_A );
+		update_option( 'dealz_db_version', '1.1.0' );
+		\DealZ\Database\Schema::maybe_upgrade();
+		$this->assertSame( $indexes_before_second_run, $this->get_index_snapshot( $tables ), 'A repeated 1.0 to 1.2 migration must not change any index.' );
+		$this->assertSame( $data_before_second_run, $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, title_snapshot, item_type, status, position FROM ' . $tables['items'] . ' WHERE public_id = %s', $item->get_data()['public_id'] ), ARRAY_A ), 'A repeated migration must preserve the sample itinerary row.' );
+		$this->assert_index_columns( $tables['items'], 'day_type_status', array( 'day_id', 'item_type', 'status' ) );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+	}
+
+	public function test_migration_from_schema_1_1_adds_expense_archive_status_without_data_loss(): void {
+		$trip_id = $this->create_trip();
+		global $wpdb;
+		$tables = \DealZ\Database\Schema::table_names();
+		$this->assertNotFalse( $wpdb->query( 'ALTER TABLE `' . $tables['expenses'] . '` DROP INDEX `trip_status`, DROP COLUMN `status`' ) );
+		$public_id = wp_generate_uuid4();
+		$now = current_time( 'mysql', true );
+		$this->assertSame( 1, $wpdb->insert(
+			$tables['expenses'],
+			array(
+				'public_id' => $public_id,
+				'trip_id' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . $tables['trips'] . ' WHERE public_id = %s', $trip_id ) ),
+				'payer_user_id' => get_current_user_id(),
+				'category' => 'food',
+				'amount_minor' => 275000,
+				'currency' => 'VND',
+				'occurred_at' => '2027-04-01 12:00:00',
+				'note' => 'Khoản chi từ schema 1.1',
+				'split_method' => 'none',
+				'created_at' => $now,
+				'updated_at' => $now,
+			)
+		) );
+		update_option( 'dealz_db_version', '1.1.0' );
+
+		\DealZ\Database\Schema::maybe_upgrade();
+
+		$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
+		$preserved = $wpdb->get_row( $wpdb->prepare(
+			'SELECT amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s',
+			$public_id
+		) );
+		$this->assertNotNull( $preserved );
+		$this->assertSame( '275000', (string) $preserved->amount_minor );
+		$this->assertSame( 'Khoản chi từ schema 1.1', $preserved->note );
+		$this->assertSame( 'active', $preserved->status );
+		$this->assert_index_columns( $tables['expenses'], 'trip_status', array( 'trip_id', 'status' ) );
+		$second_run_tables = array( 'items' => $tables['items'], 'expenses' => $tables['expenses'], 'itineraries' => $tables['itineraries'] );
+		$indexes_before_second_run = $this->get_index_snapshot( $second_run_tables );
+		$data_before_second_run = $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s', $public_id ), ARRAY_A );
+		update_option( 'dealz_db_version', '1.1.0' );
+		\DealZ\Database\Schema::maybe_upgrade();
+		$this->assertSame( $indexes_before_second_run, $this->get_index_snapshot( $second_run_tables ), 'A repeated 1.1 to 1.2 migration must not change index definitions.' );
+		$this->assertSame( $data_before_second_run, $wpdb->get_row( $wpdb->prepare( 'SELECT public_id, amount_minor, note, status FROM ' . $tables['expenses'] . ' WHERE public_id = %s', $public_id ), ARRAY_A ), 'A repeated migration must preserve the sample expense row.' );
+	}
+
+	public function test_migration_rejects_wrong_named_index_logs_notifies_admin_and_recovers_cleanly(): void {
+		global $wpdb;
+		$tables = \DealZ\Database\Schema::table_names();
+		$table = $tables['items'];
+		$quote = chr( 96 );
+		$log_path = tempnam( sys_get_temp_dir(), 'dealz-schema-migration-' );
+		$this->assertNotFalse( $log_path );
+		$previous_error_log = ini_get( 'error_log' );
+		$admin_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$wrong_index_installed = false;
+		try {
+			$changed = $wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'status' . $quote . ',' . $quote . 'item_type' . $quote . ')' );
+			$this->assertNotFalse( $changed, 'The test must install an index with the expected name but wrong column order.' );
+			$wrong_index_installed = true;
+			update_option( 'dealz_db_version', '1.1.0' );
+			ini_set( 'error_log', $log_path );
+			\DealZ\Database\Schema::maybe_upgrade();
+			$this->assertSame( '1.1.0', get_option( 'dealz_db_version' ), 'A failed migration must not advance the installed schema version.' );
+			$this->assertStringContainsString( 'day_type_status', (string) get_option( 'dealz_schema_migration_error' ) );
+			$this->assertStringContainsString( 'DealZ schema migration', (string) file_get_contents( $log_path ), 'The mismatch must be written to the PHP error log.' );
+			wp_set_current_user( $admin_id );
+			ob_start();
+			\DealZ\Database\Schema::render_admin_notice();
+			$notice = ob_get_clean();
+			$this->assertStringContainsString( 'notice-error', $notice );
+			$this->assertStringContainsString( 'DealZ database migration failed.', $notice );
+			$this->assertStringNotContainsString( 'day_type_status', $notice, 'Admin notice must not expose SQL/table details.' );
+			$this->assertStringNotContainsString( sys_get_temp_dir(), $notice, 'Admin notice must not expose filesystem paths.' );
+			$this->assertStringNotContainsString( '<script>', $notice );
+			// Restore the exact expected index, then prove a real successful retry clears the error.
+			$wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'day_id' . $quote . ',' . $quote . 'item_type' . $quote . ',' . $quote . 'status' . $quote . ')' );
+			$wrong_index_installed = false;
+			\DealZ\Database\Schema::maybe_upgrade();
+			$this->assertSame( '1.2.0', get_option( 'dealz_db_version' ) );
+			$this->assertFalse( get_option( 'dealz_schema_migration_error', false ), 'Successful migration must delete the previous error option.' );
+			ob_start();
+			\DealZ\Database\Schema::render_admin_notice();
+			$cleared_notice = ob_get_clean();
+			$this->assertSame( '', $cleared_notice, 'Admin notice must disappear after successful recovery.' );
+		} finally {
+			ini_set( 'error_log', (string) $previous_error_log );
+			if ( $wrong_index_installed ) {
+				$wpdb->query( 'ALTER TABLE ' . $quote . $table . $quote . ' DROP INDEX ' . $quote . 'day_type_status' . $quote . ' , ADD KEY ' . $quote . 'day_type_status' . $quote . ' (' . $quote . 'day_id' . $quote . ',' . $quote . 'item_type' . $quote . ',' . $quote . 'status' . $quote . ')' );
+			}
+			update_option( 'dealz_db_version', '1.1.0' );
+			\DealZ\Database\Schema::maybe_upgrade();
+			wp_set_current_user( 0 );
+			if ( is_file( $log_path ) ) {
+				unlink( $log_path );
+			}
+		}
+	}
+
+	public function test_admin_migration_notice_never_displays_sensitive_error_details(): void {
+		$admin_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+		update_option( 'dealz_schema_migration_error', '<script>/var/private/db-password.sql</script>' );
+		ob_start();
+		\DealZ\Database\Schema::render_admin_notice();
+		$notice = ob_get_clean();
+		$this->assertStringContainsString( 'notice-error', $notice );
+		$this->assertStringNotContainsString( '<script>', $notice );
+		$this->assertStringNotContainsString( '/var/private', $notice );
+		$this->assertStringNotContainsString( 'db-password', $notice );
+		delete_option( 'dealz_schema_migration_error' );
+		wp_set_current_user( 0 );
+	}
+	public function test_daily_limit_rejects_fifth_main_stop_but_allows_meals(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array( 'local_date' => '2027-04-01' ) );
+		$day_id = $day->get_data()['public_id'];
+		for ( $index = 1; $index <= 4; $index++ ) {
+			$response = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm ' . $index ) );
+			$this->assertSame( 201, $response->get_status() );
+		}
+		$fifth = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm thứ năm' ) );
+		$this->assertSame( 400, $fifth->get_status() );
+		$this->assertSame( 'dealz_daily_stop_limit', $fifth->get_data()['code'] );
+		$lunch = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'lunch', 'title_snapshot' => 'Bữa trưa' ) );
+		$this->assertSame( 201, $lunch->get_status(), 'Meal cards do not count toward the four main-stop limit.' );
+		$dinner = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'dinner', 'title_snapshot' => 'Bữa tối' ) );
+		$this->assertSame( 201, $dinner->get_status(), 'Dinner cards do not count toward the four main-stop limit.' );
+	}
+
+	public function test_archived_main_stop_does_not_count_toward_daily_limit(): void {
+		$trip_id = $this->create_trip();
+		$itinerary = $this->request( 'POST', '/trips/' . $trip_id . '/itineraries' );
+		$day = $this->request( 'POST', '/itineraries/' . $itinerary->get_data()['public_id'] . '/days', array( 'local_date' => '2027-04-01' ) );
+		$day_id = $day->get_data()['public_id'];
+		$stop_ids = array();
+		for ( $index = 1; $index <= 4; $index++ ) {
+			$response = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm ' . $index ) );
+			$this->assertSame( 201, $response->get_status() );
+			$stop_ids[] = $response->get_data()['public_id'];
+		}
+		$archived = $this->request( 'DELETE', '/items/' . $stop_ids[0] );
+		$this->assertSame( 200, $archived->get_status() );
+		$this->assertSame( 'archived', $archived->get_data()['status'] );
+		$replacement = $this->request( 'POST', '/days/' . $day_id . '/items', array( 'item_type' => 'stop', 'title_snapshot' => 'Điểm thay thế' ) );
+		$this->assertSame( 201, $replacement->get_status(), 'Archived stops must be excluded from the active main-stop count.' );
 	}
 
 	public function test_budget_rejects_zero_quantity_and_integer_overflow(): void {

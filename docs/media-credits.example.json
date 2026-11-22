@@ -1,0 +1,21 @@
+[
+  {
+    "media_id": "REPLACE_WITH_INTERNAL_MEDIA_ID",
+    "item_type": "stop",
+    "item_public_id": "REPLACE_WITH_REAL_ITEM_PUBLIC_ID",
+    "file": "REPLACE_WITH_REVIEWED_LOCAL_FILENAME.webp",
+    "source_url": null,
+    "source_name": "REPLACE_WITH_PHOTOGRAPHER_OR_RIGHTSHOLDER",
+    "author": "REPLACE_WITH_AUTHOR_NAME",
+    "license": "REPLACE_WITH_EXACT_LICENSE_OR_WRITTEN_PERMISSION",
+    "license_url": null,
+    "permission_reference": "REPLACE_WITH_SIGNED_RELEASE_OR_PERMISSION_RECORD",
+    "attribution": "REPLACE_WITH_REQUIRED_ATTRIBUTION_TEXT",
+    "captured_at": null,
+    "verified_by": null,
+    "verified_at": null,
+    "location_match_verified": false,
+    "people_release_verified": false,
+    "approved_for_web": false
+  }
+]

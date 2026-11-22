@@ -41,4 +41,10 @@ jobs:
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
         working-directory: wp-content/plugins/dealz-core
-        run: phpunit -c phpunit.xml.dist
+        run: |
+          set -o pipefail
+          phpunit -c phpunit.xml.dist 2>&1 | tee /tmp/dealz-phpunit.log
+          if grep -F "Duplicate key" /tmp/dealz-phpunit.log; then
+            echo "::error::Migration output contains a duplicate-key warning."
+            exit 1
+          fi

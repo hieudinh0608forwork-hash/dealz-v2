@@ -14,6 +14,52 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build and validate installable ZIP archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd wp-content/plugins
+          zip -qr "$GITHUB_WORKSPACE/dist/dealz-core.zip" dealz-core \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*/README*' '*/phpunit.xml*' '*.md'
+          cd "$GITHUB_WORKSPACE/wp-content/themes"
+          zip -qr "$GITHUB_WORKSPACE/dist/dealz-theme.zip" dealz-theme \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*.md'
+          python - <<'PY'
+          import os, re, zipfile
+          from pathlib import Path
+          workspace = Path(os.environ["GITHUB_WORKSPACE"])
+          archives = [
+              (workspace / "dist/dealz-core.zip", "dealz-core/", "dealz-core/dealz-core.php"),
+              (workspace / "dist/dealz-theme.zip", "dealz-theme/", "dealz-theme/style.css"),
+          ]
+          blocked = re.compile(r"(^|/)\.env(?:\.|$)|(^|/)(?:id_rsa|id_ed25519|[^/]+\.pem|[^/]+\.key)$", re.I)
+          private_key = re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|ci-only-password-not-for-reuse", re.I)
+          for path, root, header in archives:
+              if not path.is_file() or path.stat().st_size == 0:
+                  raise SystemExit(f"FAIL: required release ZIP missing or empty: {path}")
+              with zipfile.ZipFile(path) as z:
+                  names = z.namelist()
+                  files = [name for name in names if not name.endswith("/")]
+                  assert files and all(name.startswith(root) for name in files), f"wrong ZIP root: {path}"
+                  assert header in names, f"missing header file: {header}"
+                  assert not any(re.search(r"(^|/)(tests|docs|\.github|node_modules)/", name) for name in names), f"dev files included: {path}"
+                  assert not any(blocked.search(name) for name in names), f"secret/config filename included: {path}"
+                  for name in files:
+                      assert not private_key.search(z.read(name)), f"private key or CI password in {name}"
+                  source = z.read(header).decode()
+                  if root == "dealz-core/":
+                      assert re.search(r"^\s*\*\s*Plugin Name:\s*DealZ Core\s*$", source, re.M)
+                  else:
+                      assert re.search(r"^Theme Name:\s*DealZ Theme\s*$", source, re.M)
+                  print(f"PASS {path}: root={root}, files={len(files)}, header and secret scan valid")
+          PY
+
+      - name: Prepare empty WordPress plugin and theme mounts for ZIP installation
+        run: |
+          rm -rf wp-content/plugins/dealz-core wp-content/themes/dealz-theme
+          mkdir -p wp-content/plugins/dealz-core wp-content/themes/dealz-theme
+
       - name: Validate Compose configuration
         run: |
           cp .env.example .env
@@ -38,6 +84,16 @@ jobs:
             --admin_password=ci-only-password-not-for-reuse \
             --admin_email=dealz-ci@example.invalid \
             --skip-email
+          test -s "$GITHUB_WORKSPACE/dist/dealz-core.zip" || { echo "FAIL: dealz-core.zip missing or empty" >&2; exit 1; }
+          test -s "$GITHUB_WORKSPACE/dist/dealz-theme.zip" || { echo "FAIL: dealz-theme.zip missing or empty" >&2; exit 1; }
+          unzip -oq "$GITHUB_WORKSPACE/dist/dealz-core.zip" -d "$GITHUB_WORKSPACE/wp-content/plugins"
+          unzip -oq "$GITHUB_WORKSPACE/dist/dealz-theme.zip" -d "$GITHUB_WORKSPACE/wp-content/themes"
+          test -f wp-content/plugins/dealz-core/dealz-core.php
+          test -f wp-content/themes/dealz-theme/style.css
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite structure '/%postname%/' --hard
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite flush --hard
+          echo "WordPress permalink_structure:"
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get permalink_structure
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
 
@@ -65,7 +121,60 @@ jobs:
             if ( get_option( "dealz_smoke_sentinel" ) !== "preserve-me" ) { exit( 1 ); }
             echo "PASS: repeat activation preserved schema and data.\n";
           '
-          curl -fsS http://localhost:8080/wp-json/dealz/v1/health
+          set -o pipefail
+          url="http://127.0.0.1:8080/wp-json/dealz/v1/health"
+          ok=0
+          for i in $(seq 1 30); do
+            response="$(curl -sS -L --max-redirs 3 -o /tmp/health.json -w '%{http_code} %{url_effective}' "$url" 2>/tmp/curl.err || true)"
+            code="${response%% *}"
+            effective_url="${response#* }"
+            if [ "$code" = "200" ] && jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' /tmp/health.json >/dev/null 2>&1; then
+              ok=1
+              echo "PASS: health OK after $i attempt(s); url_effective=$effective_url"
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ok" != "1" ]; then
+            echo "FAIL: last http_code=$code url_effective=${effective_url:-unavailable}" >&2
+            echo "--- body (first 40 lines) ---" >&2
+            head -n 40 /tmp/health.json >&2 || true
+            echo "--- curl stderr ---" >&2
+            cat /tmp/curl.err >&2 || true
+            echo "--- curl -i (no -f) ---" >&2
+            curl -sS -i "$url" | head -n 30 >&2 || true
+            echo "--- rest_route form ---" >&2
+            curl -sS -i "http://127.0.0.1:8080/?rest_route=/dealz/v1/health" | head -n 30 >&2 || true
+            echo "--- site config ---" >&2
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get home >&2 || true
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get siteurl >&2 || true
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get permalink_structure >&2 || true
+            echo "--- container logs ---" >&2
+            docker compose logs --tail 80 >&2 || true
+            exit 1
+          fi
+          echo "Verifying the query-string REST route as a secondary health assertion"
+          curl -fsS "http://127.0.0.1:8080/?rest_route=/dealz/v1/health" | tee /tmp/health-rest-route.json | jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' >/dev/null
+          cat /tmp/health.json
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
+            global $wpdb;
+            if ( get_option( "dealz_db_version" ) !== "1.2.0" ) { exit( 1 ); }
+            foreach ( \DealZ\Database\Schema::table_names() as $table ) {
+              if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) ) !== $table ) { exit( 1 ); }
+              if ( empty( $wpdb->get_results( "SHOW COLUMNS FROM `" . esc_sql( $table ) . "`", ARRAY_A ) ) ) { exit( 1 ); }
+            }
+            echo "PASS: schema 1.2.0 and all eight tables remain valid.\n";
+          '
+          echo "PASS: plugin activation cycle completed; health endpoint was verified above."
+
+      - name: Upload ZIP installation proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dealz-zip-install-proof
+          path: dist/*.zip
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Stop stack and remove ephemeral volumes
         if: always()

@@ -3,6 +3,11 @@
 
 	const config = window.dealzApp || {};
 	const workspace = document.getElementById('itinerary-workspace');
+	const rentalWorkspace = document.getElementById('rental-workspace');
+	const heroSection = document.querySelector('.hero-section');
+	const featureBento = document.querySelector('.feature-bento');
+	const tripsSection = document.getElementById('trips');
+	const nextStepSection = document.querySelector('.next-step-section');
 	const tripList = document.getElementById('trip-list');
 	const sectionHeading = document.querySelector('.trips-section .section-heading');
 	const createTripPanel = document.getElementById('create-trip');
@@ -13,6 +18,8 @@
 	const itemsList = document.getElementById('day-items-list');
 	const dayForm = document.getElementById('create-day-form');
 	const itemForm = document.getElementById('create-item-form');
+	const itemFormPanel = document.getElementById('create-item-panel');
+	const stopAnchorList = document.getElementById('stop-anchor-list');
 	const feedback = document.getElementById('workspace-feedback');
 	const financeFeedback = document.getElementById('finance-feedback');
 	const budgetSummary = document.getElementById('budget-summary');
@@ -29,6 +36,9 @@
 	let activeTripData = null;
 	let activeItinerary = null;
 	let activeDay = null;
+	let activeDayNumber = null;
+	let activeDays = [];
+	const dayItemsCache = new Map();
 	let requestSequence = 0;
 
 	const baseUrl = String(config.restUrl || '').replace(/\/?$/, '/');
@@ -71,28 +81,117 @@
 		feedback.classList.remove('notice--error');
 	}
 
+	function setScreenElement(element, visible) {
+		if (!element) return;
+		element.hidden = !visible;
+		element.inert = !visible;
+	}
+
+	function setHomeScreen(visible) {
+		setScreenElement(heroSection, visible);
+		setScreenElement(featureBento, visible);
+		setScreenElement(nextStepSection, visible);
+	}
+
+	function showExploreScreen() {
+		document.body.classList.remove('is-trip-view', 'is-rental-view');
+		setHomeScreen(true);
+		setScreenElement(tripsSection, false);
+		setScreenElement(workspace, false);
+		setScreenElement(rentalWorkspace, false);
+	}
+
+	function showTripsScreen() {
+		document.body.classList.remove('is-trip-view', 'is-rental-view');
+		setHomeScreen(false);
+		setScreenElement(tripsSection, true);
+		setScreenElement(sectionHeading, true);
+		setScreenElement(tripList, true);
+		setScreenElement(createTripPanel, true);
+		setScreenElement(workspace, false);
+		setScreenElement(rentalWorkspace, false);
+	}
+
 	function showWorkspace() {
-		workspace.hidden = false;
-		if (tripList) tripList.hidden = true;
-		if (sectionHeading) sectionHeading.hidden = true;
-		if (createTripPanel) createTripPanel.hidden = true;
+		document.body.classList.remove('is-rental-view');
+		document.body.classList.add('is-trip-view');
+		setHomeScreen(false);
+		setScreenElement(tripsSection, true);
+		setScreenElement(sectionHeading, false);
+		setScreenElement(tripList, false);
+		setScreenElement(createTripPanel, false);
+		setScreenElement(workspace, true);
+		setScreenElement(rentalWorkspace, false);
 	}
 
 	function hideWorkspace() {
-		workspace.hidden = true;
-		if (tripList) tripList.hidden = false;
-		if (sectionHeading) sectionHeading.hidden = false;
-		if (createTripPanel) createTripPanel.hidden = false;
+		showTripsScreen();
 		activeTrip = null;
 		activeTripData = null;
+		activeDays = [];
+		dayItemsCache.clear();
+		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
 	}
 
+	function updateBadgeDisplay(count) {
+		const badge = document.getElementById('mobile-trip-badge');
+		if (!badge) return;
+		const safeCount = Number.isFinite(count) ? Math.max(0, count) : 0;
+		badge.textContent = String(safeCount);
+		badge.hidden = safeCount === 0;
+		badge.setAttribute('aria-label', safeCount + ' điểm dừng chưa lưu trữ');
+	}
+
+	async function updateTripStopBadge(days) {
+		if (!activeTrip || !Array.isArray(days) || days.length === 0) {
+			updateBadgeDisplay(0);
+			return;
+		}
+		try {
+			const tripAtRequestStart = activeTrip;
+			const missingDays = days.filter(function (day) {
+				return !dayItemsCache.has(day.public_id);
+			});
+			const itemLists = await Promise.all(missingDays.map(function (day) {
+				return api('days/' + encodeURIComponent(day.public_id) + '/items');
+			}));
+			if (tripAtRequestStart !== activeTrip) return;
+			missingDays.forEach(function (day, index) {
+				dayItemsCache.set(day.public_id, itemLists[index]);
+			});
+			let count = 0;
+			days.forEach(function (day) {
+				const items = dayItemsCache.get(day.public_id);
+				if (!Array.isArray(items)) return;
+				count += items.filter(function (item) {
+					return item.item_type === 'stop' && item.status !== 'archived';
+				}).length;
+			});
+			updateBadgeDisplay(count);
+		} catch (error) {
+			// Keep the last confirmed count; a transient read failure must not invent a new count.
+		}
+	}
 	function formatDate(value) {
 		if (!value) return '';
 		const parts = value.split('-');
 		return parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : value;
+	}
+
+	function renderTripMeta() {
+		const meta = document.getElementById('itinerary-workspace-meta');
+		if (!meta || !activeTripData) return;
+		const parts = [];
+		if (activeTripData.start_date && activeTripData.end_date) {
+			parts.push(formatDate(activeTripData.start_date) + ' – ' + formatDate(activeTripData.end_date));
+		}
+		if (activeDays.length > 0) {
+			parts.push(activeDays.length + ' ngày');
+		}
+		meta.textContent = parts.join(' · ');
+		meta.hidden = parts.length === 0;
 	}
 
 	function makeEmpty(message) {
@@ -106,8 +205,10 @@
 
 	async function openTrip(publicId) {
 		if (!publicId) return;
-		if (window.location.hash !== '#trip/' + publicId) {
-			window.location.hash = 'trip/' + publicId;
+		const routeHash = '#route?trip=' + encodeURIComponent(publicId);
+		sessionStorage.setItem('dealz:last-trip', publicId);
+		if (window.location.hash !== routeHash) {
+			window.location.hash = routeHash.slice(1);
 			return;
 		}
 		await loadTrip(publicId);
@@ -121,6 +222,9 @@
 		editor.hidden = true;
 		itemsPanel.hidden = true;
 		activeTrip = publicId;
+		activeDays = [];
+		dayItemsCache.clear();
+		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
 
@@ -128,6 +232,7 @@
 			const trip = await api('trips/' + encodeURIComponent(publicId));
 			if (sequence !== requestSequence) return;
 			activeTripData = trip;
+			renderTripMeta();
 			const dayDateInput = document.getElementById('itinerary-day-date');
 			if (dayDateInput) {
 				dayDateInput.min = trip.start_date || '';
@@ -157,6 +262,11 @@
 			const itineraries = await api('trips/' + encodeURIComponent(activeTrip) + '/itineraries');
 			versionsList.replaceChildren();
 
+			const createItineraryButton = document.getElementById('create-itinerary-btn');
+			if (createItineraryButton) {
+				createItineraryButton.classList.toggle('button--primary', !Array.isArray(itineraries) || itineraries.length === 0);
+				createItineraryButton.classList.toggle('button--secondary', Array.isArray(itineraries) && itineraries.length > 0);
+			}
 			if (!Array.isArray(itineraries) || itineraries.length === 0) {
 				versionsList.append(makeEmpty('Chưa có lịch trình. Tạo một bản thủ công để thêm ngày và điểm dừng.'));
 				editor.hidden = true;
@@ -187,6 +297,8 @@
 	async function selectItinerary(publicId) {
 		activeItinerary = publicId;
 		activeDay = null;
+		activeDays = [];
+		updateBadgeDisplay(0);
 		editor.hidden = false;
 		itemsPanel.hidden = true;
 		versionsList.querySelectorAll('.version-chip').forEach(function (button) {
@@ -199,8 +311,12 @@
 		if (!activeItinerary) return;
 		daysList.replaceChildren(makeEmpty('Đang tải ngày…'));
 		itemsPanel.hidden = true;
+			if (itemFormPanel) itemFormPanel.hidden = true;
 		try {
 			const days = await api('itineraries/' + encodeURIComponent(activeItinerary) + '/days');
+			activeDays = Array.isArray(days) ? days : [];
+			if (activeDays.length === 0) updateBadgeDisplay(0);
+			renderTripMeta();
 			daysList.replaceChildren();
 
 			if (!Array.isArray(days) || days.length === 0) {
@@ -213,24 +329,32 @@
 				button.type = 'button';
 				button.className = 'day-chip';
 				button.textContent = 'Ngày ' + (index + 1) + ' · ' + formatDate(day.local_date);
+				button.setAttribute('aria-label', 'Chọn ngày ' + (index + 1) + ', ' + formatDate(day.local_date));
 				button.dataset.dayId = day.public_id;
 				button.setAttribute('aria-pressed', 'false');
 				button.addEventListener('click', function () {
-					selectDay(day.public_id, day.local_date);
+					selectDay(day.public_id, day.local_date, index + 1);
 				});
 				daysList.append(button);
 			});
 
+			const daySubmit = document.querySelector('#create-day-form button[type="submit"]');
+			if (daySubmit) {
+				daySubmit.classList.toggle('button--primary', days.length === 0);
+				daySubmit.classList.toggle('button--secondary', days.length > 0);
+			}
 			const target = days.find(function (day) { return day.public_id === preferredDayId; }) || days[0];
-			await selectDay(target.public_id, target.local_date);
+			const targetIndex = days.findIndex(function (day) { return day.public_id === target.public_id; });
+			await selectDay(target.public_id, target.local_date, targetIndex + 1);
 		} catch (error) {
 			showFeedback(error.message, true);
 			daysList.replaceChildren(makeEmpty('Không tải được danh sách ngày.'));
 		}
 	}
 
-	async function selectDay(publicId, date) {
+	async function selectDay(publicId, date, dayNumber) {
 		activeDay = publicId;
+		activeDayNumber = dayNumber || null;
 		const validationResults = document.getElementById('validation-results');
 		if (validationResults) { validationResults.hidden = true; validationResults.classList.remove('validation-results--error'); }
 		daysList.querySelectorAll('.day-chip').forEach(function (button) {
@@ -238,6 +362,7 @@
 		});
 		document.getElementById('day-items-title').textContent = 'Điểm dừng · ' + formatDate(date);
 		itemsPanel.hidden = false;
+		if (itemFormPanel) itemFormPanel.hidden = false;
 		await loadItems();
 	}
 
@@ -283,6 +408,27 @@
 		}
 	}
 
+	function attachTimeMask(input) {
+		if (!input) return;
+		input.type = 'text';
+		input.inputMode = 'numeric';
+		input.pattern = '(?:[01][0-9]|2[0-3]):[0-5][0-9]';
+		input.maxLength = 5;
+		input.placeholder = 'HH:MM';
+		input.autocomplete = 'off';
+		input.addEventListener('input', function () {
+			const digits = input.value.replace(/\D/g, '').slice(0, 4);
+			input.value = digits.length > 2 ? digits.slice(0, 2) + ':' + digits.slice(2) : digits;
+			input.setCustomValidity('');
+		});
+		input.addEventListener('blur', function () {
+			const valid = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(input.value);
+			input.setCustomValidity(input.value && !valid ? 'Nhập giờ theo định dạng HH:MM.' : '');
+		});
+	}
+
+	document.querySelectorAll('[data-time-mask]').forEach(attachTimeMask);
+
 	function itemTypeLabel(type) {
 		if (type === 'lunch') return 'Bữa trưa';
 		if (type === 'dinner') return 'Bữa tối';
@@ -293,16 +439,36 @@
 		const isMainStop = item.item_type === 'stop';
 		const card = document.createElement('article');
 		card.className = 'itinerary-item-card ' + (isMainStop ? 'itinerary-item-card--stop' : 'itinerary-item-card--meal');
+		card.id = 'itinerary-item-' + item.public_id;
 
 		if (isMainStop) {
 			const media = document.createElement('div');
-			media.className = 'itinerary-item-card__media';
+			media.className = 'itinerary-item-card__media image-slot image-slot--empty';
 			media.setAttribute('role', 'img');
-			media.setAttribute('aria-label', 'Chưa có ảnh địa điểm được xác minh');
-			const mediaLabel = document.createElement('span');
-			mediaLabel.className = 'itinerary-item-card__media-label';
-			mediaLabel.textContent = 'Chưa có ảnh địa điểm được xác minh';
-			media.append(mediaLabel);
+			media.setAttribute('aria-label', 'Chưa có ảnh cho ' + item.title_snapshot);
+			const contours = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			contours.setAttribute('class', 'image-slot__contours');
+			contours.setAttribute('viewBox', '0 0 900 220');
+			contours.setAttribute('preserveAspectRatio', 'none');
+			contours.setAttribute('aria-hidden', 'true');
+			contours.setAttribute('focusable', 'false');
+			contours.innerHTML = '<g fill="none" stroke="rgba(224,243,84,.16)" stroke-width="1.5"><path d="M-30 45C90 -5 180 100 300 52S520 0 650 58s190 35 290-15"/><path d="M-30 75C90 25 180 130 300 82S520 30 650 88s190 35 290-15"/><path d="M-30 105C90 55 180 160 300 112S520 60 650 118s190 35 290-15"/><path d="M-30 155C90 105 180 210 300 162S520 110 650 168s190 35 290-15"/></g>';
+			const pin = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			pin.setAttribute('class', 'image-slot__pin');
+			pin.setAttribute('viewBox', '0 0 24 24');
+			pin.setAttribute('aria-hidden', 'true');
+			pin.setAttribute('focusable', 'false');
+			pin.innerHTML = '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" fill="var(--dealz-lime)"/><circle cx="12" cy="10" r="2.5" fill="var(--dealz-green)"/>';
+			const footer = document.createElement('div');
+			footer.className = 'image-slot__footer';
+			const mediaTitle = document.createElement('span');
+			mediaTitle.className = 'image-slot__title';
+			mediaTitle.textContent = item.title_snapshot;
+			const mediaStatus = document.createElement('span');
+			mediaStatus.className = 'image-slot__status';
+			mediaStatus.textContent = 'Chưa có ảnh đã xác minh';
+			footer.append(mediaTitle, mediaStatus);
+			media.append(contours, pin, footer);
 			card.append(media);
 		}
 
@@ -315,10 +481,10 @@
 		time.className = 'item-time';
 		time.textContent = item.start_local
 			? item.start_local.slice(0, 5) + (item.end_local ? ' – ' + item.end_local.slice(0, 5) : '')
-			: 'Chưa có giờ';
+			: 'Chưa đặt giờ';
 		top.append(type, time);
 
-		const title = document.createElement('h4');
+		const title = document.createElement('h3');
 		title.textContent = item.title_snapshot;
 		const details = document.createElement('p');
 		details.className = 'itinerary-item-card__details';
@@ -326,6 +492,12 @@
 		if (item.duration_minutes) detailParts.push(item.duration_minutes + ' phút');
 		if (item.address_snapshot) detailParts.push(item.address_snapshot);
 		details.textContent = detailParts.length ? detailParts.join(' · ') : 'Chưa có thời lượng hoặc địa chỉ.';
+		const photoHint = document.createElement('p');
+		photoHint.className = 'itinerary-item-card__photo-hint';
+		photoHint.textContent = 'Góc chụp · Gợi ý chung: ưu tiên toàn cảnh, ánh sáng tự nhiên và giữ chủ thể chính rõ ràng.';
+		const gearHint = document.createElement('p');
+		gearHint.className = 'itinerary-item-card__gear-hint';
+		gearHint.textContent = 'Đồ gợi ý · Chưa có dữ liệu sản phẩm được xác minh.';
 
 		const editDetails = document.createElement('details');
 		editDetails.className = 'item-edit-details';
@@ -341,14 +513,14 @@
 		editInput.setAttribute('aria-label', 'Tên điểm dừng');
 
 		const startInput = document.createElement('input');
-		startInput.type = 'time';
 		startInput.value = item.start_local ? item.start_local.slice(0, 5) : '';
 		startInput.setAttribute('aria-label', 'Giờ đến');
+		attachTimeMask(startInput);
 
 		const endInput = document.createElement('input');
-		endInput.type = 'time';
 		endInput.value = item.end_local ? item.end_local.slice(0, 5) : '';
 		endInput.setAttribute('aria-label', 'Giờ kết thúc');
+		attachTimeMask(endInput);
 
 		const durationInput = document.createElement('input');
 		durationInput.type = 'number';
@@ -363,7 +535,20 @@
 		save.type = 'submit';
 		save.className = 'text-action';
 		save.textContent = 'Lưu thay đổi';
-		editForm.append(editInput, startInput, endInput, durationInput, save);
+		function addEditField(labelText, input) {
+			const label = document.createElement('label');
+			label.className = 'item-edit-field';
+			const caption = document.createElement('span');
+			caption.textContent = labelText;
+			label.append(caption, input);
+			editForm.append(label);
+		}
+		addEditField('Tên điểm dừng', editInput);
+		addEditField('Giờ đến', startInput);
+		addEditField('Giờ kết thúc', endInput);
+		addEditField('Thời lượng (phút)', durationInput);
+		save.className = 'button button--secondary item-edit-save';
+		editForm.append(save);
 		editDetails.append(editSummary, editForm);
 		editForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
@@ -400,13 +585,13 @@
 		moveControls.className = 'item-move-controls';
 		const moveUp = document.createElement('button');
 		moveUp.type = 'button';
-		moveUp.className = 'text-action';
+		moveUp.className = 'button button--icon';
 		moveUp.textContent = '↑';
 		moveUp.setAttribute('aria-label', 'Di chuyển lên');
 		moveUp.disabled = itemIndex <= 0;
 		const moveDown = document.createElement('button');
 		moveDown.type = 'button';
-		moveDown.className = 'text-action';
+		moveDown.className = 'button button--icon';
 		moveDown.textContent = '↓';
 		moveDown.setAttribute('aria-label', 'Di chuyển xuống');
 		moveDown.disabled = itemIndex >= allItems.length - 1;
@@ -436,9 +621,29 @@
 		moveDown.addEventListener('click', function () { moveItem(1); });
 		moveControls.append(moveUp, moveDown);
 
+		if (isMainStop) {
+			const rental = document.createElement('a');
+			rental.className = 'button button--tonal item-rental-cta';
+			rental.href = '#shop';
+			rental.textContent = 'Thuê đồ cho điểm này';
+			rental.setAttribute('aria-label', 'Mở mục thuê đồ cho ' + item.title_snapshot);
+			rental.addEventListener('click', function (event) {
+				event.preventDefault();
+				const params = new URLSearchParams({
+					stop: item.public_id,
+					name: item.title_snapshot,
+					return: window.location.hash,
+					day: activeDayNumber ? 'Ngày ' + activeDayNumber : '',
+					time: item.start_local ? item.start_local.slice(0, 5) : ''
+				});
+				window.location.hash = 'shop?' + params.toString();
+			});
+			actions.append(rental);
+		}
+
 		if (isMainStop && item.address_snapshot) {
 			const directions = document.createElement('a');
-			directions.className = 'text-action item-directions';
+			directions.className = 'button button--tertiary item-directions';
 			directions.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(item.address_snapshot);
 			directions.target = '_blank';
 			directions.rel = 'noopener noreferrer';
@@ -451,24 +656,50 @@
 
 		const archive = document.createElement('button');
 		archive.type = 'button';
-		archive.className = 'text-action text-action--danger';
+		archive.className = 'text-action item-archive-action';
 		archive.textContent = 'Lưu trữ';
-		archive.addEventListener('click', async function () {
-			if (!window.confirm('Lưu trữ nội dung này?')) return;
-			archive.disabled = true;
-			archive.textContent = 'Đang lưu trữ…';
+		const archiveDialog = document.createElement('dialog');
+		archiveDialog.className = 'archive-dialog';
+		const archiveTitle = document.createElement('h3');
+		archiveTitle.textContent = 'Lưu trữ nội dung này?';
+		const archiveDescription = document.createElement('p');
+		archiveDescription.textContent = 'Nội dung sẽ chuyển sang trạng thái lưu trữ và không còn xuất hiện trong danh sách đang hoạt động. Giao diện hiện không có thao tác khôi phục.';
+		const archiveActions = document.createElement('div');
+		archiveActions.className = 'archive-dialog__actions';
+		const cancelArchive = document.createElement('button');
+		cancelArchive.type = 'button';
+		cancelArchive.className = 'button button--secondary';
+		cancelArchive.textContent = 'Giữ lại';
+		const confirmArchive = document.createElement('button');
+		confirmArchive.type = 'button';
+		confirmArchive.className = 'button button--tertiary';
+		confirmArchive.textContent = 'Lưu trữ';
+		cancelArchive.addEventListener('click', function () { archiveDialog.close(); });
+		confirmArchive.addEventListener('click', async function () {
+			confirmArchive.disabled = true;
+			confirmArchive.textContent = 'Đang lưu trữ…';
 			try {
 				await api('items/' + encodeURIComponent(item.public_id), 'DELETE');
+				archiveDialog.close();
 				showFeedback('Đã lưu trữ nội dung.', false);
 				await loadItems();
 			} catch (error) {
 				showFeedback(error.message, true);
-				archive.disabled = false;
-				archive.textContent = 'Lưu trữ';
+				confirmArchive.disabled = false;
+				confirmArchive.textContent = 'Lưu trữ';
 			}
 		});
+		archiveActions.append(cancelArchive, confirmArchive);
+		archiveDialog.append(archiveTitle, archiveDescription, archiveActions);
+		archive.addEventListener('click', function () {
+			document.body.append(archiveDialog);
+			archiveDialog.addEventListener('close', function () { archiveDialog.remove(); }, { once: true });
+			archiveDialog.showModal();
+		});
 		actions.append(archive);
-		card.append(top, title, details, actions);
+		card.append(top, title, details);
+		if (isMainStop) card.append(photoHint, gearHint);
+		card.append(actions);
 		return card;
 	}
 
@@ -479,9 +710,9 @@
 		const icon = document.createElement('span');
 		icon.className = 'route-connector__icon';
 		icon.setAttribute('aria-hidden', 'true');
-		icon.textContent = '🛵';
+		icon.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 17h2l2-6h6l2 6h2M9 11l-1-3h5l2 3M5 17a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 		const label = document.createElement('span');
-		label.textContent = 'Chưa có dữ liệu tuyến đường';
+		label.textContent = 'Chưa có đủ dữ liệu tuyến đường';
 		connector.append(icon, label);
 		return connector;
 	}
@@ -492,12 +723,28 @@
 		itemsList.replaceChildren(makeEmpty('Đang tải điểm dừng…'));
 		try {
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
+			dayItemsCache.set(activeDay, items);
+			await updateTripStopBadge(activeDays);
 			itemsList.replaceChildren();
+			if (stopAnchorList) stopAnchorList.replaceChildren();
+			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop' && item.status !== 'archived'; }).length : 0;
+			const mainStopOption = document.querySelector('#item-type option[value="stop"]');
+			if (mainStopOption) {
+				mainStopOption.disabled = activeMainStops >= 4;
+				mainStopOption.title = activeMainStops >= 4 ? 'Đã đủ 4 điểm dừng chính trong ngày.' : '';
+			}
+			if (activeMainStops >= 4) {
+				const limitNotice = document.createElement('p');
+				limitNotice.className = 'notice notice--warning';
+				limitNotice.setAttribute('role', 'status');
+				limitNotice.textContent = 'Ngày này đã đủ 4 điểm dừng chính. Bạn vẫn có thể thêm thẻ bữa trưa hoặc bữa tối.';
+				itemsList.append(limitNotice);
+			}
 			if (!Array.isArray(items) || items.length === 0) {
 				const empty = makeEmpty('Ngày này chưa có điểm dừng. Thêm điểm chính hoặc thẻ bữa ăn bên dưới.');
 				const action = document.createElement('button');
 				action.type = 'button';
-				action.className = 'button button--primary button--compact';
+				action.className = 'button button--secondary button--compact';
 				action.textContent = 'Thêm nội dung đầu tiên';
 				action.addEventListener('click', function () {
 					itemForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -513,7 +760,18 @@
 				if (item.item_type === 'stop' && previousMainStop) {
 					itemsList.append(makeRoutePlaceholder());
 				}
-				itemsList.append(makeItemCard(item, index, items));
+				const card = makeItemCard(item, index, items);
+				itemsList.append(card);
+				if (stopAnchorList && item.item_type === 'stop') {
+					const anchor = document.createElement('button');
+					anchor.type = 'button';
+					anchor.className = 'stop-anchor-chip';
+					anchor.textContent = item.title_snapshot;
+					anchor.addEventListener('click', function () {
+						card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					});
+					stopAnchorList.append(anchor);
+				}
 				if (item.item_type === 'stop') previousMainStop = true;
 			});
 		} catch (error) {
@@ -803,9 +1061,28 @@
 	}
 
 	if (itemForm) {
+		const titleInput = document.getElementById('item-title');
+		const titleError = document.getElementById('item-title-error');
+		if (titleInput) titleInput.addEventListener('input', function () {
+			if (titleInput.value.trim()) {
+				titleInput.removeAttribute('aria-invalid');
+				if (titleError) titleError.hidden = true;
+			}
+		});
 		itemForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
-			if (!activeDay || !itemForm.reportValidity()) return;
+			if (!activeDay) return;
+			const titleInput = document.getElementById('item-title');
+			const titleError = document.getElementById('item-title-error');
+			if (titleInput && !titleInput.value.trim()) {
+				titleInput.setAttribute('aria-invalid', 'true');
+				if (titleError) titleError.hidden = false;
+				titleInput.focus();
+				return;
+			}
+			if (titleInput) titleInput.removeAttribute('aria-invalid');
+			if (titleError) titleError.hidden = true;
+			if (!itemForm.reportValidity()) return;
 			const values = new FormData(itemForm);
 			const duration = String(values.get('duration_minutes') || '');
 			const start = String(values.get('start_local') || '');
@@ -908,19 +1185,74 @@
 		});
 	}
 
-	window.addEventListener('hashchange', function () {
-		const match = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
-		if (match) {
-			loadTrip(match[1]);
-		} else {
-			hideWorkspace();
+	function showRentalWorkspace(query) {
+		if (!rentalWorkspace) return;
+		hideWorkspace();
+		document.body.classList.remove('is-trip-view');
+		document.body.classList.add('is-rental-view');
+		setHomeScreen(false);
+		setScreenElement(tripsSection, false);
+		setScreenElement(rentalWorkspace, true);
+		const params = new URLSearchParams(query || '');
+		const stopName = params.get('name') || 'điểm dừng đã chọn';
+		const heading = document.getElementById('rental-workspace-title');
+		const context = document.getElementById('rental-stop-context');
+		const contextChip = document.getElementById('rental-context-chip');
+		const back = document.getElementById('rental-back-link');
+		if (heading) heading.textContent = 'Thuê đồ cho ' + stopName;
+		if (context) context.textContent = 'Điểm dừng đang chọn: ' + stopName;
+		if (contextChip) {
+			const contextParts = ['Từ hành trình'];
+			if (params.get('day')) contextParts.push(params.get('day'));
+			if (params.get('time')) contextParts.push(params.get('time'));
+			contextChip.textContent = contextParts.join(' · ');
+			contextChip.hidden = !params.get('stop');
 		}
+		if (back) {
+			const returnTarget = params.get('return') || '#trips';
+			back.href = returnTarget;
+			back.textContent = params.has('stop') && params.has('return') ? '← Quay lại ' + stopName : '← Quay lại hành trình';
+		}
+		const nextAction = rentalWorkspace.querySelector('.rental-empty-state__back');
+		if (nextAction && back) nextAction.href = back.href;
+	}
+
+	function resolveRoute(hash) {
+		const currentHash = hash || '#explore';
+		const shopMatch = currentHash.match(/^#shop(?:\?(.*))?$/);
+		if (shopMatch) {
+			showRentalWorkspace(shopMatch[1] || '');
+			return;
+		}
+		const routeMatch = currentHash.match(/^#route(?:\?(.*))?$/);
+		if (routeMatch) {
+			const routeParams = new URLSearchParams(routeMatch[1] || '');
+			const tripId = routeParams.get('trip') || (currentHash === '#route' ? sessionStorage.getItem('dealz:last-trip') : null);
+			if (tripId && /^[a-f0-9-]{36}$/i.test(tripId)) {
+				sessionStorage.setItem('dealz:last-trip', tripId);
+				loadTrip(tripId);
+			} else {
+				showTripsScreen();
+			}
+			return;
+		}
+		const legacyTripMatch = currentHash.match(/^#trip\/([a-f0-9-]{36})$/i);
+		if (legacyTripMatch) {
+			loadTrip(legacyTripMatch[1]);
+			return;
+		}
+		if (currentHash === '#trips' || currentHash === '#create-trip') {
+			showTripsScreen();
+			return;
+		}
+		showExploreScreen();
+	}
+
+	window.addEventListener('hashchange', function () {
+		resolveRoute(window.location.hash);
 	});
 
 	window.dealzItinerary = { openTrip: openTrip };
 
-	const initialMatch = window.location.hash.match(/^#trip\/([a-f0-9-]{36})$/i);
-	if (initialMatch) {
-		loadTrip(initialMatch[1]);
-	}
+	resolveRoute(window.location.hash);
 })();

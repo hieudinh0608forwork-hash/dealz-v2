@@ -29,6 +29,9 @@ final class Schema {
 	 */
 	private const OPTION_NAME = 'dealz_db_version';
 
+	/** Option containing the most recent schema migration failure. */
+	private const ERROR_OPTION_NAME = 'dealz_schema_migration_error';
+
 	/**
 	 * Run an additive upgrade when required.
 	 *
@@ -42,10 +45,14 @@ final class Schema {
 		}
 
 		if ( ! self::create_tables() ) {
+			if ( ! get_option( self::ERROR_OPTION_NAME, '' ) ) {
+				self::record_migration_error( 'Schema upgrade did not complete; the installed schema version was not changed.' );
+			}
 			return;
 		}
 
 		update_option( self::OPTION_NAME, self::VERSION, false );
+		delete_option( self::ERROR_OPTION_NAME );
 	}
 
 	/**
@@ -233,11 +240,33 @@ final class Schema {
 		) $charset_collate;";
 
 		foreach ( $sql as $index => $statement ) {
+			// dbDelta can mis-detect existing secondary indexes on legacy MySQL schemas.
+			// Keep secondary indexes out of its parser and reconcile them explicitly below.
+			$statement = preg_replace( '/^\s*KEY\s+[A-Za-z0-9_]+\s+\([^\n]+\),?\s*$/m', '', $statement );
+			$statement = preg_replace( '/,\s*\)/', "\n\t\t)", $statement );
 			dbDelta( $statement );
 			$created_table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_names[ $index ] ) );
 
 			if ( $table_names[ $index ] !== $created_table ) {
-				return false;
+				return self::record_migration_error( sprintf( 'Expected table %s was not created.', $table_names[ $index ] ) );
+			}
+		}
+
+		$required_indexes = array(
+			'trips'         => array( 'owner_status' => array( 'owner_user_id', 'status' ), 'owner_dates' => array( 'owner_user_id', 'start_date', 'end_date' ) ),
+			'collaborators' => array( 'invite_email' => array( 'invite_email' ), 'token_hash' => array( 'token_hash' ), 'user_status' => array( 'user_id', 'invitation_status' ) ),
+			'itineraries'   => array( 'trip_status' => array( 'trip_id', 'status' ) ),
+			'days'          => array( 'itinerary_position' => array( 'itinerary_id', 'position' ) ),
+			'items'         => array( 'day_position' => array( 'day_id', 'position' ), 'day_type_status' => array( 'day_id', 'item_type', 'status' ), 'place_lookup' => array( 'place_provider', 'place_provider_id' ) ),
+			'budget_lines'  => array( 'trip_type' => array( 'trip_id', 'cost_type' ), 'trip_category' => array( 'trip_id', 'category' ) ),
+			'expenses'      => array( 'trip_occurred' => array( 'trip_id', 'occurred_at' ), 'trip_status' => array( 'trip_id', 'status' ), 'payer_user' => array( 'payer_user_id' ) ),
+			'route_legs'    => array( 'itinerary_status' => array( 'itinerary_id', 'status' ) ),
+		);
+		foreach ( $required_indexes as $table_key => $indexes ) {
+			foreach ( $indexes as $index_name => $columns ) {
+				if ( ! self::ensure_secondary_index( $tables[ $table_key ], $index_name, $columns ) ) {
+					return false;
+				}
 			}
 		}
 
@@ -261,6 +290,85 @@ final class Schema {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Ensure a secondary index exists with the declared column order.
+	 *
+	 * @param string        $table      Table name.
+	 * @param string        $index_name Index name.
+	 * @param array<string> $columns    Ordered index columns.
+	 * @return bool
+	 */
+	private static function ensure_secondary_index( string $table, string $index_name, array $columns ): bool {
+		global $wpdb;
+		$quote = chr( 96 );
+		$quoted_table = $quote . str_replace( $quote, $quote . $quote, $table ) . $quote;
+		$rows = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+		$existing = array();
+		foreach ( (array) $rows as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$existing[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $existing );
+		if ( array_values( $existing ) === $columns ) {
+			return true;
+		}
+		if ( ! empty( $existing ) ) {
+			return self::record_migration_error( sprintf( 'Index %s on table %s has columns (%s); expected (%s). The migration stopped without changing the schema version.', $index_name, $table, implode( ', ', array_values( $existing ) ), implode( ', ', $columns ) ) );
+		}
+		$quoted_columns = array_map( static function ( string $column ) use ( $quote ): string {
+			return $quote . str_replace( $quote, $quote . $quote, $column ) . $quote;
+		}, $columns );
+		$quoted_index = $quote . str_replace( $quote, $quote . $quote, $index_name ) . $quote;
+		$sql = 'ALTER TABLE ' . $quoted_table . ' ADD KEY ' . $quoted_index . ' (' . implode( ',', $quoted_columns ) . ')';
+		if ( false === $wpdb->query( $sql ) ) {
+			return self::record_migration_error( sprintf( 'Could not create index %s on table %s: %s', $index_name, $table, $wpdb->last_error ) );
+		}
+		$verified = $wpdb->get_results( 'SHOW INDEX FROM ' . $quoted_table, ARRAY_A );
+		$actual = array();
+		foreach ( (array) $verified as $row ) {
+			if ( $index_name === $row['Key_name'] ) {
+				$actual[ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+		}
+		ksort( $actual );
+		if ( array_values( $actual ) !== $columns ) {
+			return self::record_migration_error( sprintf( 'Index %s on table %s failed post-creation verification; expected (%s), found (%s).', $index_name, $table, implode( ', ', $columns ), implode( ', ', array_values( $actual ) ) ) );
+		}
+		return true;
+	}
+
+	/**
+	 * Persist and log a migration failure without advancing the schema version.
+	 *
+	 * @param string $message Failure detail.
+	 * @return false
+	 */
+	private static function record_migration_error( string $message ): bool {
+		update_option( self::ERROR_OPTION_NAME, $message, false );
+		error_log( '[DealZ schema migration] ' . $message );
+		return false;
+	}
+
+	/**
+	 * Display the latest schema migration failure to administrators.
+	 *
+	 * @return void
+	 */
+	public static function render_admin_notice(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$message = get_option( self::ERROR_OPTION_NAME, '' );
+		if ( ! is_string( $message ) || '' === $message ) {
+			return;
+		}
+
+		// Keep SQL errors, table names and environment details in the server log only.
+		// The dashboard notice is intentionally generic and escaped.
+		echo '<div class="notice notice-error"><p>' . esc_html__( 'DealZ database migration failed. Check the server error log or contact the site administrator.', 'dealz-core' ) . '</p></div>';
 	}
 
 	/**

@@ -21,10 +21,16 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           find wp-content -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Enforce design token and contrast matrices
+        run: |
+          php scripts/check-css-tokens.php
+          php scripts/check-design-contrast.php
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Validate OpenAPI contract
         run: |
-          python -m pip install --disable-pip-version-check pyyaml
+          python -m pip install --disable-pip-version-check pyyaml fonttools brotli
           python scripts/validate_openapi.py
+          python scripts/check-font-metrics.py
+          python scripts/check-font-subsets.py

@@ -1,0 +1,53 @@
+name: Fetch official local font assets
+
+on:
+  push:
+    branches: [ work/ui-rental-cta-browser-migration-2026-11-22 ]
+    paths:
+      - .github/workflows/fetch-local-fonts.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-fonts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch WOFF2 subsets from official Google Fonts
+        run: |
+          python scripts/fetch_google_fonts.py
+          test -s assets/fonts/fonts.css
+          find assets/fonts -type f -maxdepth 1 -printf '%f %s bytes\n'
+      - name: Inspect Be Vietnam Pro tabular figures
+        run: |
+          python -m pip install --disable-pip-version-check fonttools brotli
+          python - <<'PY'
+          import glob, json
+          from fontTools.ttLib import TTFont
+          files = glob.glob('assets/fonts/be-vietnam-pro-*.woff2')
+          tags = set()
+          for path in files:
+              font = TTFont(path)
+              for table_name in ('GSUB', 'GPOS'):
+                  if table_name in font:
+                      records = getattr(font[table_name].table.FeatureList, 'FeatureRecord', [])
+                      tags.update(record.FeatureTag for record in records)
+          proof_path = 'assets/fonts/font-proof.json'
+          proof = json.load(open(proof_path, encoding='utf-8'))
+          proof['be_vietnam_pro_tnum'] = 'tnum' in tags
+          proof['be_vietnam_pro_features'] = sorted(tags)
+          json.dump(proof, open(proof_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+          print('Be Vietnam Pro tnum:', proof['be_vietnam_pro_tnum'])
+          PY
+      - name: Package generated font assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: dealz-official-local-fonts
+          path: assets/fonts/
+          if-no-files-found: error
+          retention-days: 7

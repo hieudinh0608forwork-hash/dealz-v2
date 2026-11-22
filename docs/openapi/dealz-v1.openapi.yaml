@@ -218,6 +218,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ItineraryItem'
         '400':
+          description: Invalid item payload or dealz_daily_stop_limit when a fifth active main stop is submitted; lunch and dinner items are excluded from this limit.
           $ref: '#/components/responses/BadRequest'
   /items/{public_id}:
     parameters:
