@@ -121,16 +121,18 @@ jobs:
           url="http://127.0.0.1:8080/wp-json/dealz/v1/health"
           ok=0
           for i in $(seq 1 30); do
-            code="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$url" 2>/tmp/curl.err || true)"
+            response="$(curl -sS -L --max-redirs 3 -o /tmp/health.json -w '%{http_code} %{url_effective}' "$url" 2>/tmp/curl.err || true)"
+            code="${response%% *}"
+            effective_url="${response#* }"
             if [ "$code" = "200" ] && jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' /tmp/health.json >/dev/null 2>&1; then
               ok=1
-              echo "PASS: health OK after $i attempt(s)"
+              echo "PASS: health OK after $i attempt(s); url_effective=$effective_url"
               break
             fi
             sleep 2
           done
           if [ "$ok" != "1" ]; then
-            echo "FAIL: last http_code=$code" >&2
+            echo "FAIL: last http_code=$code url_effective=${effective_url:-unavailable}" >&2
             echo "--- body (first 40 lines) ---" >&2
             head -n 40 /tmp/health.json >&2 || true
             echo "--- curl stderr ---" >&2
@@ -142,7 +144,7 @@ jobs:
             echo "--- site config ---" >&2
             docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get home >&2 || true
             docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get siteurl >&2 || true
-            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite structure >&2 || true
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get permalink_structure >&2 || true
             echo "--- container logs ---" >&2
             docker compose logs --tail 80 >&2 || true
             exit 1
