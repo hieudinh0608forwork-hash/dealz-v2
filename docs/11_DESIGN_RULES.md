@@ -21,10 +21,10 @@
 | Tiêu đề lớn | Bricolage Grotesque | 800, 40–84px, dòng ~1.02, giãn −0.03em |
 | Tiêu đề nhỏ, tên thẻ | Bricolage Grotesque | 700, 22–28px |
 | Nội dung, menu, nút, ô nhập | Be Vietnam Pro | 400/600/700, 16–17px, dòng 1.6 |
-| Giá, giờ | Be Vietnam Pro | 700, số đều (tabular-nums) |
+| Giá, giờ | Be Vietnam Pro | 700, cột min-width phù hợp và căn phải; không dựa vào tnum |
 
 - Tối đa 2 họ font, 4 độ đậm: 400, 600, 700, 800.
-- File woff2 nằm trong theme; dùng `font-display: swap`, có font dự phòng, không gọi font từ mạng ngoài.
+- File WOFF2 nằm trong theme; dùng `font-display: swap`, `unicode-range` cho subset latin/vietnamese, có font dự phòng, không gọi font từ mạng ngoài. Tổng WOFF2 ≤300 KiB; chỉ preload hai file Vietnamese quan trọng.
 - Không in hoa nhãn; không tô màu riêng một từ trong tiêu đề.
 - Dòng chữ tối đa khoảng 70 ký tự.
 - Kiểm tra hiển thị chuỗi "Ướ ặ ẫ ỡ ọ" ở tiêu đề, nội dung và ô nhập.
@@ -109,7 +109,7 @@ Các ghi nhận dưới đây là trạng thái triển khai tại nhánh `work/
 | Hạng mục | Tình trạng | Còn thiếu / giới hạn |
 |---|---|---|
 | CSS design tokens | Token màu tập trung tại `assets/css/tokens.css`; CI có gate cấm hex ngoài file này và gate ma trận tương phản | Cần giữ các token semantic đồng bộ khi thêm component |
-| Font | Bricolage Grotesque 700/800 và Be Vietnam Pro 400/600/700 đã tải từ Google Fonts, subset latin/latin-ext/vietnamese, WOFF2 và OFL được lưu cục bộ | Be Vietnam Pro không có OpenType `tnum`; tổng WOFF2 279.284 bytes (272,74 KiB), cao hơn mục tiêu xấp xỉ 220 KiB. Không tự đổi font |
+| Font | Bricolage Grotesque 700/800 và Be Vietnam Pro 400/600/700 tự lưu WOFF2 + OFL; subset latin/vietnamese, có unicode-range; latin-ext đã bỏ sau coverage scan 12 file | Tổng 201.432 bytes (196,71 KiB), dưới giới hạn 300 KiB; chỉ preload 2 file; Be Vietnam Pro không có `tnum`, số tiền/giờ dùng min-width và căn phải |
 | App shell | Header sticky, mobile nav island, footer và 3 trang legal draft noindex; Zalo chỉ hiện khi HTTPS option được cấu hình | Chưa có URL Zalo do chủ dự án chưa cung cấp |
 | Itinerary | Rail ngày, timeline, empty rental 7/5 và giới hạn 4 điểm dừng chính/ngày đã được triển khai; badge đếm stop chưa lưu trữ | Badge/meal behavior cần xác nhận với chủ dự án; chưa có ảnh thật/giấy phép |
 | Browser QA | Workflow Chromium desktop/mobile và artifact screenshot tồn tại | Chưa có bằng chứng Firefox, Safari, thiết bị thật hoặc screen reader |
