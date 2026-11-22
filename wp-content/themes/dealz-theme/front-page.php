@@ -21,7 +21,7 @@ get_header();
 			<p class="hero-section__note"><?php esc_html_e( 'Bạn chủ động lựa chọn và chỉnh sửa thông tin chuyến đi.', 'dealz-theme' ); ?></p>
 		</div>
 		<div class="hero-art">
-			<img class="hero-art__photo" src="<?php echo esc_url( get_theme_file_uri( '/assets/img/hero-danang-rail.webp' ) ); ?>" width="426" height="533" alt="<?php esc_attr_e( 'Tàu hỏa chạy qua cầu đá giữa rừng xanh, nhìn ra biển', 'dealz-theme' ); ?>" fetchpriority="high" decoding="async">
+			<img class="hero-art__photo" src="<?php echo esc_url( get_theme_file_uri( '/assets/img/hero-danang-rail.webp' ) ); ?>" width="852" height="1066" alt="<?php esc_attr_e( 'Tàu hỏa chạy qua cầu đá giữa rừng xanh, nhìn ra biển', 'dealz-theme' ); ?>" fetchpriority="high" decoding="async">
 			<div class="hero-art__label">Đà Nẵng <span>·</span> Hội An</div>
 		</div>
 	</section>
