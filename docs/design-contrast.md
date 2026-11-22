@@ -109,3 +109,11 @@ Phương pháp: chuyển từng kênh sRGB sang linear, tính relative luminance
 
 - Lần axe báo serious `color-contrast` tại `#create-item-submit` trong commit `df92eec`, foreground/background computed của lần báo lỗi ban đầu: **chưa xác định**. Không suy diễn cặp màu từ kết quả thay thế.
 - Override thử `#B93400` (5,91:1) đã được hoàn nguyên; nút chính hiện giữ `#D63F00` theo quyết định thiết kế (4,595:1). Browser QA 12/12 trên commit `df92eec` sau hoàn nguyên; điều này không thay thế bằng chứng axe ban đầu và không chứng minh riêng computed pair của lần báo lỗi.
+
+
+## Phạm vi đối chiếu và các cặp chưa đo (22/11/2026)
+
+- Đã đối chiếu từng dòng ma trận với kết quả chạy `scripts/check-design-contrast.php` trên HEAD: các giá trị làm tròn khớp output của script (script passed).
+- **Giới hạn của phép đo viền input:** chỉ thử `#7C948A` và hai giá trị lân cận làm sáng một kênh (`#7D958B`, `#7C948B`), chưa quét toàn bộ dải màu để chứng minh `#7C948A` là giá trị sáng nhất đạt ≥3:1. Kết luận "giữ `#7C948A`" dựa trên các giá trị đã thử; biên 3,00095:1 trên mint-50 rất mỏng.
+- Chưa đo: viền input `#7C948A` trên mint-100, lime-50, orange-50 (không nằm trong nền ngoài được phép của input, nên chưa có phép đo); viền focus `#FD550A` trên nền input không phải trắng (input luôn nền trắng); placeholder `#5F776D` trên nền khác trắng (không dùng).
+- Tỷ lệ cho text/link ngoài ma trận (ví dụ chữ trong thẻ trạng thái, badge) chưa được liệt kê riêng: chưa đo.
