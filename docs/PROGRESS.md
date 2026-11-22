@@ -70,3 +70,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Failure 2: axe reported serious `color-contrast` on `#create-item-submit`. During async reload it is disabled; opacity 0.6 composited white text against the primary background. Root fix removes disabled opacity and applies mint-100 + muted ink to disabled primary buttons.
 - Failure 3: focus outline width 0 because `.item-form select:focus` and `.item-edit-form input:focus` explicitly set `outline: 0`. Root fix removes suppression and adds explicit 3px focus-visible outlines with 3px offset; test checks every itinerary form control against `:focus-visible`.
 - No test deleted or relaxed. Re-run required on this new head.
+
+
+## UI defect C1 – rental bento card (2026-11-22)
+- Changed the “Thuê đồ theo hành trình” bento card from a row/wrap flex layout to a vertical label → heading → “Sắp có” chip → description stack, with bounded width and safe wrapping.
+- Extended the existing viewport test (no new test removed) to inspect the card and every descendant for `scrollWidth > clientWidth` at 360px and 390px.
+- Pending browser CI evidence on the new commit; no visual pass claimed yet.

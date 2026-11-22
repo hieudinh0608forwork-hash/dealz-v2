@@ -345,10 +345,13 @@ test('six viewport matrix has no horizontal overflow or undersized controls', as
     const metrics = await page.evaluate(() => {
       const visible = element => { const r = element.getBoundingClientRect(); const s = getComputedStyle(element); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
       const undersized = Array.from(document.querySelectorAll('button, .button, input, select, textarea')).filter(visible).filter(element => !element.classList.contains('adminbar-input')).filter(element => { const r = element.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).map(element => ({ tag: element.tagName, className: element.className, width: Math.round(element.getBoundingClientRect().width), height: Math.round(element.getBoundingClientRect().height) }));
-      return { viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, undersized };
+      const rentalCard = document.querySelector('.feature-card--rental');
+      const rentalOverflow = rentalCard ? [rentalCard, ...rentalCard.querySelectorAll('*')].filter(element => element.scrollWidth > element.clientWidth).map(element => ({ tag: element.tagName, className: element.className, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth })) : ['missing rental card'];
+      return { viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, undersized, rentalOverflow };
     });
     expect(metrics.scroll, 'Horizontal overflow at viewport ' + width).toBeLessThanOrEqual(metrics.viewport);
     expect(metrics.undersized, 'Controls smaller than 44px at viewport ' + width).toEqual([]);
+    if (width === 360 || width === 390) expect(metrics.rentalOverflow, 'Rental bento content overflow at viewport ' + width).toEqual([]);
   }
 });
 
