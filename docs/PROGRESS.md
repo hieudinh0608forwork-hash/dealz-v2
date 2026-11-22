@@ -387,3 +387,10 @@ Last reconciled: 2026-11-22 (UTC)
 - Khi fail, ghi HTTP status cuối, 40 dòng đầu body, curl stderr, header response qua REST pretty URL và `?rest_route=`, WordPress `home`/`siteurl`/rewrite structure, cùng 80 dòng container logs. WP-CLI được gọi qua `php /tmp/wp-cli.phar --allow-root`, đúng cách workflow cài CLI.
 - Chẩn đoán `?rest_route=` chỉ là bằng chứng phân loại, không được tính là pass. Chờ log rồi mới chọn sửa permalink, URL, response contract hoặc container/DB.
 - Không chạy CI thủ công ngoài run được kích hoạt bởi commit chẩn đoán. PR #10 giữ Draft; không merge/deploy; T7 chưa Verified.
+
+
+## Docker smoke canonical redirect fix (2026-11-22)
+- Root cause confirmed from diagnostic run: the pretty health URL responds HTTP 301 to WordPress's trailing-slash canonical URL; the prior curl did not follow redirects, leaving an empty JSON file for jq. The alternate `?rest_route=` response matched the existing health contract; it is diagnostic evidence only.
+- Minimal CI-only correction in [`3d251bcd`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/3d251bcdc96951770763052ca9ba3de9d7e2a61a): health polling follows up to three redirects with `curl -sS -L --max-redirs 3`, records both final HTTP status and `url_effective`, and still requires HTTP 200 plus the unchanged three-field JSON assertion. The 30-attempt/two-second poll, `set -o pipefail`, hard `exit 1`, and failure diagnostics remain; no `continue-on-error` and no assertion changes.
+- Corrected the permalink diagnostic to `wp option get permalink_structure`; no change to `home`/`siteurl`, route registration, or application configuration.
+- PR #10 remains Draft; no merge/deploy. C1–C7 remain Implemented pending owner review of QA screenshots. Chromium only; Safari, Firefox and physical devices remain untested.
