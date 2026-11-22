@@ -38,6 +38,13 @@ https://<ten-mien>/wp-json/dealz/v1/health
 
 Phản hồi hiện tại dự kiến có `service: dealz-core`, `status: scaffolded` và `application_ready: false`. HTTP 200 xác nhận route health của plugin trả lời; **không** có nghĩa toàn bộ ứng dụng đã sẵn sàng vận hành.
 
+### Pretty permalinks và REST health URL
+
+- Sau khi cài WordPress, đặt **Settings → Permalinks** thành cấu trúc **Post name** (`/%postname%/`). Với WP-CLI có thể chạy `wp rewrite structure '/%postname%/' --hard` rồi `wp rewrite flush --hard`.
+- REST URL chuẩn của DealZ là `/wp-json/dealz/v1/health`. WordPress có thể trả HTTP 301 để chuẩn hóa dấu gạch chéo cuối, ví dụ `/wp-json/dealz/v1/health` → `/wp-json/dealz/v1/health/`. Client kiểm tra health cần theo redirect và xác nhận response cuối là JSON đúng hợp đồng, không chỉ dựa vào HTTP 200.
+- Nếu pretty permalinks chưa hoạt động, có thể chẩn đoán riêng bằng `/?rest_route=/dealz/v1/health`. Đây là đường kiểm tra phụ để phân biệt lỗi rewrite; không thay thế kiểm tra endpoint chuẩn `/wp-json/dealz/v1/health`.
+- Health hiện trả `service: dealz-core`, `status: scaffolded`, `application_ready: false`; đây chỉ là xác nhận route/plugin phản hồi, không phải xác nhận ứng dụng sẵn sàng vận hành.
+
 ### Schema và 8 bảng
 
 Chạy bằng WP-CLI từ thư mục WordPress:
@@ -88,11 +95,3 @@ wp db query "SHOW TABLES LIKE '$(wp db prefix)dealz_%';"
 - [ ] Chủ dự án duyệt nội dung, tài khoản được mời và phạm vi thử nghiệm trước khi chia sẻ URL.
 
 **Trạng thái:** hướng dẫn cho môi trường thử nghiệm. Chưa phải xác nhận production-ready; không deploy production nếu chưa có phê duyệt riêng.
-
-
-## 4.1 Pretty permalinks và REST health URL
-
-- Sau khi cài WordPress, đặt **Settings → Permalinks** thành cấu trúc **Post name** (`/%postname%/`). Với WP-CLI có thể chạy `wp rewrite structure '/%postname%/' --hard` rồi `wp rewrite flush --hard`.
-- REST URL chuẩn của DealZ là `/wp-json/dealz/v1/health`. WordPress có thể trả HTTP 301 để chuẩn hóa dấu gạch chéo cuối, ví dụ `/wp-json/dealz/v1/health` → `/wp-json/dealz/v1/health/`. Client kiểm tra health cần theo redirect và xác nhận response cuối là JSON đúng hợp đồng, không chỉ dựa vào HTTP 200.
-- Nếu pretty permalinks chưa hoạt động, có thể chẩn đoán riêng bằng `/?rest_route=/dealz/v1/health`. Đây là đường kiểm tra phụ để phân biệt lỗi rewrite; không thay thế kiểm tra endpoint chuẩn `/wp-json/dealz/v1/health`.
-- Health hiện trả `service: dealz-core`, `status: scaffolded`, `application_ready: false`; đây chỉ là xác nhận route/plugin phản hồi, không phải xác nhận ứng dụng sẵn sàng vận hành.
