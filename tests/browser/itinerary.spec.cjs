@@ -610,7 +610,7 @@ test('one primary action per active screen and CLS budget', async ({ page }) => 
 test('capture home, itinerary, edit panel, rental and styleguide viewport screenshots at required widths', async ({ page }) => {
   test.setTimeout(120000);
   await signIn(page);
-  const widths = [360, 390, 768, 1024, 1280];
+  const widths = [360, 390, 768, 1024, 1280, 1536];
   const scrollTo = async (top = 0) => {
     await page.evaluate(target => {
       const root = document.scrollingElement || document.documentElement;

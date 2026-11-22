@@ -113,3 +113,10 @@ Ma trận hiện hành chỉ đo các cặp thực sự dùng trong UI, theo yê
 - Advance width glyph `0–9`: `0=676, 1=385, 2=651, 3=660, 4=710, 5=660, 6=680, 7=594, 8=634, 9=680`.
 - Mười glyph có 8 giá trị advance width khác nhau; Be Vietnam Pro 400 KHÔNG tabular sẵn. Giữ nguyên font; `.item-time`, `.budget-summary__tile strong`, `.finance-row__side strong` dùng `min-width` và căn phải. Không giả định `font-variant-numeric: tabular-nums` có hiệu lực trên file font này.
 - Bằng chứng: PHP syntax workflow [44989847815](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989847815), log `scripts/check-font-metrics.py`.
+
+
+## 17. Tài khoản khách trong giai đoạn thử nghiệm (22/11/2026)
+- Giữ `users_can_register = false`; không bật đăng ký công khai mặc định của WordPress.
+- Đợt thử nghiệm đầu chỉ sử dụng tài khoản do quản trị viên/chủ dự án tạo theo lời mời.
+- Chỉ xem xét đăng ký công khai khi có trang tài khoản riêng và chủ dự án duyệt rõ ràng.
+- Quyết định này áp dụng cho cả staging và checklist triển khai; không tự tạo endpoint/form đăng ký công khai.

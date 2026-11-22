@@ -319,3 +319,14 @@ Last reconciled: 2026-11-22 (UTC)
 ## Finance focus computed-style synchronization (2026-11-22)
 - Browser run [44995025423](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995025423) on `115064bcd3c7815e87fc981d22d6f9157a558d3a`: 11/12 passed; all four other browser scenarios, including the 27-image viewport capture, passed. PHP [44995025465](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995025465), Docker [44995025439](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995025439), Integration [44995025492](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995025492) passed.
 - Remaining assertion: visible and focused `#expense-amount` still returned neutral border on the immediate computed-style read. The CSS has `.finance-form input:focus` with approved `--dealz-input-focus` and 4px halo. Added Playwright web-first `toHaveCSS` checks for exact orange border and 4px shadow before the existing computed-value assertions; no threshold, color, or shadow requirement changed.
+
+
+## Tiếp quản – ZIP, DEPLOY và chính sách tài khoản (22/11/2026)
+- HEAD khi bắt đầu lát việc này: `115d74fa165a360fe94bb94a0e93e28d5e10abff`. PR #10 vẫn Draft.
+- Commit `115d74f` bổ sung web-first CSS assertions cho viền #FD550A và quầng 4px của #expense-amount; giữ nguyên giá trị mong đợi, không sleep.
+- Browser run [44995414089](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995414089) trên `115d74f` đang chạy khi cập nhật; PHP [44995414046](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995414046), Integration [44995414117](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995414117), Docker [44995414041](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995414041) success.
+- Thêm workflow đóng gói hai ZIP cài đặt từ đúng thư mục plugin/theme; loại tests, docs, .github, node_modules, README và cấu hình PHPUnit. Artifact được upload với `if: always()`; cần kiểm tra artifact contents ở run đầu.
+- `docs/DEPLOY.md` ghi yêu cầu PHP 8.1+, WordPress 6.5+, MySQL 8.0+ (Docker đang dùng MySQL 8.4; MariaDB chưa xác nhận), cài plugin trước theme, endpoint health, schema 1.2.0/8 bảng, rollback và checklist bảo mật.
+- Chính sách tài khoản khách: `users_can_register=false`; pilot dùng tài khoản tạo bằng lời mời; đăng ký công khai cần trang tài khoản riêng và chủ dự án duyệt.
+- Browser screenshot matrix bổ sung viewport 1536; upload artifact được xác nhận có `if: always()`.
+- Các kết quả CI của commit mới sẽ được ghi bổ sung sau khi GitHub tạo run IDs; không gắn nhầm run của HEAD trước.
