@@ -135,3 +135,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Removed five latin-ext WOFF2 subsets after a source scan of 12 theme files found zero codepoints requiring latin-ext but not covered by Latin or Vietnamese. Added `scripts/check-font-subsets.py` to reproduce this check in PHP syntax CI.
 - Kept Latin + Vietnamese subsets and all required weights. Removed files total 77,852 bytes; payload falls from 279,284 bytes (272.74 KiB) to 201,432 bytes (196.71 KiB), under 300 KiB. `fonts.css` still uses unicode-range; theme preload remains exactly two files.
 - Browser font test now checks the new payload, ≤300 KiB budget and absence of latin-ext. The six already-uncovered decorative symbols remain on fallback fonts; no regression introduced by this subset removal.
+
+
+## Browser QA route-fixture correction (2026-11-22)
+- Browser run [#44989482181](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989482181) ran on commit `c5381f07ddcf31eed873a18dc27ba2a2feb1015c` and failed 7/12 tests. The failures all timed out filling `#trip-title` because the new route model correctly hides `#trips` on the default Explore route, while `createTripAndDay()` still assumed the trip form was visible immediately after login.
+- Root fix: the test setup now explicitly navigates to `/#trips` and asserts the create-trip panel is visible before creating its fixture. This aligns test setup with the intended user route; no assertion was removed, weakened or bypassed.
+- Rerun required on a new commit before claiming route isolation or other Browser QA fixes verified.

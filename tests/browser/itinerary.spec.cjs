@@ -53,6 +53,8 @@ async function expectScreenState(page, visibleSelector, hiddenSelectors) {
 
 async function createTripAndDay(page, title) {
   await signIn(page);
+  await page.goto(BASE_URL + '/#trips');
+  await expect(page.locator('#create-trip')).toBeVisible();
   await page.locator('#trip-title').fill(title);
   await page.locator('#trip-origin').fill('Đà Nẵng');
   await page.locator('#trip-destination').fill('Hội An');
