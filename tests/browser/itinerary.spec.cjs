@@ -165,6 +165,9 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await expect(page.locator('.day-chip')).toHaveCount(2);
   await firstReadStarted;
   await expect(page.locator('#day-items-list')).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('#day-items-list')).toContainText('Đang tải điểm dừng…');
+  await page.locator('#day-items-list').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/state-loading-items.png', fullPage: false });
   releaseFirstRead();
   await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 
@@ -172,7 +175,11 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   failNextRead = true;
   await page.locator('.day-chip').first().click();
   await expect(page.locator('#day-items-list')).toContainText('Thử tải lại');
+  await page.locator('#day-items-list').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/state-error-items.png', fullPage: false });
   await page.getByRole('button', { name: 'Thử tải lại' }).click();
+  await expect(page.locator('#day-items-list')).not.toContainText('Thử tải lại');
+  await page.screenshot({ path: 'artifacts/state-retry-success-items.png', fullPage: false });
   await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 
   await addStop(page, 'Điểm A', 'Cầu Rồng, Đà Nẵng');

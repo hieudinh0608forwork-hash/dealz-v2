@@ -483,6 +483,10 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
+## T8 – bổ sung ảnh bằng chứng loading/error (23/11/2026)
+- Luồng Browser QA desktop chụp ba trạng thái thật từ API được giữ/chặn có chủ đích trong test: artifacts/state-loading-items.png, artifacts/state-error-items.png, artifacts/state-retry-success-items.png.
+- Loading có assertion aria-busy=true và nội dung 'Đang tải điểm dừng…'; error có 'Thử tải lại'; sau retry xác nhận nút lỗi biến mất. Không dùng ảnh dựng, không thay đổi logic sản phẩm hoặc bỏ assertion.
+
 ## T8 – tăng thứ bậc thị giác màn Hành trình (23/11/2026)
 - Khối danh sách ngày ở rail 4/8 được chuyển thành khối xanh rừng; tiêu đề trắng, ngày đang chọn nền lime/chữ xanh rừng, các ngày còn lại chữ trắng dịu. Không thay đổi lưới 4/8, dữ liệu ngày hoặc CTA.
 - Playwright tại viewport 1280 đo computed color thật của panel, tiêu đề và chip đang chọn; kỳ vọng lần lượt rgb(1,93,71), rgb(255,255,255), rgb(224,243,84), rgb(1,93,71).
