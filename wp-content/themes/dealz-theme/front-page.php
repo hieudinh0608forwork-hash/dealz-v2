@@ -350,13 +350,17 @@ get_header();
 		</div>
 		<div class="rental-layout">
 			<div class="rental-empty-state" role="status" aria-live="polite">
-				<div class="rental-empty-state__symbol" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M15 14a17 17 0 0 0 34 0M32 31l-18 22h36L32 31Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-				<h2><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h2>
-				<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
-				<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
-				<a class="button button--primary rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại điểm dừng', 'dealz-theme' ); ?></a>
-				<?php $zalo_url = dealz_sanitize_zalo_url( get_option( 'dealz_zalo_url', '' ) ); ?>
-				<?php if ( $zalo_url ) : ?><a class="button button--tertiary rental-empty-state__zalo" href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nhắn Zalo để được báo khi có shop', 'dealz-theme' ); ?> →</a><?php endif; ?>
+				<div class="rental-empty-state__intro">
+					<div class="rental-empty-state__symbol" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M15 14a17 17 0 0 0 34 0M32 31l-18 22h36L32 31Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+					<h2><?php esc_html_e( 'Danh mục thuê đồ chưa sẵn sàng', 'dealz-theme' ); ?></h2>
+				</div>
+				<div class="rental-empty-state__content">
+					<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
+					<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
+					<a class="button button--primary rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại điểm dừng', 'dealz-theme' ); ?></a>
+					<?php $zalo_url = dealz_sanitize_zalo_url( get_option( 'dealz_zalo_url', '' ) ); ?>
+					<?php if ( $zalo_url ) : ?><a class="button button--tertiary rental-empty-state__zalo" href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nhắn Zalo để được báo khi có shop', 'dealz-theme' ); ?> →</a><?php endif; ?>
+				</div>
 			</div>
 		</div>
 		<section class="next-step-section rental-next-step"><div class="next-step-card"><div><p class="eyebrow"><?php esc_html_e( 'Tiếp theo', 'dealz-theme' ); ?></p><h2><?php esc_html_e( 'Xem toàn bộ hành trình.', 'dealz-theme' ); ?></h2></div><a class="button button--tertiary" href="#trips"><?php esc_html_e( 'Xem toàn bộ hành trình', 'dealz-theme' ); ?> →</a></div></section>

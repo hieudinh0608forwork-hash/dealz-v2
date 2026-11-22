@@ -773,6 +773,15 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
     await expectFullyInViewport(page.locator('#rental-context-chip'));
     await expectFullyInViewport(page.locator('#rental-workspace-title'));
+    if (width >= 1024) {
+      const layout = await page.locator('.rental-layout').evaluate(element => ({
+        width: element.getBoundingClientRect().width,
+        cardWidth: element.querySelector('.rental-empty-state').getBoundingClientRect().width
+      }));
+      expect(layout.cardWidth).toBeGreaterThanOrEqual(layout.width - 2);
+      await expect(page.locator('.rental-empty-state__intro')).toBeVisible();
+      await expect(page.locator('.rental-empty-state__content')).toBeVisible();
+    }
     if (width === 1280) {
       await expect.poll(() => page.locator('.site-header').evaluate(element => getComputedStyle(element).backgroundColor))
         .toBe('rgb(251, 247, 238)');

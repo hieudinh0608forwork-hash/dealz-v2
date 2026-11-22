@@ -483,6 +483,11 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
+## T8 – cân đối màn Thuê đồ (23/11/2026)
+- Đã xác định nguyên nhân phần trắng dư: rental-layout bị giới hạn một cột 760px dù container desktop rộng 1180px; không có cột nội dung thứ hai sau khi bỏ thẻ gợi ý chung.
+- Mở rộng empty-state thành một khối toàn chiều rộng; bố cục nội bộ 5/7: biểu tượng + tiêu đề ở cột trái, nội dung trung thực + CTA ở cột phải. Không thêm sản phẩm, giá, shop, dữ liệu hoặc CTA mới; giữ nguyên primary và điều kiện hiển thị Zalo.
+- Mobile chuyển về một cột; giữ nguyên các selector hiện có của empty state/CTA. Browser QA thêm phép đo cardWidth >= layoutWidth - 2 ở desktop và kiểm tra hai vùng nội dung hiển thị; không xóa/nới assertion cũ.
+
 ## T8 – chẩn đoán và sửa bóng mờ header (23/11/2026)
 - Browser QA đầu sau fix: 11/12 passed. Assertion đo trong 180ms transition nên nhận nền trung gian rgba(251,247,239,0.996), không phải trạng thái cuối; lỗi là timing của phép đo, không phải CSS không áp dụng. Bổ sung poll chờ computed background ổn định trước screenshot/đọc diagnostic, không nới assertion.
 - Đã xác nhận PR #10 HEAD trước chẩn đoán: aaad65c79fd431f2c10cc41a98dbe213fbe41217; PR vẫn Draft, chưa merge.
