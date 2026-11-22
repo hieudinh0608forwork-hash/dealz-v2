@@ -30,7 +30,7 @@ a:hover { color: var(--dealz-orange-text); }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
-:focus-visible {
+body #primary :focus-visible {
 	outline: 3px solid var(--dealz-focus-outline);
 	outline-offset: 3px;
 }
@@ -157,7 +157,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .button--primary:hover { background: var(--dealz-primary-hover); color: var(--dealz-white); box-shadow: 0 12px 28px var(--dealz-primary-shadow-hover); }
 .button:disabled { opacity: 1; cursor: not-allowed; transform: none; box-shadow: none; }
-.button--primary:disabled { background: var(--dealz-mint-100); color: var(--dealz-muted); }
 .hero-section__note { margin: 14px 0 0; color: var(--dealz-muted); font-size: 13px; }
 
 .hero-art {
@@ -300,7 +299,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .form-field input::placeholder { color: var(--dealz-placeholder); opacity: 1; }
 .form-field input:focus { border-color: var(--dealz-input-focus); box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
-.form-field input:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
 .form-field input[aria-invalid="true"] { border-color: var(--dealz-error); }
 .form-actions { display: flex; align-items: center; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 4px; }
 .form-footnote { margin: 0; color: var(--dealz-muted); font-size: 13px; }
@@ -439,7 +437,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .item-edit-form input { width: 100%; min-width: 0; height: 38px; padding: 0 9px; border: 1px solid var(--dealz-input-border); border-radius: 10px; color: var(--dealz-ink); font-size: 12px; }
 .item-edit-form input:first-child, .item-edit-form button { grid-column: 1 / -1; }
 .item-edit-form input:focus { border-color: var(--dealz-input-focus); box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
-.item-edit-form input:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
 .text-action { padding: 4px 0; border: 0; background: transparent; color: var(--dealz-green); font-size: 12px; font-weight: 700; cursor: pointer; }
 .text-action:hover { color: var(--dealz-orange-text); }
 .text-action--danger { color: var(--dealz-alert-ink); }
@@ -456,8 +453,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-size: 16px;
 }
 .item-form select:focus { border-color: var(--dealz-input-focus); box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
-.item-form select:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
-#create-item-form .form-field input:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
 .item-form .form-field--wide { grid-column: 1 / -1; }
 
 @media (max-width: 640px) {
@@ -703,15 +698,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-weight: 700;
 	cursor: pointer;
 }
-.item-edit-details summary:focus-visible {
-	outline: 3px solid var(--dealz-focus-outline);
-	outline-offset: 3px;
-	border-radius: 4px;
-}
 .item-edit-details[open] .item-edit-form { margin-top: 10px; }
 .item-edit-form input { min-height: 44px; font-size: 14px; }
 .item-edit-form button:disabled,
-.item-card-actions button:disabled { opacity: 0.55; cursor: wait; }
+.item-card-actions button:disabled { background: var(--dealz-mint-100); color: var(--dealz-muted); opacity: 1; cursor: not-allowed; }
 .item-directions { flex: 0 0 auto; text-decoration: underline; text-underline-offset: 3px; }
 .itinerary-item-list[aria-busy="true"] { opacity: 0.72; }
 .workspace-empty .button { margin-top: 16px; }
@@ -840,13 +830,6 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 	border-right-color: transparent;
 	border-radius: 50%;
 	animation: dealz-spin 700ms linear infinite;
-}
-.form-field input:focus-visible,
-.item-form select:focus-visible,
-.finance-form input:focus-visible,
-.finance-form select:focus-visible {
-	outline: 3px solid var(--dealz-focus-outline);
-	outline-offset: 3px;
 }
 .next-step-card :focus-visible,
 .budget-summary :focus-visible,
@@ -1114,3 +1097,6 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 	#day-items-panel .itinerary-item-card::before { display: none; }
 	#day-items-panel .itinerary-item-card--stop { padding: 16px; }
 }
+
+/* Inline validation for required itinerary title; no disabled-empty submit state. */
+.form-field__error { margin: 6px 0 0; color: var(--dealz-error); font-size: 14px; line-height: 1.45; }

@@ -232,3 +232,12 @@ Last reconciled: 2026-11-22 (UTC)
 - Remaining failure: `tests/browser/itinerary.spec.cjs:517` – `#item-title` matched `:focus-visible`, but computed `outlineWidth` was `0px` (required ≥3px). The test's heading selector, keyboard-link modality, route flow, positive 43px probe, viewport checks, primary action/CLS and 25 screenshot captures passed.
 - Added a high-specificity, form-scoped `#create-item-form .form-field input:focus-visible` outline using the approved `--dealz-focus-outline` token and 3px offset. The assertion remains unchanged. This is an explicit style correction for the actual form input, not a test relaxation.
 - Screenshot/error artifact from this run: [dealz-browser-qa](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44991475239/artifacts). It contains 25 viewport images and readable Playwright error text.
+
+
+## Owner follow-up – disabled CTA, inline validation and unified focus (2026-11-22)
+- Browser QA head before this change: `190d0ffcbc01dae89700c30c7db159d78d7faca3`; PHP, Integration and Docker passed; Browser failed only the focus-visible assertion for `item-title` (run 44991475239).
+- Create-stop submit remains enabled when the title is empty. Clicking it displays an inline field error with `aria-invalid` and `aria-describedby`; the error clears on input.
+- Disabled buttons use mint-100 + muted ink (the ink-2 token), with no opacity dimming, including item edit/archive controls.
+- Consolidated form focus indicators under one high-specificity `:focus-visible` rule (3px solid outline, 3px offset); removed duplicate form-specific outline declarations. Keyboard tests now switch modality with Tab/Shift+Tab before checking each form control.
+- The itinerary editor locator remains the exact `#itinerary-editor` id selector; no broad locator or weakened condition was introduced.
+- Await full four-workflow CI on the new commit.

@@ -159,7 +159,8 @@ get_header();
 						<h3 id="create-item-title"><?php esc_html_e( 'Thêm điểm dừng hoặc bữa ăn', 'dealz-theme' ); ?></h3>
 						<div class="form-field">
 							<label for="item-title"><?php esc_html_e( 'Tên địa điểm / hoạt động', 'dealz-theme' ); ?></label>
-							<input id="item-title" name="title_snapshot" type="text" maxlength="190" required placeholder="<?php esc_attr_e( 'Nhập tên điểm dừng', 'dealz-theme' ); ?>">
+							<input id="item-title" name="title_snapshot" type="text" maxlength="190" aria-describedby="item-title-error" placeholder="<?php esc_attr_e( 'Nhập tên điểm dừng', 'dealz-theme' ); ?>">
+							<p class="form-field__error" id="item-title-error" role="alert" hidden><?php esc_html_e( 'Nhập tên điểm dừng hoặc hoạt động.', 'dealz-theme' ); ?></p>
 						</div>
 						<div class="form-field">
 							<label for="item-type"><?php esc_html_e( 'Loại thẻ', 'dealz-theme' ); ?></label>

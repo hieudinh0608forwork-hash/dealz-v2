@@ -475,6 +475,11 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await signIn(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await createTripAndDay(page, 'QA locale and motion DealZ');
+  await expect(page.locator('#create-item-submit')).toBeEnabled();
+  await page.locator('#create-item-submit').click();
+  await expect(page.locator('#item-title')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#item-title-error')).toBeVisible();
+  await expect(page.locator('#create-item-submit')).toBeEnabled();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const reduced = await page.evaluate(() => { const el = document.querySelector('.dz-skeleton'); return el ? getComputedStyle(el).animationDuration : '0s'; });
   expect(['0s', '0.01ms']).toContain(reduced);
@@ -508,6 +513,9 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   for (let index = 0; index < await focusable.count(); index++) {
     const control = focusable.nth(index);
     await control.focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Shift+Tab');
+    await expect(control).toBeFocused();
     const focus = await control.evaluate(element => {
       const style = getComputedStyle(element);
       return { visible: element.matches(':focus-visible'), style: style.outlineStyle, width: style.outlineWidth };

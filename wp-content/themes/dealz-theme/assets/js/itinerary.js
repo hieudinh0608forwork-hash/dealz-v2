@@ -1061,9 +1061,28 @@
 	}
 
 	if (itemForm) {
+		const titleInput = document.getElementById('item-title');
+		const titleError = document.getElementById('item-title-error');
+		if (titleInput) titleInput.addEventListener('input', function () {
+			if (titleInput.value.trim()) {
+				titleInput.removeAttribute('aria-invalid');
+				if (titleError) titleError.hidden = true;
+			}
+		});
 		itemForm.addEventListener('submit', async function (event) {
 			event.preventDefault();
-			if (!activeDay || !itemForm.reportValidity()) return;
+			if (!activeDay) return;
+			const titleInput = document.getElementById('item-title');
+			const titleError = document.getElementById('item-title-error');
+			if (titleInput && !titleInput.value.trim()) {
+				titleInput.setAttribute('aria-invalid', 'true');
+				if (titleError) titleError.hidden = false;
+				titleInput.focus();
+				return;
+			}
+			if (titleInput) titleInput.removeAttribute('aria-invalid');
+			if (titleError) titleError.hidden = true;
+			if (!itemForm.reportValidity()) return;
 			const values = new FormData(itemForm);
 			const duration = String(values.get('duration_minutes') || '');
 			const start = String(values.get('start_local') || '');
