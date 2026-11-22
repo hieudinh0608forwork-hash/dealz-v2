@@ -457,6 +457,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .item-form select:focus { border-color: var(--dealz-input-focus); box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
 .item-form select:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
+#create-item-form .form-field input:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
 .item-form .form-field--wide { grid-column: 1 / -1; }
 
 @media (max-width: 640px) {
