@@ -175,11 +175,11 @@ get_header();
 						</div>
 						<div class="form-field">
 							<label for="item-start"><?php esc_html_e( 'Giờ đến', 'dealz-theme' ); ?></label>
-							<input id="item-start" name="start_local" type="time">
+							<input id="item-start" name="start_local" type="text" inputmode="numeric" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" maxlength="5" placeholder="HH:MM" autocomplete="off" data-time-mask>
 						</div>
 						<div class="form-field">
 							<label for="item-end"><?php esc_html_e( 'Giờ kết thúc (nếu đã biết)', 'dealz-theme' ); ?></label>
-							<input id="item-end" name="end_local" type="time">
+							<input id="item-end" name="end_local" type="text" inputmode="numeric" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" maxlength="5" placeholder="HH:MM" autocomplete="off" data-time-mask>
 						</div>
 						<div class="form-field">
 							<label for="item-duration"><?php esc_html_e( 'Thời lượng gợi ý (phút)', 'dealz-theme' ); ?></label>

@@ -83,3 +83,10 @@ Last reconciled: 2026-11-22 (UTC)
 - Canonical selected-itinerary route is now `#route?trip=<uuid>`; legacy `#trip/<uuid>` remains readable. Rental return URLs preserve the selected route; `#route` without a trip resolves to the Trips list. `#trips` and `#explore` resolve to their own screens.
 - Browser scenarios now assert visible screen, hidden/inert sibling screens and zero enabled focusable descendants in hidden screens across itinerary, rental, trips and explore navigation. Existing flow remains covered; URL expectation changed because the canonical route was introduced.
 - Pending CI proof; no route isolation pass claimed yet.
+
+
+## UI defect C3 – explicit 24-hour time fields (2026-11-22)
+- Replaced native `type=time` controls with masked text inputs (`inputmode=numeric`, strict HH:MM pattern, max length 5) in both create and inline edit forms. The input mask normalizes digits to HH:MM and validates 00:00–23:59; no locale-specific AM/PM widget can appear.
+- Kept unset time as the explicit card label “Chưa đặt giờ”; added browser assertion for this state.
+- Browser QA now exercises the field in separate `en-US` and `vi-VN` contexts, asserting the input type, mask and stable `09:30` value.
+- Pending CI evidence on this commit.

@@ -392,10 +392,27 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   const reduced = await page.evaluate(() => { const el = document.querySelector('.dz-skeleton'); return el ? getComputedStyle(el).animationDuration : '0s'; });
   expect(['0s', '0.01ms']).toContain(reduced);
   const time = page.locator('#item-start');
+  await expect(time).toHaveAttribute('type', 'text');
+  await expect(time).toHaveAttribute('inputmode', 'numeric');
+  await expect(time).toHaveAttribute('pattern', '(?:[01][0-9]|2[0-3]):[0-5][0-9]');
   await time.fill('09:30');
   await expect(time).toHaveValue('09:30');
-  const hours = await page.evaluate(() => { const d = new Date('2027-04-01T09:30:00Z'); return ['en-US','vi-VN'].map(locale => new Intl.DateTimeFormat(locale, { hour: '2-digit', hour12: false, timeZone: 'UTC' }).format(d)); });
-  expect(hours.every(value => value.startsWith('09'))).toBe(true);
+  await page.locator('#item-title').fill('Điểm chưa đặt giờ');
+  await page.locator('#create-item-submit').click();
+  const unsetTimeCard = page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm chưa đặt giờ' });
+  await expect(unsetTimeCard.locator('.item-time')).toHaveText('Chưa đặt giờ');
+  const browser = page.context().browser();
+  for (const locale of ['en-US', 'vi-VN']) {
+    const localeContext = await browser.newContext({ locale });
+    const localePage = await localeContext.newPage();
+    await signIn(localePage);
+    await createTripAndDay(localePage, 'QA locale ' + locale);
+    const localeTime = localePage.locator('#item-start');
+    await expect(localeTime).toHaveAttribute('type', 'text');
+    await localeTime.fill('09:30');
+    await expect(localeTime).toHaveValue('09:30');
+    await localeContext.close();
+  }
   await page.keyboard.press('Tab');
   const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit');
   for (let index = 0; index < await focusable.count(); index++) {

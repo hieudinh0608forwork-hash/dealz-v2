@@ -407,6 +407,27 @@
 		}
 	}
 
+	function attachTimeMask(input) {
+		if (!input) return;
+		input.type = 'text';
+		input.inputMode = 'numeric';
+		input.pattern = '(?:[01][0-9]|2[0-3]):[0-5][0-9]';
+		input.maxLength = 5;
+		input.placeholder = 'HH:MM';
+		input.autocomplete = 'off';
+		input.addEventListener('input', function () {
+			const digits = input.value.replace(/\\D/g, '').slice(0, 4);
+			input.value = digits.length > 2 ? digits.slice(0, 2) + ':' + digits.slice(2) : digits;
+			input.setCustomValidity('');
+		});
+		input.addEventListener('blur', function () {
+			const valid = /^(?:[01]\\d|2[0-3]):[0-5]\\d$/.test(input.value);
+			input.setCustomValidity(input.value && !valid ? 'Nhập giờ theo định dạng HH:MM.' : '');
+		});
+	}
+
+	document.querySelectorAll('[data-time-mask]').forEach(attachTimeMask);
+
 	function itemTypeLabel(type) {
 		if (type === 'lunch') return 'Bữa trưa';
 		if (type === 'dinner') return 'Bữa tối';
@@ -472,14 +493,14 @@
 		editInput.setAttribute('aria-label', 'Tên điểm dừng');
 
 		const startInput = document.createElement('input');
-		startInput.type = 'time';
 		startInput.value = item.start_local ? item.start_local.slice(0, 5) : '';
 		startInput.setAttribute('aria-label', 'Giờ đến');
+		attachTimeMask(startInput);
 
 		const endInput = document.createElement('input');
-		endInput.type = 'time';
 		endInput.value = item.end_local ? item.end_local.slice(0, 5) : '';
 		endInput.setAttribute('aria-label', 'Giờ kết thúc');
+		attachTimeMask(endInput);
 
 		const durationInput = document.createElement('input');
 		durationInput.type = 'number';
