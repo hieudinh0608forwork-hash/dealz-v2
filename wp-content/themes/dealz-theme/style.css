@@ -297,7 +297,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-size: 16px;
 }
 .form-field input::placeholder { color: var(--dealz-placeholder); opacity: 1; }
-.form-field input:focus { border-color: var(--dealz-input-focus); outline: 0; box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
+.form-field input:focus { border-color: var(--dealz-input-focus); box-shadow: 0 0 0 4px var(--dealz-focus-halo); }
+.form-field input:focus-visible { outline: 3px solid var(--dealz-focus-outline); outline-offset: 3px; }
 .form-field input[aria-invalid="true"] { border-color: var(--dealz-error); }
 .form-actions { display: flex; align-items: center; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 4px; }
 .form-footnote { margin: 0; color: var(--dealz-muted); font-size: 13px; }
@@ -762,6 +763,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	.rental-empty-state { margin-top: 20px; border-radius: 20px; }
 }
 
+
+/* Trip editing is a focused workspace, not a continuation of the public landing page. */
+body.is-trip-view .hero-section,
+body.is-trip-view .feature-bento,
+body.is-trip-view .next-step-section { display: none !important; }
 
 /* Rental handoff is a focused destination, not a second copy of the home hero. */
 body.is-rental-view .hero-section,

@@ -33,6 +33,7 @@
 	let activeDay = null;
 	let activeDayNumber = null;
 	let activeDays = [];
+	const dayItemsCache = new Map();
 	let requestSequence = 0;
 
 	const baseUrl = String(config.restUrl || '').replace(/\/?$/, '/');
@@ -76,6 +77,7 @@
 	}
 
 	function showWorkspace() {
+		document.body.classList.add('is-trip-view');
 		workspace.hidden = false;
 		if (tripList) tripList.hidden = true;
 		if (sectionHeading) sectionHeading.hidden = true;
@@ -83,6 +85,7 @@
 	}
 
 	function hideWorkspace() {
+		document.body.classList.remove('is-trip-view');
 		workspace.hidden = true;
 		const rentalWorkspace = document.getElementById('rental-workspace');
 		if (rentalWorkspace) rentalWorkspace.hidden = true;
@@ -93,6 +96,7 @@
 		activeTrip = null;
 		activeTripData = null;
 		activeDays = [];
+		dayItemsCache.clear();
 		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
@@ -114,23 +118,29 @@
 		}
 		try {
 			const tripAtRequestStart = activeTrip;
-			const itemLists = await Promise.all(days.map(function (day) {
+			const missingDays = days.filter(function (day) {
+				return !dayItemsCache.has(day.public_id);
+			});
+			const itemLists = await Promise.all(missingDays.map(function (day) {
 				return api('days/' + encodeURIComponent(day.public_id) + '/items');
 			}));
+			if (tripAtRequestStart !== activeTrip) return;
+			missingDays.forEach(function (day, index) {
+				dayItemsCache.set(day.public_id, itemLists[index]);
+			});
 			let count = 0;
-			itemLists.forEach(function (items) {
+			days.forEach(function (day) {
+				const items = dayItemsCache.get(day.public_id);
 				if (!Array.isArray(items)) return;
 				count += items.filter(function (item) {
 					return item.item_type === 'stop' && item.status !== 'archived';
 				}).length;
 			});
-			if (tripAtRequestStart !== activeTrip) return;
 			updateBadgeDisplay(count);
 		} catch (error) {
 			// Keep the last confirmed count; a transient read failure must not invent a new count.
 		}
 	}
-
 	function formatDate(value) {
 		if (!value) return '';
 		const parts = value.split('-');
@@ -178,6 +188,7 @@
 		itemsPanel.hidden = true;
 		activeTrip = publicId;
 		activeDays = [];
+		dayItemsCache.clear();
 		updateBadgeDisplay(0);
 		activeItinerary = null;
 		activeDay = null;
@@ -271,7 +282,6 @@
 			activeDays = Array.isArray(days) ? days : [];
 			if (activeDays.length === 0) updateBadgeDisplay(0);
 			renderTripMeta();
-			updateTripStopBadge(activeDays);
 			daysList.replaceChildren();
 
 			if (!Array.isArray(days) || days.length === 0) {
@@ -634,10 +644,11 @@
 		itemsList.replaceChildren(makeEmpty('Đang tải điểm dừng…'));
 		try {
 			const items = await api('days/' + encodeURIComponent(activeDay) + '/items');
+			dayItemsCache.set(activeDay, items);
+			await updateTripStopBadge(activeDays);
 			itemsList.replaceChildren();
 			if (stopAnchorList) stopAnchorList.replaceChildren();
 			const activeMainStops = Array.isArray(items) ? items.filter(function (item) { return item.item_type === 'stop' && item.status !== 'archived'; }).length : 0;
-			await updateTripStopBadge(activeDays);
 			const mainStopOption = document.querySelector('#item-type option[value="stop"]');
 			if (mainStopOption) {
 				mainStopOption.disabled = activeMainStops >= 4;
