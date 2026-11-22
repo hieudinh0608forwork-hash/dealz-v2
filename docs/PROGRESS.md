@@ -482,3 +482,9 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 | 10 | Giọng văn / trung thực | 2 | Trạng thái trống và "Sắp có" trung thực, không dữ liệu giả |
 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
+
+## T8 – chẩn đoán bóng mờ header (23/11/2026)
+- Đã xác nhận PR #10 HEAD trước chẩn đoán: aaad65c79fd431f2c10cc41a98dbe213fbe41217; PR vẫn Draft, chưa merge.
+- Artifact Browser QA hiện tại có ảnh rental-1280-viewport-empty.png. Ảnh cho thấy vùng chữ nền bị nhòe xuyên qua header; đây mới là dấu hiệu thị giác, chưa kết luận nguyên nhân.
+- Commit chẩn đoán chỉ bổ sung Playwright instrumentation ở viewport 1280: ghi computed style của header (background, backdrop-filter, box-shadow, filter, transform, z-index), ::before/::after, các layer giao vùng header và element stack tại (100,85), (200,85), (1130,85), (1200,85). Kết quả được lưu thành artifacts/rental-shadow-diagnostic.json và in vào log.
+- Không sửa CSS/UI, không thay assertion sản phẩm, không đổi selector/ARIA/data-testid. Chờ Browser QA trên commit này để xác định đúng phần tử/lớp gây hiệu ứng.

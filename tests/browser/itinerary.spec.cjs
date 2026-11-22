@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const fs = require('node:fs');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 const BASE_URL = 'http://127.0.0.1:8080';
@@ -773,6 +774,78 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await expectFullyInViewport(page.locator('#rental-context-chip'));
     await expectFullyInViewport(page.locator('#rental-workspace-title'));
     await page.screenshot({ path: 'artifacts/rental-' + width + '-viewport-empty.png', fullPage: false });
+    if (width === 1280) {
+      const diagnostic = await page.evaluate(() => {
+        const describe = element => {
+          if (!element) return null;
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return {
+            tag: element.tagName.toLowerCase(),
+            id: element.id || null,
+            className: typeof element.className === 'string' ? element.className : null,
+            text: (element.innerText || element.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 100),
+            rect: { x: rect.x, y: rect.y, top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height },
+            position: style.position,
+            zIndex: style.zIndex,
+            opacity: style.opacity,
+            backgroundColor: style.backgroundColor,
+            backgroundImage: style.backgroundImage,
+            boxShadow: style.boxShadow,
+            filter: style.filter,
+            backdropFilter: style.backdropFilter,
+            transform: style.transform,
+            overflow: style.overflow,
+            pointerEvents: style.pointerEvents
+          };
+        };
+        const header = document.querySelector('.site-header');
+        const headerRect = header ? header.getBoundingClientRect() : null;
+        const pseudo = element => {
+          if (!element) return null;
+          return ['::before', '::after'].map(selector => {
+            const style = getComputedStyle(element, selector);
+            return {
+              selector,
+              content: style.content,
+              display: style.display,
+              position: style.position,
+              zIndex: style.zIndex,
+              opacity: style.opacity,
+              backgroundColor: style.backgroundColor,
+              backgroundImage: style.backgroundImage,
+              boxShadow: style.boxShadow,
+              filter: style.filter,
+              backdropFilter: style.backdropFilter,
+              transform: style.transform
+            };
+          });
+        };
+        const points = [[100, 85], [200, 85], [1130, 85], [1200, 85]].map(([x, y]) => ({
+          x, y, stack: document.elementsFromPoint(x, y).slice(0, 8).map(describe)
+        }));
+        const overlappingLayers = [...document.querySelectorAll('body *')].map(element => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          const overlaps = headerRect && rect.bottom >= headerRect.top - 8 && rect.top <= headerRect.bottom + 8 && rect.right > 0 && rect.left < innerWidth;
+          const hasVisualEffect = style.boxShadow !== 'none' || style.filter !== 'none' || style.backdropFilter !== 'none';
+          return overlaps && (hasVisualEffect || ['fixed', 'sticky', 'absolute'].includes(style.position))
+            ? { element: describe(element), pseudo: pseudo(element) }
+            : null;
+        }).filter(Boolean).slice(0, 80);
+        return {
+          viewport: { width: innerWidth, height: innerHeight, scrollY: window.scrollY },
+          bodyClass: document.body.className,
+          header: describe(header),
+          headerPseudo: pseudo(header),
+          samplePoints: points,
+          overlappingLayers
+        };
+      });
+      fs.mkdirSync('artifacts', { recursive: true });
+      fs.writeFileSync('artifacts/rental-shadow-diagnostic.json', JSON.stringify(diagnostic, null, 2));
+      console.log('[rental-shadow-diagnostic] ' + JSON.stringify(diagnostic));
+    }
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();
   }
