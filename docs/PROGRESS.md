@@ -458,3 +458,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Đã kiểm tra trực tiếp metadata GitHub của cả năm run: tất cả `head_sha` đều là `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7`, trạng thái `completed/success`.
 - Merge ref `5ac1ddbda3d789acf4b7d6bf3b88ca1b7ba8563a` có hai parent theo thứ tự `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc` và `2d1725abb35f3cb3ebbdd861487b8cc5caae34a7`; message: `Merge 2d1725abb35f3cb3ebbdd861487b8cc5caae34a7 into 59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`.
 - PR #10 hiện được API REST xác nhận `state=open`, `draft=true`, `merged=false`; head khớp `2d1725ab`.
+
+## Verified CI trên HEAD tài liệu mới nhất (22/11/2026)
+- Branch HEAD `ef7f863d3f991048d2a69ba76f3b4cce464831ea` (chỉ đổi `docs/DEPLOY.md`: chuyển mục permalink/health vào mục 4). Merge ref SHA từ log checkout: `da949c6e84f30323bbcec8f070fa76da0808dae4` (merge `ef7f863d…` vào base `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`).
+- 5/5 xanh trên HEAD này: [PHP syntax](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106916) · [WordPress integration – 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106864) · [Docker Compose smoke](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106936) · [Browser QA – 12 passed](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106921) · [Package ZIP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106855).
+- Các commit giữa `2d1725ab` và `ef7f863d` chỉ đổi tài liệu. Đã chạy lại `scripts/check-design-contrast.php`: passed (viền ô nhập trên mint-50 = 3,00095:1, biên rất mỏng).
+- PR #10 vẫn Draft; không merge, không deploy.
