@@ -88,7 +88,7 @@ async function createTripAndDay(page, title) {
   await tripButton.click();
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
   await expect(page).toHaveURL(/#route\?trip=/);
-  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '.section-heading', '#trip-list', '#create-trip', '#rental-workspace']);
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '.section-heading', '#trip-list', '#create-trip', '#rental-workspace']);
   await page.locator('#create-itinerary-btn').click();
   await expect(page.locator('#itinerary-editor')).toBeVisible();
   await page.locator('#itinerary-day-date').fill('2027-04-01');
@@ -178,7 +178,8 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await rentalLink.click();
   await expect(page).toHaveURL(/#shop\?/);
   await expect(page.locator('#rental-workspace')).toBeVisible();
-  await expectScreenState(page, '#rental-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#trips', '#itinerary-workspace']);
+  await expectScreenState(page, '#rental-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '#trips', '#itinerary-workspace']);
+  await expect(page.locator('.rental-next-step')).toBeVisible();
   await expect(page.locator('#rental-workspace-title')).toHaveText('Thuê đồ cho Điểm B đã sửa');
   await expect(page.locator('#rental-workspace')).toContainText('Danh mục thuê đồ chưa sẵn sàng');
   await page.locator('#rental-workspace').scrollIntoViewIfNeeded();
@@ -187,7 +188,7 @@ test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboar
   await page.locator('#rental-back-link').click();
   await expect(page).toHaveURL(/#route\?trip=/);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
-  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#rental-workspace']);
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '#rental-workspace']);
 
   await page.locator('.itinerary-item-card--stop').filter({ hasText: 'Điểm A' }).locator('.item-archive-action').click();
   const archiveDialog = page.locator('.archive-dialog');
@@ -254,10 +255,10 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await page.locator('#rental-back-link').click();
   await expect(page).toHaveURL(/#trip\//);
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
-  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section', '#rental-workspace']);
+  await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '#rental-workspace']);
 
   await page.goto(BASE_URL + '/#trips');
-  await expectScreenState(page, '#trip-list', ['.hero-section', '.feature-bento', '.next-step-section', '#itinerary-workspace', '#rental-workspace']);
+  await expectScreenState(page, '#trip-list', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '#itinerary-workspace', '#rental-workspace']);
   await page.goto(BASE_URL + '/#explore');
   await expectScreenState(page, '.hero-section', ['#trips', '#itinerary-workspace', '#rental-workspace']);
 

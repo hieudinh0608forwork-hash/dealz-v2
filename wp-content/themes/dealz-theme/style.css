@@ -773,11 +773,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 /* Trip editing is a focused workspace, not a continuation of the public landing page. */
 body.is-trip-view .hero-section,
 body.is-trip-view .feature-bento,
-body.is-trip-view .next-step-section { display: none !important; }
+body.is-trip-view .next-step-section.page-container { display: none !important; }
 
 /* Rental handoff is a focused destination, not a second copy of the home hero. */
 body.is-rental-view .hero-section,
-body.is-rental-view .next-step-section,
+body.is-rental-view .next-step-section.page-container,
 body.is-rental-view #trip-feedback { display: none !important; }
 body.is-rental-view .rental-workspace { padding-top: 42px; }
 @media (max-width: 640px) {

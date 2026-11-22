@@ -154,3 +154,8 @@ Last reconciled: 2026-11-22 (UTC)
 - Browser workflow now emits `artifacts/playwright-results.json` and a readable `artifacts/playwright-errors.txt` including Playwright failures and `error-context.md` snapshots. Artifact upload includes both screenshots and text logs.
 - Screenshot suite timeout is 120 seconds to accommodate the expanded 25-image matrix; assertions and test count remain unchanged.
 - Pending new Browser QA artifact/run evidence.
+
+
+## Route QA selector correction (2026-11-22)
+- Browser run [44989906380](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989906380) on commit `b233cac320e27e8f0d297dd4ed20b68f53920751` completed with 5 passed / 7 failed. All seven failures stopped in the shared route assertion because `.next-step-section` matched both the home next-step section and the distinct rental-next-step section (strict-mode locator ambiguity).
+- Root correction: scope the hidden home section to `.next-step-section.page-container`; the rental route's own `.rental-next-step` remains visible, and CSS no longer hides it as a side effect. Browser test asserts rental-next-step visibility. No test was removed or weakened.
