@@ -579,6 +579,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await expect(financeInput).toBeVisible();
   await financeInput.focus();
   await expect(financeInput).toBeFocused();
+  await expect(financeInput).toHaveCSS('border-color', 'rgb(253, 85, 10)');
+  await expect(financeInput).toHaveCSS('box-shadow', /0px 0px 0px 4px/);
   const financeFocus = await financeInput.evaluate(element => ({ border: getComputedStyle(element).borderColor, shadow: getComputedStyle(element).boxShadow }));
   expect(financeFocus.border).toBe('rgb(253, 85, 10)');
   expect(financeFocus.shadow).toContain('4px');
