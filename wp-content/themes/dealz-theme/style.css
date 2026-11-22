@@ -1114,6 +1114,20 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 .workspace-heading.rental-heading { margin-top: 20px; }
 .itinerary-layout { margin-top: 20px; }
 
+/* Selected-day rail is the itinerary screen's visual anchor. */
+.itinerary-rail__days {
+	background: var(--dealz-green);
+	border-color: transparent;
+	color: var(--dealz-white);
+}
+.itinerary-rail__days h3 { color: var(--dealz-white); }
+.itinerary-rail__days .day-chip { color: var(--dealz-white-muted); }
+.itinerary-rail__days .day-chip[aria-pressed="true"] {
+	background: var(--dealz-lime);
+	color: var(--dealz-green);
+}
+.itinerary-rail__days .day-chip[aria-pressed="true"]::after { background: var(--dealz-green); }
+
 .rental-empty-state {
 	display: grid;
 	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

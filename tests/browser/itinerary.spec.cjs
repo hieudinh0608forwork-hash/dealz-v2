@@ -757,6 +757,23 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
     await expectFullyInViewport(page.locator('#itinerary-workspace-title'));
+    if (width === 1280) {
+      const dayRail = await page.locator('.itinerary-rail__days').evaluate(element => {
+        const selected = element.querySelector('.day-chip[aria-pressed="true"]');
+        return {
+          panelBackground: getComputedStyle(element).backgroundColor,
+          headingColor: getComputedStyle(element.querySelector('h3')).color,
+          selectedBackground: selected ? getComputedStyle(selected).backgroundColor : null,
+          selectedColor: selected ? getComputedStyle(selected).color : null
+        };
+      });
+      expect(dayRail).toEqual({
+        panelBackground: 'rgb(1, 93, 71)',
+        headingColor: 'rgb(255, 255, 255)',
+        selectedBackground: 'rgb(224, 243, 84)',
+        selectedColor: 'rgb(1, 93, 71)'
+      });
+    }
     await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-default.png', fullPage: false });
 
     const card = page.locator('.itinerary-item-card--stop').first();

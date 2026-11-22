@@ -483,6 +483,10 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
+## T8 – tăng thứ bậc thị giác màn Hành trình (23/11/2026)
+- Khối danh sách ngày ở rail 4/8 được chuyển thành khối xanh rừng; tiêu đề trắng, ngày đang chọn nền lime/chữ xanh rừng, các ngày còn lại chữ trắng dịu. Không thay đổi lưới 4/8, dữ liệu ngày hoặc CTA.
+- Playwright tại viewport 1280 đo computed color thật của panel, tiêu đề và chip đang chọn; kỳ vọng lần lượt rgb(1,93,71), rgb(255,255,255), rgb(224,243,84), rgb(1,93,71).
+
 ## T8 – cân đối màn Thuê đồ (23/11/2026)
 - Đã xác định nguyên nhân phần trắng dư: rental-layout bị giới hạn một cột 760px dù container desktop rộng 1180px; không có cột nội dung thứ hai sau khi bỏ thẻ gợi ý chung.
 - Mở rộng empty-state thành một khối toàn chiều rộng; bố cục nội bộ 5/7: biểu tượng + tiêu đề ở cột trái, nội dung trung thực + CTA ở cột phải. Không thêm sản phẩm, giá, shop, dữ liệu hoặc CTA mới; giữ nguyên primary và điều kiện hiển thị Zalo.
