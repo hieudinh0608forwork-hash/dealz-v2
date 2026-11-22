@@ -439,7 +439,15 @@ test('six viewport matrix has no horizontal overflow or undersized controls', as
     await page.goto(BASE_URL + '/');
     const metrics = await page.evaluate(() => {
       const visible = element => { const r = element.getBoundingClientRect(); const s = getComputedStyle(element); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
-      const undersized = Array.from(document.querySelectorAll('button, .button, input, select, textarea')).filter(visible).filter(element => !element.classList.contains('adminbar-input')).filter(element => { const r = element.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).map(element => ({ tag: element.tagName, className: element.className, width: Math.round(element.getBoundingClientRect().width), height: Math.round(element.getBoundingClientRect().height) }));
+      const collectUndersized = () => Array.from(document.querySelectorAll('button, .button, input, select, textarea')).filter(visible).filter(element => !element.closest('#wpadminbar')).filter(element => { const r = element.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).map(element => ({ id: element.id, tag: element.tagName, className: element.className, width: Math.round(element.getBoundingClientRect().width), height: Math.round(element.getBoundingClientRect().height) }));
+      const probe = document.createElement('button');
+      probe.id = 'qa-undersized-control-probe';
+      probe.textContent = 'QA';
+      probe.style.cssText = 'position:fixed!important;left:0!important;top:0!important;width:43px!important;height:43px!important;min-width:0!important;min-height:0!important;padding:0!important;z-index:999999!important;';
+      document.body.appendChild(probe);
+      const probeDetected = collectUndersized().some(control => control.id === probe.id);
+      probe.remove();
+      const undersized = collectUndersized();
       const rentalCard = document.querySelector('.feature-card--rental');
       const rentalOverflow = rentalCard ? [rentalCard, ...rentalCard.querySelectorAll('*')].filter(element => element.scrollWidth > element.clientWidth).map(element => ({ tag: element.tagName, className: element.className, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth })) : ['missing rental card'];
       const hero = document.querySelector('.hero-section h1');
@@ -451,10 +459,11 @@ test('six viewport matrix has no horizontal overflow or undersized controls', as
         const lastTop = Math.max(...tops);
         heroLastLineWords = tops.filter(top => Math.abs(top - lastTop) < 1).length;
       }
-      return { viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, undersized, rentalOverflow, heroLastLineWords };
+      return { viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, probeDetected, undersized, rentalOverflow, heroLastLineWords };
     });
     expect(metrics.scroll, 'Horizontal overflow at viewport ' + width).toBeLessThanOrEqual(metrics.viewport);
-    expect(metrics.undersized, 'Controls smaller than 44px at viewport ' + width).toEqual([]);
+    expect(metrics.probeDetected, 'The 44px gate must detect a real 43px control at viewport ' + width).toBe(true);
+    expect(metrics.undersized, 'Controls smaller than 44px outside WordPress admin bar at viewport ' + width).toEqual([]);
     if (width === 360 || width === 390) expect(metrics.rentalOverflow, 'Rental bento content overflow at viewport ' + width).toEqual([]);
     expect(metrics.heroLastLineWords, 'Hero heading must not leave a one-word orphan at viewport ' + width).toBeGreaterThanOrEqual(2);
   }
