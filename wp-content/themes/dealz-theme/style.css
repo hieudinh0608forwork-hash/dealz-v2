@@ -1156,3 +1156,6 @@ body.is-rental-view .site-header.is-scrolled {
 	background: var(--dealz-cream);
 	backdrop-filter: none;
 }
+
+/* Trial-site notice (only rendered when option dealz_test_site is on). */
+.test-site-notice { margin: 0; padding: 8px 20px; background: var(--dealz-lime-50); color: var(--dealz-green); font-size: 13px; font-weight: 600; text-align: center; }

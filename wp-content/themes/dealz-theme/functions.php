@@ -192,8 +192,45 @@ function dealz_theme_register_settings(): void {
 			'default'           => '',
 		)
 	);
+	register_setting(
+		'dealz_theme_settings',
+		'dealz_test_site',
+		array(
+			'type'              => 'boolean',
+			'sanitize_callback' => static function ( $value ): int {
+				return empty( $value ) ? 0 : 1;
+			},
+			'default'           => 0,
+		)
+	);
 }
 add_action( 'admin_init', 'dealz_theme_register_settings' );
+
+/**
+ * Trial-site mode (option dealz_test_site, default off): visible notice and site-wide noindex.
+ */
+function dealz_is_test_site(): bool {
+	return (bool) get_option( 'dealz_test_site', 0 );
+}
+
+function dealz_test_site_robots( array $robots ): array {
+	return dealz_is_test_site() ? wp_robots_no_robots( $robots ) : $robots;
+}
+add_filter( 'wp_robots', 'dealz_test_site_robots' );
+
+function dealz_test_site_header(): void {
+	if ( dealz_is_test_site() && ! is_admin() ) {
+		header( 'X-Robots-Tag: noindex, nofollow', true );
+	}
+}
+add_action( 'send_headers', 'dealz_test_site_header' );
+
+function dealz_render_test_site_notice(): void {
+	if ( dealz_is_test_site() ) {
+		echo '<p class="test-site-notice" role="status">' . esc_html__( 'Bản thử nghiệm. Chưa phải dịch vụ chính thức; dữ liệu có thể thay đổi hoặc bị xóa.', 'dealz-theme' ) . '</p>' . "\n";
+	}
+}
+add_action( 'wp_body_open', 'dealz_render_test_site_notice', 5 );
 
 function dealz_theme_add_settings_page(): void {
 	add_theme_page( 'DealZ Settings', 'DealZ Settings', 'manage_options', 'dealz-settings', 'dealz_theme_render_settings_page' );
@@ -215,6 +252,12 @@ function dealz_theme_render_settings_page(): void {
 					<td>
 						<input class="regular-text" type="url" id="dealz_zalo_url" name="dealz_zalo_url" value="<?php echo esc_attr( (string) get_option( 'dealz_zalo_url', '' ) ); ?>" placeholder="https://zalo.me/…">
 						<p class="description"><?php esc_html_e( 'Để trống thì ẩn toàn bộ liên kết Zalo. Chỉ lưu URL HTTPS đã được chủ dự án cung cấp.', 'dealz-theme' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Chế độ bản thử nghiệm', 'dealz-theme' ); ?></th>
+					<td>
+						<label for="dealz_test_site"><input type="checkbox" id="dealz_test_site" name="dealz_test_site" value="1" <?php checked( dealz_is_test_site() ); ?>> <?php esc_html_e( 'Hiện dòng "Bản thử nghiệm" và đặt noindex cho toàn site', 'dealz-theme' ); ?></label>
 					</td>
 				</tr>
 			</table>

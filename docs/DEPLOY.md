@@ -95,3 +95,10 @@ wp db query "SHOW TABLES LIKE '$(wp db prefix)dealz_%';"
 - [ ] Chủ dự án duyệt nội dung, tài khoản được mời và phạm vi thử nghiệm trước khi chia sẻ URL.
 
 **Trạng thái:** hướng dẫn cho môi trường thử nghiệm. Chưa phải xác nhận production-ready; không deploy production nếu chưa có phê duyệt riêng.
+
+## 8. Chế độ bản thử nghiệm
+
+- Bật bằng **Giao diện → DealZ Settings → Chế độ bản thử nghiệm**, hoặc `wp option update dealz_test_site 1`. Mặc định tắt.
+- Khi bật: mọi trang có dòng "Bản thử nghiệm. Chưa phải dịch vụ chính thức…", thẻ `<meta name="robots" content="noindex, nofollow">` và header `X-Robots-Tag: noindex, nofollow`.
+- Chế độ này **bổ sung**, không thay cho các việc trong checklist mục 7 (HTTPS, tài khoản theo lời mời, sao lưu, bảo vệ truy cập). Khuyến nghị đặt thêm **Settings → Reading → Discourage search engines**.
+- Trạng thái xác minh: **Implemented**; chưa có test tự động và chưa kiểm tra trên môi trường WordPress thật trong phiên này.
