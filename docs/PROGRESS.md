@@ -484,6 +484,7 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
 ## T8 – chẩn đoán và sửa bóng mờ header (23/11/2026)
+- Browser QA đầu sau fix: 11/12 passed. Assertion đo trong 180ms transition nên nhận nền trung gian rgba(251,247,239,0.996), không phải trạng thái cuối; lỗi là timing của phép đo, không phải CSS không áp dụng. Bổ sung poll chờ computed background ổn định trước screenshot/đọc diagnostic, không nới assertion.
 - Đã xác nhận PR #10 HEAD trước chẩn đoán: aaad65c79fd431f2c10cc41a98dbe213fbe41217; PR vẫn Draft, chưa merge.
 - Browser QA chẩn đoán trên HEAD f4e02e91f9bc53209161c19f7b3087c3b476ea4b: 12/12 passed; 5/5 workflow xanh. Merge ref: bd3b09f6c35ac46659b4d2e1ecae25b177484de2.
 - Computed style thật tại 1280px, scrollY=74: header .site-header.is-scrolled, position=sticky, z-index=10, background rgba(255,255,255,0.94), backdrop-filter=blur(14px), box-shadow=none, filter=none; ::before/::after đều content:none.
