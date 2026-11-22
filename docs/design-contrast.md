@@ -40,6 +40,12 @@ Phương pháp: WCAG relative luminance, sRGB linearization, ratio (L1 + 0.05) /
 | Trắng #FFFFFF trên nút #D63F00 | 4,59:1 | Đạt; nút chính dùng chữ trắng |
 | Kem #FBF7EE trên nút #D63F00 | 4,30:1 | Không đạt; loại khỏi cách dùng, không dùng chữ kem trên nút chính |
 
+### Chữ xanh rừng trên nền lime
+
+| Cặp | Tỷ lệ | Ngưỡng | Kết quả |
+|---|---:|---:|---|
+| Chữ forest #015D47 trên lime #E0F354 | 6,44:1 | 4,5:1 | Đạt |
+
 ### Focus
 
 | Cặp | Tỷ lệ | Ngưỡng | Kết quả |

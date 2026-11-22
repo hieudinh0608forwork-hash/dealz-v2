@@ -2,7 +2,7 @@
 
 Branch: `work/ui-rental-cta-browser-migration-2026-11-22`  
 PR: [#10 – Draft](https://github.com/hieudinh0608forwork-hash/dealz-v2/pull/10)  
-Last reconciled: 2026-11-22 (UTC)
+Last reconciled: 2026-11-23 (UTC)
 
 > Update this table in every subsequent commit. `Verified` is reserved for acceptance criteria backed by a green CI run on the relevant commit. This log does not authorize merge or deployment.
 
@@ -15,8 +15,8 @@ Last reconciled: 2026-11-22 (UTC)
 | T4 – App shell | Implemented | [`6bc043c2`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/6bc043c21b9d058adba5ed3202be156993c1b207) + [`14ca277c`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/14ca277c9a9a7987b9c60ea495648dcddc9c3d92) | 14ca PHP + Docker smoke green; browser checks rerunning after 404 fix | Legal draft routes, Zalo settings, global mobile island with inline SVG icons/badge slot, sticky header, skip link, toast and skeleton | Zalo remains hidden unless HTTPS dealz_zalo_url is explicitly configured; three legal drafts contain headings only and are noindex. Mobile nav is global with inline SVG; badge count is now wired by T6; test rerun pending. Current commit adds browser assertions for public drafts and public styleguide denial |
 | T5 – Screens | Implemented | [`92f30ee0`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/92f30ee07e52e041a2f07bb9effea0849071b4ba) + [`6062b410`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/6062b410e4ad6fd5140d431850f30d1cc712f6f5) | CI pending after layout and interaction changes | Home hero/bento, itinerary rail/timeline/form/budget hierarchy, and empty rental two-column screen with context/generic guidance. Desktop/mobile layouts, card archive dialog, stop-anchor navigation and rental two-column empty state implemented; trip date range/day count meta now uses real trip/day data; finance forms collapse into details and their save actions are secondary. Visual QA remains | Real destination photos/licences not supplied; retain honest ImageSlot placeholders; native archive confirmation dialog, labelled edit fields, accessible move controls and stop-anchor navigation added; badge count and viewport screenshot proof remain |
 | T6 – Logic | Implemented | [[`84febcc1`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/84febcc19edf54dff120955f8d4fce5da677740b) + [`62ddbf96`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/62ddbf962884f1842bd11d1b25f8007e63401929) | [PHP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44955967523) · [Integration](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44955967515) · [Docker](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44955967598) · [Browser](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44955967511) – all success | Badge counts active unarchived stop items across all days of the selected itinerary, excludes lunch/dinner, hides at zero; Playwright asserts 2→2 after lunch→4→3 after archive. Current fix removes duplicate rental context declaration and updates strict robots selector; latest CI pending | Meal types excluded from the four-stop limit in code and integration/browser tests; owner confirmation still requested. Badge is a read-only aggregate, no existing records rewritten |
-| T7 – Quality gates | Blocked | [`73c7ddf8`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/73c7ddf80647c0707fec36d4dfb0364ceaec369a) | [Browser QA #62](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44959473937) – failure; PHP, Integration, Docker green | axe-core WCAG 2.1 AA, six viewport overflow/44px control matrix, reduced motion, 24-hour time, keyboard focus, admin-bar, CLS, primary CTA and screenshot matrix | Four browser failures remain; inspect logs and correct the loading-state race, WordPress admin-bar false positive, input focus ring and active-screen CTA visibility |
-| T8 – Self-review | Planned | — | — | Score 10 premium criteria with screenshot evidence; iterate up to three rounds | Cannot score before T3–T7 evidence exists |
+| T7 – Quality gates | Verified | [`46429517`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/46429517ba3c9bfe2b93f8ba4d7f36da855d16d5) | [PHP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589249) · [Integration 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589212) · [Docker](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589198) · [Browser 13/13](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175) · [Package ZIP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589168) – all success on the same code HEAD | All quality gates and Browser QA assertions green; latest artifact includes 45 PNG + 1 WebM; only Chromium |
+| T8 – Self-review | In review | [`46429517`](https://github.com/hieudinh0608forwork-hash/dealz-v2/commit/46429517ba3c9bfe2b93f8ba4d7f36da855d16d5) | [Browser QA 13/13 + screenshots/video](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175) · [artifact](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175/artifacts/14766242901) | Owner reviews the 18/20 self-score and latest images; wait for approval before further UI changes | Meets ≥16/20. Remaining: destination photo assets, mobile bottom-nav overlap in initial viewport, stale fetch-error banner after retry |
 
 ## Source intake notes
 - Read `docs/UI_BRIEF.md` and `docs/DECISIONS.md` before this log was created. `DECISIONS.md` wins over conflicting brief details.
@@ -448,7 +448,7 @@ Last reconciled: 2026-11-22 (UTC)
 
 ## Trạng thái nghiệm thu sau CI
 - C1–C7: **Implemented**, chưa được chủ dự án duyệt ảnh; không tự nâng thành Verified.
-- T8: Planned, chưa tự chấm; chỉ thực hiện sau khi chủ dự án duyệt ảnh C1–C7.
+- T8: tự chấm 18/20 (đạt ngưỡng), đang chờ chủ dự án duyệt artifact mới nhất; không tiếp tục thay đổi UI trước khi có phản hồi.
 - Browser QA chỉ chạy Chromium. Chưa test Safari, Firefox hoặc thiết bị thật; không tuyên bố đã kiểm thử toàn hệ thống.
 - PR #10 vẫn Draft; không merge, không deploy.
 
@@ -465,23 +465,29 @@ Last reconciled: 2026-11-22 (UTC)
 - Các commit giữa `2d1725ab` và `ef7f863d` chỉ đổi tài liệu. Đã chạy lại `scripts/check-design-contrast.php`: passed (viền ô nhập trên mint-50 = 3,00095:1, biên rất mỏng).
 - PR #10 vẫn Draft; không merge, không deploy.
 
-## T8 tự chấm "cao cấp" (23/11/2026) – chưa đạt ngưỡng
-Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit hero có ảnh). Chủ dự án đã duyệt C1–C7 ngày 23/11/2026. Chấm thang 0–2, chỉ dựa trên ảnh tĩnh đã xem (home 1280/390, hành trình 1280, thuê đồ 1280, styleguide 1280, hành trình 390 edit-open); chưa xem hết 42 ảnh.
+## T8 tự chấm "cao cấp" (23/11/2026) – đạt ngưỡng, chờ chủ dự án duyệt
+Nguồn: [artifact dealz-browser-qa](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175/artifacts/14766242901), Browser QA 13/13 trên code HEAD 46429517ba3c9bfe2b93f8ba4d7f36da855d16d5. Đã tải và xem ảnh thật: 45 PNG và video WebM 1,48 giây; không chấm dựa trên tên file hoặc metadata.
 
 | # | Tiêu chí | Điểm | Bằng chứng / ghi chú |
 |---|---|---:|---|
-| 1 | Thứ bậc thị giác | 1 | Home tốt (tiêu đề, ảnh, CTA); hành trình 1280 thẻ trắng cùng trọng lượng, không có điểm nhấn |
-| 2 | Nhịp khoảng trắng | 1 | Hành trình dày; thuê đồ 1280 trống nửa bên phải |
-| 3 | Typography | 2 | Bricolage/Be Vietnam Pro rõ cấp bậc, dấu tiếng Việt đọc tốt |
-| 4 | Kiềm chế màu | 2 | Chỉ dùng bảng màu đã chốt; cam chỉ ở CTA |
-| 5 | Nhất quán thành phần | 2 | Thẻ, chip, nút đồng bộ (styleguide) |
-| 6 | Lưới / căn lề | 2 | Lề trái thẳng hàng, bố cục 4/8 ổn định |
-| 7 | Khung ảnh / họa tiết | 1 | Chỉ một ảnh hero, độ phân giải thấp, chưa có Hội An |
-| 8 | Chuyển động | 1 (tạm) | Ảnh tĩnh không chứng minh được; chưa có bằng chứng video |
-| 9 | Đủ trạng thái | 1 | Thấy empty/success/edit; chưa thấy loading/error trong ảnh đã xem |
-| 10 | Giọng văn / trung thực | 2 | Trạng thái trống và "Sắp có" trung thực, không dữ liệu giả |
+| 1 | Thứ bậc thị giác | 2 | Home có tiêu đề/ảnh/CTA rõ; màn hành trình có khối ngày đang chọn nền forest; màn thuê đồ có empty-state toàn chiều rộng |
+| 2 | Nhịp khoảng trắng | 2 | Màn thuê đồ dùng lưới nội bộ 5/7, không còn nửa phải trống; khoảng cách giữa tiêu đề và nội dung cân đối |
+| 3 | Typography | 2 | Bricolage Grotesque + Be Vietnam Pro; cấp bậc rõ, dấu tiếng Việt đọc tốt |
+| 4 | Kiềm chế màu | 2 | Chỉ dùng token có sẵn; trắng/forest 7,90:1, forest/lime 6,44:1; CTA vẫn cam primary |
+| 5 | Nhất quán thành phần | 2 | Nút, chip, thẻ, trạng thái và styleguide nhất quán |
+| 6 | Lưới / căn lề | 1 | Desktop giữ lưới 4/8; ở ảnh mobile 390px, thanh điều hướng dưới che một phần nội dung cuối màn hình tại vị trí cuộn đầu |
+| 7 | Khung ảnh / họa tiết | 1 | Chỉ có một ảnh hero nguồn 800px; chưa có ảnh Hội An/điểm đến bổ sung với nguồn và quyền sử dụng rõ |
+| 8 | Chuyển động | 2 | Playwright đo transition 0,16 giây, transform đổi khi hover; video WebM và hai ảnh before/hover đã xem |
+| 9 | Đủ trạng thái | 2 | Ảnh loading và error thật; test xác nhận aria-busy, nút thử lại và retry. Lưu ý banner lỗi tổng quát còn tồn tại sau retry |
+| 10 | Giọng văn / trung thực | 2 | Empty state nói rõ chưa có shop/sản phẩm/giá/đặt thuê; không tạo dữ liệu giả |
 
-**Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
+**Tổng 18/20 – đạt ngưỡng ≥16.** Đây là tự chấm kỹ thuật, chưa phải chủ dự án duyệt T8.
+
+Ba điểm yếu còn lại:
+1. Thiếu ảnh điểm đến thật có nguồn gốc/giấy phép rõ; hiện chỉ có ảnh hero.
+2. Thanh điều hướng mobile che một phần nội dung cuối ở trạng thái cuộn đầu; cần tinh chỉnh vùng an toàn và xác nhận trên thiết bị thật.
+3. Thông báo "Failed to fetch" chưa tự xóa sau khi retry thành công; cần làm rõ vòng đời thông báo và kiểm thử lại.
+
 
 ## T8 – bổ sung ảnh bằng chứng loading/error (23/11/2026)
 - Luồng Browser QA desktop chụp hai trạng thái bằng chứng từ API được giữ/chặn có chủ đích: artifacts/state-loading-items.png và artifacts/state-error-items.png.
@@ -507,3 +513,13 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 ## T8 – bằng chứng chuyển động (23/11/2026)
 - Thêm test riêng bật video Playwright cho hover CTA chính trang chủ; test đo transition-duration=0.16s, xác nhận computed transform đổi khi hover, chờ chuyển động kết thúc, chụp trạng thái mặc định/hover và click kiểm tra liên kết #create-trip.
 - Video WebM được ghi bằng BrowserContext riêng (recordVideo) và lưu tại artifacts/motion-primary-hover.webm; ảnh đối chiếu: artifacts/motion-primary-default.png và artifacts/motion-primary-hover.png. Cách bật video bằng test.use trong describe bị Playwright từ chối vì yêu cầu worker mới; đã thay bằng BrowserContext riêng, không đổi cấu hình cho các test còn lại. Chỉ Chromium; không tuyên bố kiểm thử Safari/Firefox.
+
+
+## Reconciliation cuối T8 (23/11/2026)
+- Code HEAD đã kiểm thử: 46429517ba3c9bfe2b93f8ba4d7f36da855d16d5. PR #10 merge ref: 06c7984fc035369446de591ca7d4c107537035e6; hai parent theo đúng thứ tự base/main 59c9eeaa91f930769dc8b9711a17cbdde8baf2cc và code HEAD.
+- Năm workflow cùng xanh trên đúng code HEAD: [PHP syntax](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589249) · [Integration 25/164](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589212) · [Docker smoke](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589198) · [Browser QA 13/13](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175) · [Package ZIP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589168).
+- [Artifact Browser QA](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45052589175/artifacts/14766242901): 45 PNG, diagnostic JSON, Playwright results, WebM motion 1,48 giây. Đã mở xem ảnh desktop/mobile, loading/error và video.
+- Main vẫn là 59c9eeaa91f930769dc8b9711a17cbdde8baf2cc. PR #10 vẫn open/Draft, chưa merge; không deploy.
+- Không có git/gh CLI trong môi trường thực thi (git clone không truy cập được mạng); đã đối chiếu GitHub REST API: branch ref, 10 commit gần nhất, PR, merge-ref parents và metadata của cả năm workflow. Không thấy commit lạ sau thời điểm tiếp quản; các commit Claude nằm trước HEAD bàn giao aaad65c.
+- Cần chủ dự án cung cấp/xác nhận: docs/MASTER_HANDOFF.md (hiện chưa có; docs/13_HANDOFF_COMPLETION.md chưa được xác nhận là Master Handoff), URL Zalo chính thức, ảnh điểm đến có nguồn gốc/quyền sử dụng rõ, thông tin hosting/PHP/MySQL/DNS/HTTPS.
+- Chỉ Chromium đã chạy; chưa test Safari, Firefox hoặc thiết bị thật. T8 đang chờ chủ dự án duyệt; chưa chuẩn bị bản thử nghiệm online.
