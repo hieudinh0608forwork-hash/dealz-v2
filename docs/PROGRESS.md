@@ -182,3 +182,8 @@ Last reconciled: 2026-11-22 (UTC)
 ## Playwright error artifact formatting correction (2026-11-22)
 - Inspected the generated workflow source and found the error-export script used double-escaped `\\n`, which would write literal backslash-n sequences instead of readable line breaks. Corrected to real newline escapes for failure headings, error-context separators and file joins.
 - Artifact still contains both JSON report and `error-context.md` snapshots; the exported `.txt` is now line-oriented and readable. Pending next Browser QA artifact verification.
+
+
+## Stable itinerary/item loading assertions (2026-11-22)
+- Addressed the observed `Đang tải điểm dừng…` race with Playwright web-first assertions, no fixed sleeps: after route reload the test waits for the selected trip title and the resolved empty-itinerary state; after creating a day and each stop it waits until `#day-items-list` no longer contains the loading message and `aria-busy` is no longer `true`.
+- These assertions prevent subsequent clicks/axe scans/screenshots from racing the async API render. Test coverage is stronger; no delay was added and no assertion removed.

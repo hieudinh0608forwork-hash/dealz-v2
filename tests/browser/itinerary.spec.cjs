@@ -105,11 +105,15 @@ async function createTripAndDay(page, title) {
   await expect(page).toHaveURL(/#route$/);
   await page.goto(BASE_URL + '/#route?trip=' + encodeURIComponent(selectedTripId));
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  await expect(page.locator('#itinerary-workspace-title')).toHaveText(title);
+  await expect(page.locator('#itinerary-versions')).toContainText('Chưa có lịch trình. Tạo một bản thủ công để thêm ngày và điểm dừng.');
   await page.locator('#create-itinerary-btn').click();
   await expect(page.locator('#itinerary-editor')).toBeVisible();
   await page.locator('#itinerary-day-date').fill('2027-04-01');
   await page.locator('#create-day-form button[type="submit"]').click();
   await expect(page.locator('#day-items-panel')).toBeVisible();
+  await expect(page.locator('#day-items-list')).not.toContainText('Đang tải điểm dừng…');
+  await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 }
 
 async function addStop(page, title, address) {
@@ -120,6 +124,8 @@ async function addStop(page, title, address) {
   await page.locator('#item-duration').fill('90');
   await page.locator('#create-item-submit').click();
   await expect(page.locator('.itinerary-item-card--stop').filter({ hasText: title })).toBeVisible();
+  await expect(page.locator('#day-items-list')).not.toContainText('Đang tải điểm dừng…');
+  await expect(page.locator('#day-items-list')).not.toHaveAttribute('aria-busy', 'true');
 }
 
 test('desktop: loading/error, reorder, edit, archive, rental handoff and keyboard', async ({ page }) => {
