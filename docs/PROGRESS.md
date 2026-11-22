@@ -353,3 +353,12 @@ Last reconciled: 2026-11-22 (UTC)
 - `font-proof.json` supersedes the earlier 272.74 KiB measurement: current 10 WOFF2 files total 201,432 bytes (196.71 KiB), under 300 KiB.
 - latin-ext removed; `check-font-subsets.py` scanned 12 source files and found no latin-ext-only required codepoints. `fonts.css` retains latin and vietnamese `unicode-range`; `functions.php` preloads exactly two Vietnamese WOFF2 files.
 - Updated DECISIONS 14.1 and Design Rules 11.2 to remove stale 279,284-byte / latin-ext / `tabular-nums` statements. Be Vietnam Pro remains unchanged; measured digits are non-tabular, so time/money columns use min-width and right alignment.
+
+
+## Focus transition fix, screenshot viewport criterion, and ZIP installation proof (22/11/2026)
+- `:focus-visible` now sets `transition: none !important` for every keyboard-focused control; approved outline values remain 3px solid #D63F00, offset 3px; input focus border #FD550A + 4px halo; lime ring on green surfaces.
+- Replaced general background transition shorthand with explicit `background-color`; existing transform, box-shadow and border-color transitions remain explicit. No `transition: all` declaration was present in tracked theme CSS.
+- Browser QA retains focus width ≥3px, exact color and offset assertions; additionally checks transition-property none for form controls, summaries, and back/header/footer links.
+- Screenshot checks now require the target's complete bounding box within the viewport (`top >= 0`, `bottom <= innerHeight`), replacing partial intersection checks and avoiding false failures from fractional scroll rounding (previous delta 1.015625px). No product acceptance assertion changed.
+- Docker smoke builds both ZIPs, verifies roots, plugin/theme headers, excluded development paths and absence of .env/private-key/CI-password material; clears source mounts before extracting ZIPs into clean WordPress plugin/theme directories; activates plugin before theme; verifies health, eight tables and schema 1.2.0; cycles plugin deactivate/activate and confirms persistence.
+- This is the single authorized CI attempt for the focus fix. Do not rerun after failure. PR #10 remains Draft; no merge/deploy. C1–C7 remain Implemented pending owner review of screenshots.

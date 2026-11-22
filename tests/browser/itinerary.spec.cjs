@@ -509,7 +509,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.keyboard.press('Tab');
   await page.locator('.finance-card').first().locator('summary').click();
   await page.locator('.finance-card').nth(1).locator('summary').click();
-  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit, #budget-description, #budget-quantity, #budget-unit-amount, #budget-cost-type, #create-budget-submit, #expense-amount, #expense-occurred-at, #expense-note, #create-expense-submit');
+  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit, #budget-description, #budget-quantity, #budget-unit-amount, #budget-cost-type, #create-budget-submit, #expense-amount, #expense-occurred-at, #expense-note, #create-expense-submit, .finance-card summary');
   for (let index = 0; index < await focusable.count(); index++) {
     const control = focusable.nth(index);
     await control.focus();
@@ -587,6 +587,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     await page.keyboard.press('Shift+Tab');
     await expect(control).toBeFocused();
     await expect(control).toHaveCSS('outline-width', '3px');
+    await expect(control).toHaveCSS('transition-property', 'none');
     if (controlId === 'item-title') await expect(control).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
     const focus = await control.evaluate(element => {
       const style = getComputedStyle(element);
@@ -621,6 +622,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
       };
     });
     expect(focus.visible, 'Control must match :focus-visible: ' + controlId).toBe(true);
+    expect(focus.transitionProperty, 'Focus transition must be disabled: ' + controlId).toBe('none');
     expect(focus.style, 'Focus outline style: ' + controlId).not.toBe('none');
     expect(parseFloat(focus.width), 'Focus outline width: ' + controlId + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);
     if (controlId === 'item-title') expect(focus.color, 'Input focus color: ' + JSON.stringify(focus)).toBe('rgb(214, 63, 0)');
@@ -631,6 +633,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect(backLink).toBeFocused();
+  await expect(backLink).toHaveCSS('transition-property', 'none');
   const backLinkFocus = await backLink.evaluate(element => ({
     visible: element.matches(':focus-visible'),
     style: getComputedStyle(element).outlineStyle,
@@ -659,6 +662,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect(headerLink).toBeFocused();
+  await expect(headerLink).toHaveCSS('transition-property', 'none');
   await expect(headerLink).toHaveCSS('outline-width', '3px');
   await expect(headerLink).toHaveCSS('outline-offset', '3px');
   await expect(headerLink).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
@@ -668,6 +672,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect(footerLink).toBeFocused();
+  await expect(footerLink).toHaveCSS('transition-property', 'none');
   await expect(footerLink).toHaveCSS('outline-width', '3px');
   await expect(footerLink).toHaveCSS('outline-offset', '3px');
   await expect(footerLink).toHaveCSS('outline-color', 'rgb(224, 243, 84)');
@@ -705,6 +710,12 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
       root.style.scrollBehavior = previousBehavior;
     }, top);
   };
+  const expectFullyInViewport = async locator => {
+    await expect.poll(() => locator.evaluate(element => {
+      const rect = element.getBoundingClientRect();
+      return rect.top >= 0 && rect.bottom <= window.innerHeight;
+    })).toBe(true);
+  };
   const scrollBelowHeader = async locator => {
     const targetTop = await locator.evaluate(element => {
       const header = document.querySelector('.site-header');
@@ -712,14 +723,14 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
       return Math.max(0, window.scrollY + element.getBoundingClientRect().top - headerBottom - 16);
     });
     await scrollTo(targetTop);
-    await expect(locator).toBeInViewport();
+    await expectFullyInViewport(locator);
   };
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(BASE_URL + '/#explore');
     await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(page.locator('.hero-section h1')).toBeInViewport();
+    await expectFullyInViewport(page.locator('.hero-section h1'));
     await page.screenshot({ path: 'artifacts/home-' + width + '-viewport-default.png', fullPage: false });
   }
 
@@ -728,8 +739,8 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await page.goto(BASE_URL + '/#explore');
     const rentalCard = page.locator('.feature-card--rental');
     await rentalCard.scrollIntoViewIfNeeded();
-    await expect(rentalCard.locator('h2')).toBeInViewport();
-    await expect(rentalCard.locator('.dz-chip')).toBeVisible();
+    await expectFullyInViewport(rentalCard.locator('h2'));
+    await expectFullyInViewport(rentalCard.locator('.dz-chip'));
     await page.screenshot({ path: 'artifacts/home-' + width + '-viewport-bento.png', fullPage: false });
   }
 
@@ -744,7 +755,7 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await page.setViewportSize({ width, height: 900 });
     await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(page.locator('#itinerary-workspace-title')).toBeInViewport();
+    await expectFullyInViewport(page.locator('#itinerary-workspace-title'));
     await page.screenshot({ path: 'artifacts/itinerary-' + width + '-viewport-default.png', fullPage: false });
 
     const card = page.locator('.itinerary-item-card--stop').first();
@@ -759,8 +770,8 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await expect(page.locator('#rental-workspace')).toBeVisible();
     await scrollBelowHeader(page.locator('#rental-context-chip'));
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(page.locator('#rental-context-chip')).toBeInViewport();
-    await expect(page.locator('#rental-workspace-title')).toBeInViewport();
+    await expectFullyInViewport(page.locator('#rental-context-chip'));
+    await expectFullyInViewport(page.locator('#rental-workspace-title'));
     await page.screenshot({ path: 'artifacts/rental-' + width + '-viewport-empty.png', fullPage: false });
     await page.locator('#rental-back-link').click();
     await expect(page.locator('#itinerary-workspace')).toBeVisible();
@@ -772,7 +783,7 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await page.setViewportSize({ width, height: 900 });
     await scrollTo(0);
     await expect(page.locator('.site-header')).toBeInViewport({ ratio: 0.9 });
-    await expect(page.getByRole('heading', { name: 'Trang styleguide', level: 1 })).toBeInViewport();
+    await expectFullyInViewport(page.getByRole('heading', { name: 'Trang styleguide', level: 1 }));
     await page.screenshot({ path: 'artifacts/styleguide-' + width + '-viewport-default.png', fullPage: false });
   }
 });

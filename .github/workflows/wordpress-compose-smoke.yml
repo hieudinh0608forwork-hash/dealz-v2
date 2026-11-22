@@ -14,6 +14,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build and validate installable ZIP archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd wp-content/plugins
+          zip -qr "$GITHUB_WORKSPACE/dist/dealz-core.zip" dealz-core \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*/README*' '*/phpunit.xml*' '*.md'
+          cd "$GITHUB_WORKSPACE/wp-content/themes"
+          zip -qr "$GITHUB_WORKSPACE/dist/dealz-theme.zip" dealz-theme \
+            -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*.md'
+          python - <<'PY'
+          import re, zipfile
+          archives = [
+              ("dist/dealz-core.zip", "dealz-core/", "dealz-core/dealz-core.php"),
+              ("dist/dealz-theme.zip", "dealz-theme/", "dealz-theme/style.css"),
+          ]
+          blocked = re.compile(r"(^|/)\.env(?:\.|$)|(^|/)(?:id_rsa|id_ed25519|[^/]+\.pem|[^/]+\.key)$", re.I)
+          private_key = re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|ci-only-password-not-for-reuse", re.I)
+          for path, root, header in archives:
+              with zipfile.ZipFile(path) as z:
+                  names = z.namelist()
+                  files = [name for name in names if not name.endswith("/")]
+                  assert files and all(name.startswith(root) for name in files), f"wrong ZIP root: {path}"
+                  assert header in names, f"missing header file: {header}"
+                  assert not any(re.search(r"(^|/)(tests|docs|\.github|node_modules)/", name) for name in names), f"dev files included: {path}"
+                  assert not any(blocked.search(name) for name in names), f"secret/config filename included: {path}"
+                  for name in files:
+                      assert not private_key.search(z.read(name)), f"private key or CI password in {name}"
+                  source = z.read(header).decode()
+                  if root == "dealz-core/":
+                      assert re.search(r"^\s*\*\s*Plugin Name:\s*DealZ Core\s*$", source, re.M)
+                  else:
+                      assert re.search(r"^Theme Name:\s*DealZ Theme\s*$", source, re.M)
+                  print(f"PASS {path}: root={root}, files={len(files)}, header and secret scan valid")
+          PY
+
+      - name: Prepare empty WordPress plugin and theme mounts for ZIP installation
+        run: |
+          rm -rf wp-content/plugins/dealz-core wp-content/themes/dealz-theme
+          mkdir -p wp-content/plugins/dealz-core wp-content/themes/dealz-theme
+
       - name: Validate Compose configuration
         run: |
           cp .env.example .env
@@ -38,6 +80,10 @@ jobs:
             --admin_password=ci-only-password-not-for-reuse \
             --admin_email=dealz-ci@example.invalid \
             --skip-email
+          unzip -oq dist/dealz-core.zip -d wp-content/plugins
+          unzip -oq dist/dealz-theme.zip -d wp-content/themes
+          test -f wp-content/plugins/dealz-core/dealz-core.php
+          test -f wp-content/themes/dealz-theme/style.css
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
 
@@ -66,6 +112,15 @@ jobs:
             echo "PASS: repeat activation preserved schema and data.\n";
           '
           curl -fsS http://localhost:8080/wp-json/dealz/v1/health
+
+      - name: Upload ZIP installation proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dealz-zip-install-proof
+          path: dist/*.zip
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Stop stack and remove ephemeral volumes
         if: always()

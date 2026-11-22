@@ -31,6 +31,7 @@ button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
 body :focus-visible {
+	transition: none !important;
 	outline-width: 3px !important;
 	outline-style: solid !important;
 	outline-color: var(--dealz-focus-outline) !important;
@@ -149,7 +150,7 @@ body :focus-visible {
 	font-size: 17px;
 	font-weight: 700;
 	cursor: pointer;
-	transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+	transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 .button:hover { transform: translateY(-2px); }
 .button--primary {
@@ -886,7 +887,7 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 
 
 /* T4: responsive app shell. */
-.site-header { height: auto; background: var(--dealz-cream); border-bottom: 0; backdrop-filter: none; transition: background 180ms ease, border-color 180ms ease; }
+.site-header { height: auto; background: var(--dealz-cream); border-bottom: 0; backdrop-filter: none; transition: background-color 180ms ease, border-color 180ms ease; }
 .site-header.is-scrolled { background: var(--dealz-header-surface); border-bottom: 1px solid var(--dealz-border-soft); backdrop-filter: blur(14px); }
 .site-header__inner { height: 72px; }
 .desktop-nav a[aria-current="page"] { padding: 9px 14px; border-radius: 999px; background: var(--dealz-lime); color: var(--dealz-green); }
