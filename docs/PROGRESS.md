@@ -187,3 +187,5 @@ Last reconciled: 2026-11-22 (UTC)
 ## Stable itinerary/item loading assertions (2026-11-22)
 - Addressed the observed `Đang tải điểm dừng…` race with Playwright web-first assertions, no fixed sleeps: after route reload the test waits for the selected trip title and the resolved empty-itinerary state; after creating a day and each stop it waits until `#day-items-list` no longer contains the loading message and `aria-busy` is no longer `true`.
 - These assertions prevent subsequent clicks/axe scans/screenshots from racing the async API render. Test coverage is stronger; no delay was added and no assertion removed.
+
+- Screenshot fixture now closes the budget and expense entry details after creating the two expense records, so the “default itinerary” and “edit panel open” captures show the intended screen state rather than unrelated open finance forms.

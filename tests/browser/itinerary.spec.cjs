@@ -52,6 +52,8 @@ async function addFinanceFixtures(page) {
       expense.note.startsWith('Bữa') ? 1 : 2
     );
   }
+  await page.locator('.finance-card').nth(1).locator('summary').click();
+  await page.locator('.finance-card').first().locator('summary').click();
 }
 
 async function expectScreenState(page, visibleSelector, hiddenSelectors) {
