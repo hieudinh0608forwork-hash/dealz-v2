@@ -382,7 +382,7 @@ test('six viewport matrix has no horizontal overflow or undersized controls', as
       let heroLastLineWords = 0;
       if (hero && hero.firstChild && hero.firstChild.nodeType === Node.TEXT_NODE) {
         const text = hero.firstChild.textContent;
-        const words = Array.from(text.matchAll(/\\S+/g));
+        const words = Array.from(text.matchAll(/\S+/g));
         const tops = words.map(match => { const range = document.createRange(); range.setStart(hero.firstChild, match.index); range.setEnd(hero.firstChild, match.index + match[0].length); return range.getBoundingClientRect().top; });
         const lastTop = Math.max(...tops);
         heroLastLineWords = tops.filter(top => Math.abs(top - lastTop) < 1).length;

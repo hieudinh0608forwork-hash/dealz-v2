@@ -104,3 +104,5 @@ Last reconciled: 2026-11-22 (UTC)
 - Hero heading now uses a 20ch measure and `text-wrap: balance`; this avoids forcing the final “bạn.” onto a one-word line at desktop widths while preserving the approved wording.
 - The existing six-viewport Playwright matrix now measures word line positions and requires at least two words on the final line at each viewport (360, 390, 768, 1024, 1280, 1536). No screenshot-only judgment substituted for the assertion.
 - Pending CI evidence.
+
+- Corrected the test's whitespace-token regex literal after source review; the test now tokenizes visible hero words rather than matching a literal backslash. No assertion was relaxed.
