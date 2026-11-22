@@ -118,3 +118,9 @@ Last reconciled: 2026-11-22 (UTC)
 - At mobile widths up to 767px, the outer `#day-items-panel` loses redundant padding, border, radius and background while retaining the stop-card component and its own border/padding. Stop cards use 16px internal padding.
 - Mobile Playwright at 390px measures the first stop card's actual content box (border and padding excluded) and requires at least 320px. No itinerary or API behavior changed.
 - Pending CI evidence.
+
+
+## FontTools digit-width measurement gate (2026-11-22)
+- Added `scripts/check-font-metrics.py`; the PHP syntax workflow installs the development-only `fonttools` + `brotli` packages and measures Be Vietnam Pro 400 Latin WOFF2 `hmtx` advance widths for digits 0–9, reporting units-per-em, each width and whether all ten are equal.
+- The PHP syntax workflow has NO `paths` filter: `.github/workflows/php-lint.yml` runs on pushes to `main` and pull requests targeting `main`. The new measurement step therefore runs on PR #10 CI.
+- Await the next PHP workflow log before recording the measured widths or deciding whether the UI needs min-width/right-aligned numeric columns. Font family remains unchanged.

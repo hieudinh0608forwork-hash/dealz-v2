@@ -30,5 +30,6 @@ jobs:
           python-version: '3.12'
       - name: Validate OpenAPI contract
         run: |
-          python -m pip install --disable-pip-version-check pyyaml
+          python -m pip install --disable-pip-version-check pyyaml fonttools brotli
           python scripts/validate_openapi.py
+          python scripts/check-font-metrics.py
