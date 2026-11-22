@@ -464,3 +464,21 @@ Last reconciled: 2026-11-22 (UTC)
 - 5/5 xanh trên HEAD này: [PHP syntax](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106916) · [WordPress integration – 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106864) · [Docker Compose smoke](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106936) · [Browser QA – 12 passed](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106921) · [Package ZIP](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45045106855).
 - Các commit giữa `2d1725ab` và `ef7f863d` chỉ đổi tài liệu. Đã chạy lại `scripts/check-design-contrast.php`: passed (viền ô nhập trên mint-50 = 3,00095:1, biên rất mỏng).
 - PR #10 vẫn Draft; không merge, không deploy.
+
+## T8 tự chấm "cao cấp" (23/11/2026) – chưa đạt ngưỡng
+Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit hero có ảnh). Chủ dự án đã duyệt C1–C7 ngày 23/11/2026. Chấm thang 0–2, chỉ dựa trên ảnh tĩnh đã xem (home 1280/390, hành trình 1280, thuê đồ 1280, styleguide 1280, hành trình 390 edit-open); chưa xem hết 42 ảnh.
+
+| # | Tiêu chí | Điểm | Bằng chứng / ghi chú |
+|---|---|---:|---|
+| 1 | Thứ bậc thị giác | 1 | Home tốt (tiêu đề, ảnh, CTA); hành trình 1280 thẻ trắng cùng trọng lượng, không có điểm nhấn |
+| 2 | Nhịp khoảng trắng | 1 | Hành trình dày; thuê đồ 1280 trống nửa bên phải |
+| 3 | Typography | 2 | Bricolage/Be Vietnam Pro rõ cấp bậc, dấu tiếng Việt đọc tốt |
+| 4 | Kiềm chế màu | 2 | Chỉ dùng bảng màu đã chốt; cam chỉ ở CTA |
+| 5 | Nhất quán thành phần | 2 | Thẻ, chip, nút đồng bộ (styleguide) |
+| 6 | Lưới / căn lề | 2 | Lề trái thẳng hàng, bố cục 4/8 ổn định |
+| 7 | Khung ảnh / họa tiết | 1 | Chỉ một ảnh hero, độ phân giải thấp, chưa có Hội An |
+| 8 | Chuyển động | 1 (tạm) | Ảnh tĩnh không chứng minh được; chưa có bằng chứng video |
+| 9 | Đủ trạng thái | 1 | Thấy empty/success/edit; chưa thấy loading/error trong ảnh đã xem |
+| 10 | Giọng văn / trung thực | 2 | Trạng thái trống và "Sắp có" trung thực, không dữ liệu giả |
+
+**Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
