@@ -95,8 +95,9 @@ async function createTripAndDay(page, title) {
   await page.locator('#trip-start').fill('2027-04-01');
   await page.locator('#trip-end').fill('2027-04-03');
   await page.locator('#create-trip-submit').click();
-  const tripButton = page.locator('#trip-list [data-open-trip]').filter({ hasText: title });
-  await expect(tripButton).toHaveCount(1);
+  const tripCard = page.locator('#trip-list .trip-card').filter({ hasText: title });
+  await expect(tripCard).toHaveCount(1);
+  const tripButton = tripCard.locator('[data-open-trip]');
   await expect(tripButton).toBeVisible();
   await tripButton.click();
   await expect(page.locator('#itinerary-workspace')).toBeVisible();

@@ -211,3 +211,10 @@ Last reconciled: 2026-11-22 (UTC)
 - Mobile test: line 280 expected legacy `#trip/<id>`, while the product correctly returned canonical `#route?trip=<id>`. Updated the expected route to the current canonical contract; no navigation behavior changed.
 - Locale test: shared helper selected the first itinerary in the list, which could be a previous fixture rather than the newly created locale-specific trip. Changed helper to select exactly one trip matching the supplied title and assert count=1 before opening.
 - Browser run #44990716061 did not verify the newly pushed admin-bar probe commit; this correction is followed by another run on a later head.
+
+
+## Browser QA #44990993337 – trip fixture locator root cause (2026-11-22)
+- Run [44990993337](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990993337) ran on `a5d16dad42177ab2feeedd9b8cae9b39b571c046`: 5/12 passed, 7 failed. PHP [44990993336](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990993336), Integration [44990993384](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990993384) and Docker [44990993330](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990993330) passed on the same commit.
+- Seven browser failures shared one fixture-selector regression: `createTripAndDay()` filtered the `[data-open-trip]` button by trip title, but the button's visible text is only “Mở lịch trình”; the title is rendered in the parent `.trip-card` heading. The selector therefore matched zero cards and cascaded into the desktop, mobile, badge, axe, focus, primary-action and screenshot tests.
+- Corrected the helper to locate exactly one `.trip-card` containing the requested title, then click its `[data-open-trip]` button. The 43px positive control probe and #wpadminbar-only exclusion remain intact. No test removed, skipped, or relaxed.
+- Artifact from this run: [dealz-browser-qa](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44990993337/artifacts).
