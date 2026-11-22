@@ -524,7 +524,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
               const found = [];
               for (const rule of Array.from(rules)) {
                 if (rule.selectorText && rule.style && element.matches(rule.selectorText) && /(outline|transition)/i.test(rule.cssText)) {
-                  const variables = Array.from(rule.cssText.matchAll(/var\\(\\s*(--[\\w-]+)/g), match => match[1]);
+                  const variables = Array.from(rule.cssText.matchAll(/var\(\s*(--[\w-]+)/g), match => match[1]);
                   found.push({
                     source: sheet.href || '<inline style element>',
                     selector: rule.selectorText,

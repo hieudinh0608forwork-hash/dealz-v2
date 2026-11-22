@@ -336,3 +336,7 @@ Last reconciled: 2026-11-22 (UTC)
 - Thêm snapshot JSON ngay sau `#item-title.focus()`: `:focus-visible`, bốn longhand outline, transition property/duration, số animation, toàn bộ custom properties được tham chiếu bởi rule outline/transition khớp phần tử, CSS rule + source file.
 - Thêm `expect.poll` tối đa 500ms, ghi thời gian đầu tiên outline-width đạt 3px và snapshot cuối. Không có sleep; assertion width ≥3px, offset ≥3px và màu #D63F00 vẫn giữ nguyên.
 - Chỉ là test chẩn đoán; chưa thay CSS. Phân loại H1/H2 sau khi đọc log của CI chạy trên commit chẩn đoán này.
+
+
+## Focus diagnostic regex syntax correction (2026-11-22)
+- Browser run [44995701858](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44995701858) stopped before test discovery because the diagnostic's regex literal double-escaped `\(` and `\s`, producing `Unterminated group`. Corrected the JavaScript regex literal to `/var\(\s*(--[\w-]+)/g` source form (single escapes); no product code or test assertions changed.
