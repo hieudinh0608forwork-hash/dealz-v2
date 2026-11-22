@@ -413,3 +413,41 @@ Last reconciled: 2026-11-22 (UTC)
 - Run [45039947566](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45039947566) on head `3be36bce1452d2085297e5bda06260456954fa24` confirms `permalink_structure` was set and the primary `/wp-json/dealz/v1/health` endpoint passed on the first attempt with HTTP 200 and the expected JSON. The secondary `?rest_route=` assertion also completed.
 - The job then failed in the final WP-CLI schema verification: PHP parse error `unexpected token "\\"` at line 4. The workflow source had an over-escaped fully qualified `\\DealZ\\Database\\Schema` name inside a shell single-quoted PHP snippet. Corrected it to the single leading namespace separator required by PHP; updated the success text to describe the eight-table/schema assertion rather than a removed theme lifecycle step.
 - This is the fifth and final authorized repair attempt for the Docker smoke issue. Do not make another Docker smoke code change if the next run remains red; collect logs and ask the owner. No product assertion was relaxed. PR #10 remains Draft; no merge/deploy.
+
+
+## Verified CI trên cùng một HEAD (22/11/2026)
+
+- **Tested/Verified code HEAD:** `d3f35b66e6ae129419685a786ce2ebb0acb6f4ae`.
+- **PR merge ref SHA từ log checkout của cả năm run:** `1ed42b73035430db6f5fa3c58d42ef578d796e26`; merge ref này chứa HEAD trên vào base `59c9eeaa91f930769dc8b9711a17cbdde8baf2cc`. Đã đối chiếu log checkout của từng run, không suy ra từ PR metadata.
+- **Bốn workflow nghiệm thu: 4/4 xanh trên cùng HEAD và merge ref:** [PHP syntax – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155797) · [WordPress integration – success, 25 tests/164 assertions](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155802) · [Docker Compose smoke – success](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155842) · [Browser QA – success, 12/12](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155790).
+- Package ZIP workflow cũng xanh: [Package DealZ installable ZIPs](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155795).
+- Artifact ảnh/log Chromium: [dealz-browser-qa – 4,245,273 bytes](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155790/artifacts/14761945182). ZIP cài đặt: [dealz-installable-zips](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155795/artifacts/14761201876). Bằng chứng ZIP được cài từ thư mục sạch trong Docker: [dealz-zip-install-proof](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45040155842/artifacts/14760902920).
+- Docker smoke: permalink `/%postname%/` đã được set và hard flush; primary endpoint trả HTTP 200 + JSON đúng ngay lần poll đầu; assertion phụ `?rest_route=` chạy riêng; schema 1.2.0, tám bảng và vòng deactivate/activate plugin đều pass. Lỗi namespace escape trong assertion cuối đã sửa ở commit `d3f35b66`; đây là lần sửa thứ năm, không còn lượt sửa Docker smoke dự phòng.
+
+## Đối chiếu UI_BRIEF với code tại HEAD đã Verified
+
+| Mục UI_BRIEF | Trạng thái | Đối chiếu code / giới hạn |
+|---|---|---|
+| 4.1 Nút | Implemented | Các biến thể, trạng thái và quy tắc một primary được dựng; Browser QA kiểm tra. |
+| 4.2 Ô nhập | Implemented | Nhãn, lỗi, focus, ô giờ 24h/mặt nạ; Browser QA kiểm tra. |
+| 4.3 Chip | Implemented | Chip ngày, loại điểm dừng và trạng thái chọn. |
+| 4.4 Thẻ | Implemented | Thẻ điểm dừng, tài chính, ghi chú, cảnh báo có cấu trúc riêng. |
+| 4.5 ImageSlot | Implemented | Khung ảnh rỗng trung thực; **ảnh địa điểm thật có giấy phép: Chưa**. |
+| 4.6 Header | Implemented | Header sticky, tài khoản, skip link và xử lý admin bar. |
+| 4.7 Thanh dưới mobile | Implemented | Điều hướng mobile và badge Hành trình; badge ẩn khi 0. |
+| 4.8 Footer | Implemented | Footer, ba trang legal noindex dạng bản nháp, Zalo ẩn khi chưa cấu hình; nội dung pháp lý có hiệu lực: Chưa. |
+| 4.9 Toast | Implemented | Thông báo trạng thái thành công/lỗi và vùng live. |
+| 4.10 Skeleton | Implemented | Skeleton và trạng thái tải. |
+| 4.11 Empty state | Implemented | Trạng thái trống có hướng dẫn và hành động. |
+| 4.12 Đoạn nối | Implemented | Hiển thị fallback khi không có dữ liệu tuyến; số phút/km thật: Chưa có nguồn. |
+| 4.13 Styleguide | Implemented | Route riêng cho admin, noindex, không nằm trong menu; các nhóm thành phần/trạng thái có trong trang. |
+| 5.1 Trang chủ | Implemented | Hero, minh họa nội bộ, bento tính năng và khối Tiếp theo. |
+| 5.2 Hành trình | Implemented | Tạo chuyến/ngày, điểm dừng, sắp xếp, sửa, lưu trữ, tài chính, CTA thuê đồ và chỉ đường có địa chỉ. Chia sẻ/In/PDF chưa có và không hiển thị. |
+| 5.2a Lưu/Chia sẻ/In/PDF | Chưa | Chỉ hiển thị khi chức năng chạy thật; hiện không có control chết. |
+| 5.3 Thuê đồ trống | Implemented | Context điểm dừng, empty state, gợi ý chung, quay lại và khối Tiếp theo; không có shop/sản phẩm/giá giả. |
+
+## Trạng thái nghiệm thu sau CI
+- C1–C7: **Implemented**, chưa được chủ dự án duyệt ảnh; không tự nâng thành Verified.
+- T8: Planned, chưa tự chấm; chỉ thực hiện sau khi chủ dự án duyệt ảnh C1–C7.
+- Browser QA chỉ chạy Chromium. Chưa test Safari, Firefox hoặc thiết bị thật; không tuyên bố đã kiểm thử toàn hệ thống.
+- PR #10 vẫn Draft; không merge, không deploy.
