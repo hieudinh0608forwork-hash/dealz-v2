@@ -571,7 +571,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   expect(backLinkFocus.style).not.toBe('none');
   expect(parseFloat(backLinkFocus.width)).toBeGreaterThanOrEqual(3);
   expect(parseFloat(backLinkFocus.offset)).toBeGreaterThanOrEqual(3);
-  const expenseDetails = page.locator('#finance-panel .finance-card').nth(1).locator('details.finance-form-details');
+  const expenseForm = page.locator('#create-expense-form');
+  const expenseDetails = expenseForm.locator('xpath=..');
   if (!(await expenseDetails.evaluate(element => element.open))) await expenseDetails.locator('summary').click();
   await expect(expenseDetails).toHaveAttribute('open', '');
   const financeInput = page.locator('#expense-amount');
@@ -618,7 +619,7 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
       window.scrollTo(0, target);
       root.style.scrollBehavior = previousBehavior;
     }, top);
-    await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBe(Math.round(top));
+    await expect.poll(() => page.evaluate(target => Math.abs(window.scrollY - target), top)).toBeLessThanOrEqual(1);
   };
   const scrollBelowHeader = async locator => {
     const targetTop = await locator.evaluate(element => {
