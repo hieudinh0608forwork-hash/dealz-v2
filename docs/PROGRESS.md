@@ -401,3 +401,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Set WordPress permalink structure to `/%postname%/` and hard-flush rewrite rules immediately after fresh core install; print the resulting `permalink_structure`.
 - Keep the primary `/wp-json/dealz/v1/health` poll, redirect-following, HTTP 200 requirement and unchanged JSON contract. Add `?rest_route=` as a separate secondary JSON assertion only; it does not replace the primary endpoint. Keep `set -o pipefail`, bounded retries, diagnostics and hard failure.
 - No product assertions, application code, production settings or merge/deploy state changed. Await CI evidence on the new branch head.
+
+
+## CI permalink correction commit (22/11/2026)
+- Commit `3be36bce1452d2085297e5bda06260456954fa24`: Docker smoke đặt permalink `/%postname%/`, hard flush rewrite rules, in giá trị thực tế; giữ nguyên poll/assertion endpoint chính và thêm assertion phụ `?rest_route=`.
+- Docker run [45039947566](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/45039947566) được kích hoạt cho commit này; đang chờ kết quả. Checkout ref run trước xác nhận merge ref `9ad072d187392c838eb303b5492d2e16bef1c4c8` cho HEAD `a59dd5b7a7511f1b1cf98a8e69581adc6a8c338a`.
+- Chưa Verified; cần bốn workflow xanh cùng một HEAD và ghi merge ref của lần chạy tương ứng.

@@ -98,3 +98,14 @@ CI chạy `scripts/check-design-contrast.php` để đọc token thực tế và
 | `#7C948B` (làm sáng lân cận) | Mint-50 `#F2F7F4` | 2,99825:1 | 3:1 | Không đạt |
 
 Phương pháp: chuyển từng kênh sRGB sang linear, tính relative luminance và `(L1 + 0.05) / (L2 + 0.05)`. Kết luận: giữ token `--dealz-input-border: #7C948A`; đây là ứng viên sáng nhất trong các giá trị lân cận đã thử mà vẫn đạt ngưỡng trên cả ba nền. Không đổi token màu.
+
+
+## Ghi nhận bổ sung về CTA và axe (22/11/2026)
+
+| Cặp màu | Tỷ lệ đã đo | Ngưỡng | Trạng thái |
+|---|---:|---:|---|
+| Chữ trắng `#FFFFFF` trên nút chính `#D63F00` | 4,595:1 | 4,5:1 | Đạt |
+| Viền focus `#FD550A` trên nền trắng `#FFFFFF` | 3,241:1 | 3:1 | Đạt |
+
+- Lần axe báo serious `color-contrast` tại `#create-item-submit` trong commit `df92eec`, foreground/background computed của lần báo lỗi ban đầu: **chưa xác định**. Không suy diễn cặp màu từ kết quả thay thế.
+- Override thử `#B93400` (5,91:1) đã được hoàn nguyên; nút chính hiện giữ `#D63F00` theo quyết định thiết kế (4,595:1). Browser QA 12/12 trên commit `df92eec` sau hoàn nguyên; điều này không thay thế bằng chứng axe ban đầu và không chứng minh riêng computed pair của lần báo lỗi.
