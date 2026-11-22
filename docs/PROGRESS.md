@@ -259,3 +259,9 @@ Last reconciled: 2026-11-22 (UTC)
 - The consolidated global focus rule with `!important` still needs Browser QA confirmation; previous Browser run [44992361334](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992361334) is 11/12 and retains the `#item-title` computed-width failure.
 - Added strict diagnostic output to the existing focus assertion: matching CSS rules, stylesheet URLs, resolved token value, `#primary` ancestry, inline style and computed outline color/width. The width ≥3px assertion remains unchanged.
 - Current viewport screenshot capture commit `7644de68` also moves each screen title into the viewport before taking images. New Browser run is in progress; do not call 12/12 until the diagnostic run passes.
+
+
+## Focus cascade – longhand enforcement and element-level token proof (2026-11-22)
+- Browser run [44992620574](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992620574) on `02aac315b52a5b0130438b7c0552e02e95971edf`: PHP [44992620575](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992620575), Integration [44992620477](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992620477) and Docker [44992620481](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992620481) passed; Browser remained 11/12.
+- Diagnostic proves `body #primary :focus-visible` matches and root token is `#D63F00`, but computed outline width is 0px and color falls back to text color. Expanded diagnostics to collect every matched outline rule and the custom property resolved on the input itself.
+- Replaced outline shorthand with explicit longhand width/style/color/offset in the single global focus rule. Added a strict input focus-color assertion; no test is weakened. Await new CI.

@@ -31,7 +31,9 @@ button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
 body #primary :focus-visible {
-	outline: 3px solid var(--dealz-focus-outline) !important;
+	outline-width: 3px !important;
+	outline-style: solid !important;
+	outline-color: var(--dealz-focus-outline) !important;
 	outline-offset: 3px !important;
 }
 
