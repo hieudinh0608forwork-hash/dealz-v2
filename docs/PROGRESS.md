@@ -241,3 +241,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Consolidated form focus indicators under one high-specificity `:focus-visible` rule (3px solid outline, 3px offset); removed duplicate form-specific outline declarations. Keyboard tests now switch modality with Tab/Shift+Tab before checking each form control.
 - The itinerary editor locator remains the exact `#itinerary-editor` id selector; no broad locator or weakened condition was introduced.
 - Await full four-workflow CI on the new commit.
+
+
+## Browser QA #44992063025 – focus outline cascade remains unresolved (2026-11-22)
+- Run [44992063025](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992063025) ran on `0ef8da72e40987ab1ba7389c6ffd63df813e2761`: 11/12 passed. PHP [44992063039](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992063039), Integration [44992063020](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992063020), Docker [44992063003](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992063003) passed on the same commit.
+- The single remaining failure is still `#item-title`: it matches `:focus-visible` and has a non-`none` outline style, but computed outline width remains `0px`. The consolidated `body #primary :focus-visible` rule still loses the width in the WordPress browser context.
+- Strengthened the global 3px outline and 3px offset declarations with `!important`, and made the approved lime outline-color override important on green surfaces so the focus color decision remains intact. The test remains unchanged and strict.

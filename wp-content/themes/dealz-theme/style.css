@@ -31,8 +31,8 @@ button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
 body #primary :focus-visible {
-	outline: 3px solid var(--dealz-focus-outline);
-	outline-offset: 3px;
+	outline: 3px solid var(--dealz-focus-outline) !important;
+	outline-offset: 3px !important;
 }
 
 .skip-link {
@@ -835,7 +835,7 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 .budget-summary :focus-visible,
 .site-footer :focus-visible,
 .rental-next-step :focus-visible {
-	outline-color: var(--dealz-lime);
+	outline-color: var(--dealz-lime) !important;
 }
 .styleguide-page { padding-block: 48px 88px; }
 .styleguide-intro { max-width: 760px; margin-bottom: 42px; }
