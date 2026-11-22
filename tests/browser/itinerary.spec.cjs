@@ -513,11 +513,81 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
   for (let index = 0; index < await focusable.count(); index++) {
     const control = focusable.nth(index);
     await control.focus();
+    const controlId = await control.getAttribute('id');
+
+    if (controlId === 'item-title') {
+      const diagnosticSnapshot = element => {
+        const computed = getComputedStyle(element);
+        const matchingRules = Array.from(document.styleSheets).flatMap(sheet => {
+          try {
+            const collect = (rules, conditions = []) => {
+              const found = [];
+              for (const rule of Array.from(rules)) {
+                if (rule.selectorText && rule.style && element.matches(rule.selectorText) && /(outline|transition)/i.test(rule.cssText)) {
+                  const variables = Array.from(rule.cssText.matchAll(/var\\(\\s*(--[\\w-]+)/g), match => match[1]);
+                  found.push({
+                    source: sheet.href || '<inline style element>',
+                    selector: rule.selectorText,
+                    cssText: rule.cssText,
+                    conditions,
+                    variables
+                  });
+                }
+                if (rule.cssRules) found.push(...collect(rule.cssRules, conditions.concat(rule.conditionText || rule.constructor.name)));
+              }
+              return found;
+            };
+            return collect(sheet.cssRules);
+          } catch (error) {
+            return [{ source: sheet.href || '<inline style element>', inaccessible: String(error), variables: [] }];
+          }
+        });
+        const customPropertyNames = [...new Set(matchingRules.flatMap(rule => rule.variables || []))];
+        return {
+          matchesFocusVisible: element.matches(':focus-visible'),
+          outlineStyle: computed.outlineStyle,
+          outlineWidth: computed.outlineWidth,
+          outlineColor: computed.outlineColor,
+          outlineOffset: computed.outlineOffset,
+          transitionProperty: computed.transitionProperty,
+          transitionDuration: computed.transitionDuration,
+          animationCount: element.getAnimations().length,
+          customProperties: Object.fromEntries(customPropertyNames.map(name => [name, computed.getPropertyValue(name).trim()])),
+          matchingRules,
+          inlineStyle: element.getAttribute('style')
+        };
+      };
+
+      const diagnosticStartedAt = Date.now();
+      const initialDiagnostic = await control.evaluate(diagnosticSnapshot);
+      console.log('[FOCUS_DIAGNOSTIC_INITIAL] ' + JSON.stringify(initialDiagnostic));
+
+      let widthReachedAfterMs = null;
+      let pollError = null;
+      try {
+        await expect.poll(async () => {
+          const width = await control.evaluate(element => parseFloat(getComputedStyle(element).outlineWidth));
+          if (width >= 3 && widthReachedAfterMs === null) widthReachedAfterMs = Date.now() - diagnosticStartedAt;
+          return width;
+        }, { timeout: 500, intervals: [10, 25, 50, 100] }).toBeGreaterThanOrEqual(3);
+      } catch (error) {
+        pollError = String(error.message).split('\\n')[0];
+      }
+
+      const afterPollDiagnostic = await control.evaluate(diagnosticSnapshot);
+      console.log('[FOCUS_DIAGNOSTIC_AFTER_POLL] ' + JSON.stringify({
+        elapsedMs: Date.now() - diagnosticStartedAt,
+        widthReachedAfterMs,
+        pollError,
+        ...afterPollDiagnostic
+      }));
+    }
+
     await page.keyboard.press('Tab');
     await page.keyboard.press('Shift+Tab');
     await expect(control).toBeFocused();
     await expect(control).toHaveCSS('outline-width', '3px');
-    if (await control.getAttribute('id') === 'item-title') await expect(control).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
+    if (controlId === 'item-title') await expect(control).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
     const focus = await control.evaluate(element => {
       const style = getComputedStyle(element);
       const matchingRules = Array.from(document.styleSheets).flatMap(sheet => {
@@ -525,8 +595,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
           const collect = (rules, conditions = []) => {
             const found = [];
             for (const rule of Array.from(rules)) {
-              if (rule.selectorText && rule.style && element.matches(rule.selectorText) && /outline/i.test(rule.style.cssText)) {
-                found.push({ href: sheet.href, selector: rule.selectorText, cssText: rule.style.cssText, conditions });
+              if (rule.selectorText && rule.style && element.matches(rule.selectorText) && /(outline|transition)/i.test(rule.cssText)) {
+                found.push({ source: sheet.href || '<inline style element>', selector: rule.selectorText, cssText: rule.cssText, conditions });
               }
               if (rule.cssRules) found.push(...collect(rule.cssRules, conditions.concat(rule.conditionText || rule.constructor.name)));
             }
@@ -534,7 +604,7 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
           };
           return collect(sheet.cssRules);
         } catch (error) {
-          return [{ href: sheet.href, inaccessible: String(error) }];
+          return [{ source: sheet.href || '<inline style element>', inaccessible: String(error) }];
         }
       });
       return {
@@ -542,19 +612,19 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
         style: style.outlineStyle,
         width: style.outlineWidth,
         color: style.outlineColor,
-        token: getComputedStyle(document.documentElement).getPropertyValue('--dealz-focus-outline').trim(),
-        elementToken: getComputedStyle(element).getPropertyValue('--dealz-focus-outline').trim(),
-        inPrimary: Boolean(element.closest('#primary')),
+        offset: style.outlineOffset,
+        transitionProperty: style.transitionProperty,
+        transitionDuration: style.transitionDuration,
+        animationCount: element.getAnimations().length,
         matchingRules,
-        inlineStyle: element.getAttribute('style'),
-        stylesheets: Array.from(document.styleSheets).map(sheet => sheet.href)
+        inlineStyle: element.getAttribute('style')
       };
     });
-    expect(focus.visible, 'Control must match :focus-visible: ' + await control.getAttribute('id')).toBe(true);
-    expect(focus.style, 'Focus outline style: ' + await control.getAttribute('id')).not.toBe('none');
-    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id') + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);
-    if (await control.getAttribute('id') === 'item-title') expect(focus.color, 'Input focus color: ' + JSON.stringify(focus)).toBe('rgb(214, 63, 0)');
-    expect(parseFloat(await control.evaluate(element => getComputedStyle(element).outlineOffset)), 'Focus outline offset: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
+    expect(focus.visible, 'Control must match :focus-visible: ' + controlId).toBe(true);
+    expect(focus.style, 'Focus outline style: ' + controlId).not.toBe('none');
+    expect(parseFloat(focus.width), 'Focus outline width: ' + controlId + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);
+    if (controlId === 'item-title') expect(focus.color, 'Input focus color: ' + JSON.stringify(focus)).toBe('rgb(214, 63, 0)');
+    expect(parseFloat(focus.offset), 'Focus outline offset: ' + controlId).toBeGreaterThanOrEqual(3);
   }
   const backLink = page.locator('#back-to-trips');
   await backLink.focus();

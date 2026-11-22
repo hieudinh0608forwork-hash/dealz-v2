@@ -330,3 +330,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Chính sách tài khoản khách: `users_can_register=false`; pilot dùng tài khoản tạo bằng lời mời; đăng ký công khai cần trang tài khoản riêng và chủ dự án duyệt.
 - Browser screenshot matrix bổ sung viewport 1536; upload artifact được xác nhận có `if: always()`.
 - Các kết quả CI của commit mới sẽ được ghi bổ sung sau khi GitHub tạo run IDs; không gắn nhầm run của HEAD trước.
+
+
+## Điều tra focus #item-title – chẩn đoán một lượt (22/11/2026)
+- Thêm snapshot JSON ngay sau `#item-title.focus()`: `:focus-visible`, bốn longhand outline, transition property/duration, số animation, toàn bộ custom properties được tham chiếu bởi rule outline/transition khớp phần tử, CSS rule + source file.
+- Thêm `expect.poll` tối đa 500ms, ghi thời gian đầu tiên outline-width đạt 3px và snapshot cuối. Không có sleep; assertion width ≥3px, offset ≥3px và màu #D63F00 vẫn giữ nguyên.
+- Chỉ là test chẩn đoán; chưa thay CSS. Phân loại H1/H2 sau khi đọc log của CI chạy trên commit chẩn đoán này.
