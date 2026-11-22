@@ -379,3 +379,11 @@ Last reconciled: 2026-11-22 (UTC)
 - Bỏ theme deactivate/reactivate (WP-CLI không có lệnh deactivate theme); không chạy theme lifecycle giả. Giữ plugin deactivate/activate và kiểm tra lại 8 bảng/schema 1.2.0.
 - Hoàn nguyên CSS CTA override và các dòng tài liệu #B93400 từ df92eec. Primary CTA vẫn #D63F00 + chữ trắng; không đổi test/tiêu chí sản phẩm.
 - Đây là lượt Docker smoke bổ sung duy nhất được cấp. PR #10 vẫn Draft; không merge/deploy; C1–C7 chờ chủ dự án duyệt ảnh.
+
+
+## Docker smoke health response diagnostics (22/11/2026)
+- HEAD trước chẩn đoán: `dd1a120983950171fca3cdae4f26e6d31cbf8fb4`. Quyết định: chỉ thêm quan sát lỗi, chưa sửa permalink, site URL, route registration hay assertion.
+- Thay health polling bằng 30 lần thử (nghỉ 2 giây giữa lần); chỉ pass khi HTTP 200 và JSON khớp nguyên ba điều kiện `service=dealz-core`, `status=scaffolded`, `application_ready=false`. Không dùng `continue-on-error`, không đổi assertion.
+- Khi fail, ghi HTTP status cuối, 40 dòng đầu body, curl stderr, header response qua REST pretty URL và `?rest_route=`, WordPress `home`/`siteurl`/rewrite structure, cùng 80 dòng container logs. WP-CLI được gọi qua `php /tmp/wp-cli.phar --allow-root`, đúng cách workflow cài CLI.
+- Chẩn đoán `?rest_route=` chỉ là bằng chứng phân loại, không được tính là pass. Chờ log rồi mới chọn sửa permalink, URL, response contract hoặc container/DB.
+- Không chạy CI thủ công ngoài run được kích hoạt bởi commit chẩn đoán. PR #10 giữ Draft; không merge/deploy; T7 chưa Verified.

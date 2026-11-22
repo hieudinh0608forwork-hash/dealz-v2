@@ -117,23 +117,37 @@ jobs:
             if ( get_option( "dealz_smoke_sentinel" ) !== "preserve-me" ) { exit( 1 ); }
             echo "PASS: repeat activation preserved schema and data.\n";
           '
-          health_url="http://127.0.0.1:8080/wp-json/dealz/v1/health"
-          ready=0
-          for attempt in {1..30}; do
-            if curl --connect-timeout 2 --max-time 5 -fsS "$health_url" -o /tmp/dealz-health.json \
-              && test -s /tmp/dealz-health.json \
-              && jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' /tmp/dealz-health.json; then
-              ready=1
+          set -o pipefail
+          url="http://127.0.0.1:8080/wp-json/dealz/v1/health"
+          ok=0
+          for i in $(seq 1 30); do
+            code="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$url" 2>/tmp/curl.err || true)"
+            if [ "$code" = "200" ] && jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' /tmp/health.json >/dev/null 2>&1; then
+              ok=1
+              echo "PASS: health OK after $i attempt(s)"
               break
             fi
             sleep 2
           done
-          if [ "$ready" -ne 1 ]; then
-            echo "FAIL: health endpoint did not return expected JSON within 60 seconds: $health_url" >&2
-            if test -f /tmp/dealz-health.json; then cat /tmp/dealz-health.json >&2; fi
+          if [ "$ok" != "1" ]; then
+            echo "FAIL: last http_code=$code" >&2
+            echo "--- body (first 40 lines) ---" >&2
+            head -n 40 /tmp/health.json >&2 || true
+            echo "--- curl stderr ---" >&2
+            cat /tmp/curl.err >&2 || true
+            echo "--- curl -i (no -f) ---" >&2
+            curl -sS -i "$url" | head -n 30 >&2 || true
+            echo "--- rest_route form ---" >&2
+            curl -sS -i "http://127.0.0.1:8080/?rest_route=/dealz/v1/health" | head -n 30 >&2 || true
+            echo "--- site config ---" >&2
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get home >&2 || true
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root option get siteurl >&2 || true
+            docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root rewrite structure >&2 || true
+            echo "--- container logs ---" >&2
+            docker compose logs --tail 80 >&2 || true
             exit 1
           fi
-          cat /tmp/dealz-health.json
+          cat /tmp/health.json
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
             global $wpdb;
             if ( get_option( "dealz_db_version" ) !== "1.2.0" ) { exit( 1 ); }
