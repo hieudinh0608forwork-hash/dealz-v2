@@ -26,14 +26,18 @@ jobs:
           zip -qr "$GITHUB_WORKSPACE/dist/dealz-theme.zip" dealz-theme \
             -x '*/tests/*' '*/docs/*' '*/.github/*' '*/node_modules/*' '*.md'
           python - <<'PY'
-          import re, zipfile
+          import os, re, zipfile
+          from pathlib import Path
+          workspace = Path(os.environ["GITHUB_WORKSPACE"])
           archives = [
-              ("dist/dealz-core.zip", "dealz-core/", "dealz-core/dealz-core.php"),
-              ("dist/dealz-theme.zip", "dealz-theme/", "dealz-theme/style.css"),
+              (workspace / "dist/dealz-core.zip", "dealz-core/", "dealz-core/dealz-core.php"),
+              (workspace / "dist/dealz-theme.zip", "dealz-theme/", "dealz-theme/style.css"),
           ]
           blocked = re.compile(r"(^|/)\.env(?:\.|$)|(^|/)(?:id_rsa|id_ed25519|[^/]+\.pem|[^/]+\.key)$", re.I)
           private_key = re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|ci-only-password-not-for-reuse", re.I)
           for path, root, header in archives:
+              if not path.is_file() or path.stat().st_size == 0:
+                  raise SystemExit(f"FAIL: required release ZIP missing or empty: {path}")
               with zipfile.ZipFile(path) as z:
                   names = z.namelist()
                   files = [name for name in names if not name.endswith("/")]
@@ -80,8 +84,10 @@ jobs:
             --admin_password=ci-only-password-not-for-reuse \
             --admin_email=dealz-ci@example.invalid \
             --skip-email
-          unzip -oq dist/dealz-core.zip -d wp-content/plugins
-          unzip -oq dist/dealz-theme.zip -d wp-content/themes
+          test -s "$GITHUB_WORKSPACE/dist/dealz-core.zip" || { echo "FAIL: dealz-core.zip missing or empty" >&2; exit 1; }
+          test -s "$GITHUB_WORKSPACE/dist/dealz-theme.zip" || { echo "FAIL: dealz-theme.zip missing or empty" >&2; exit 1; }
+          unzip -oq "$GITHUB_WORKSPACE/dist/dealz-core.zip" -d "$GITHUB_WORKSPACE/wp-content/plugins"
+          unzip -oq "$GITHUB_WORKSPACE/dist/dealz-theme.zip" -d "$GITHUB_WORKSPACE/wp-content/themes"
           test -f wp-content/plugins/dealz-core/dealz-core.php
           test -f wp-content/themes/dealz-theme/style.css
           docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root plugin activate dealz-core
@@ -111,7 +117,20 @@ jobs:
             if ( get_option( "dealz_smoke_sentinel" ) !== "preserve-me" ) { exit( 1 ); }
             echo "PASS: repeat activation preserved schema and data.\n";
           '
-          curl -fsS http://localhost:8080/wp-json/dealz/v1/health
+          curl -fsS http://localhost:8080/wp-json/dealz/v1/health | tee /tmp/dealz-health.json
+          jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false' /tmp/dealz-health.json
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme deactivate dealz-theme
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root theme activate dealz-theme
+          docker compose exec -T wordpress php /tmp/wp-cli.phar --allow-root eval '
+            global $wpdb;
+            if ( get_option( "dealz_db_version" ) !== "1.2.0" ) { exit( 1 ); }
+            foreach ( \\DealZ\\Database\\Schema::table_names() as $table ) {
+              if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) ) !== $table ) { exit( 1 ); }
+              if ( empty( $wpdb->get_results( "SHOW COLUMNS FROM `" . esc_sql( $table ) . "`", ARRAY_A ) ) ) { exit( 1 ); }
+            }
+            echo "PASS: theme reactivation preserves the 1.2.0 schema.\\n";
+          '
+          curl -fsS http://localhost:8080/wp-json/dealz/v1/health | jq -e '.service == "dealz-core" and .status == "scaffolded" and .application_ready == false'
 
       - name: Upload ZIP installation proof
         if: always()
