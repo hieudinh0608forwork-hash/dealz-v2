@@ -186,7 +186,14 @@ test('mobile: responsive stop card, CTA and keyboard focus', async ({ page }) =>
   await addStop(page, 'Điểm kế tiếp chưa có địa chỉ', '');
 
   const card = page.locator('.itinerary-item-card--stop').first();
-  await expect(card.locator('.itinerary-item-card__media')).toBeVisible();
+  const imageSlot = card.locator('.itinerary-item-card__media');
+  await expect(imageSlot).toBeVisible();
+  await expect(imageSlot).toHaveAttribute('role', 'img');
+  await expect(imageSlot).toHaveAttribute('aria-label', 'Chưa có ảnh cho Điểm dừng mobile');
+  await expect(imageSlot.locator('.image-slot__title')).toHaveText('Điểm dừng mobile');
+  await expect(imageSlot.locator('.image-slot__status')).toHaveText('Chưa có ảnh đã xác minh');
+  await expect(imageSlot.locator('.image-slot__pin')).toBeVisible();
+  expect(await imageSlot.evaluate(element => parseFloat(getComputedStyle(element).minHeight))).toBeGreaterThanOrEqual(112);
   await expect(card.getByRole('button', { name: 'Di chuyển lên' })).toBeDisabled();
   await expect(card.getByRole('button', { name: 'Di chuyển xuống' })).toBeEnabled();
   await expect(card.getByRole('link', { name: 'Mở mục thuê đồ cho Điểm dừng mobile' })).toBeVisible();

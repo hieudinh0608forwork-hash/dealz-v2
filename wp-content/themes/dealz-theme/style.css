@@ -644,25 +644,27 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	box-shadow: 0 10px 30px var(--dealz-surface-shadow);
 }
 .itinerary-item-card__media {
+	position: relative;
 	width: 100%;
-	aspect-ratio: 16 / 10;
-	display: grid;
-	place-items: center;
+	min-height: 144px;
+	aspect-ratio: 16 / 6;
+	display: block;
 	margin-bottom: 18px;
-	border: 1px dashed var(--dealz-border);
 	border-radius: 18px;
-	background: linear-gradient(135deg, var(--dealz-panel-bg) 0%, var(--dealz-surface-green) 100%);
-	color: var(--dealz-muted);
-	text-align: center;
+	background: linear-gradient(125deg, var(--dealz-green) 0%, var(--dealz-ink) 100%);
+	color: var(--dealz-white);
+	text-align: left;
 	overflow: hidden;
 }
-.itinerary-item-card__media-label {
-	max-width: 80%;
-	padding: 8px 14px;
-	border-radius: 999px;
-	background: var(--dealz-white-muted-strong);
-	font-size: 13px;
-	font-weight: 600;
+.image-slot__contours { position: absolute; inset: 0; width: 100%; height: 100%; }
+.image-slot__pin { position: absolute; top: 14px; left: 16px; width: 28px; height: 28px; }
+.image-slot__footer { position: absolute; right: 16px; bottom: 13px; left: 16px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.image-slot__title { min-width: 0; max-width: 62%; color: var(--dealz-white); font-family: var(--dealz-font-heading); font-size: 22px; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.image-slot__status { max-width: 38%; color: var(--dealz-white-muted-strong); font-size: 14px; line-height: 1.35; text-align: right; }
+@media (max-width: 640px) {
+	.itinerary-item-card__media { min-height: 112px; }
+	.image-slot__title { font-size: 18px; }
+	.image-slot__status { font-size: 12px; }
 }
 .itinerary-item-card--meal {
 	width: min(100%, 620px);

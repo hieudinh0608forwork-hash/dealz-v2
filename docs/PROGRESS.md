@@ -106,3 +106,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Pending CI evidence.
 
 - Corrected the test's whitespace-token regex literal after source review; the test now tokenizes visible hero words rather than matching a literal backslash. No assertion was relaxed.
+
+
+## UI defect C6 – compact empty ImageSlot (2026-11-22)
+- Rebuilt the empty stop ImageSlot as a compact forest-to-ink gradient with faint inline contour SVG, lime map-pin SVG, Bricolage 700 stop name and “Chưa có ảnh đã xác minh” status aligned at the bottom.
+- Preserved `role="img"` and added the exact accessible label “Chưa có ảnh cho [tên điểm dừng]”. Desktop minimum height is 144px; mobile minimum height is 112px. No stock or AI image is used.
+- Mobile Browser QA now asserts the role, label, title, status, pin and computed minimum height. Pending CI and desktop measurement.

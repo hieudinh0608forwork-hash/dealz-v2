@@ -442,13 +442,32 @@
 
 		if (isMainStop) {
 			const media = document.createElement('div');
-			media.className = 'itinerary-item-card__media';
+			media.className = 'itinerary-item-card__media image-slot image-slot--empty';
 			media.setAttribute('role', 'img');
-			media.setAttribute('aria-label', 'Chưa có ảnh đã xác minh cho ' + item.title_snapshot);
-			const mediaLabel = document.createElement('span');
-			mediaLabel.className = 'itinerary-item-card__media-label';
-			mediaLabel.textContent = item.title_snapshot + ' · Chưa có ảnh đã xác minh';
-			media.append(mediaLabel);
+			media.setAttribute('aria-label', 'Chưa có ảnh cho ' + item.title_snapshot);
+			const contours = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			contours.setAttribute('class', 'image-slot__contours');
+			contours.setAttribute('viewBox', '0 0 900 220');
+			contours.setAttribute('preserveAspectRatio', 'none');
+			contours.setAttribute('aria-hidden', 'true');
+			contours.setAttribute('focusable', 'false');
+			contours.innerHTML = '<g fill="none" stroke="rgba(224,243,84,.16)" stroke-width="1.5"><path d="M-30 45C90 -5 180 100 300 52S520 0 650 58s190 35 290-15"/><path d="M-30 75C90 25 180 130 300 82S520 30 650 88s190 35 290-15"/><path d="M-30 105C90 55 180 160 300 112S520 60 650 118s190 35 290-15"/><path d="M-30 155C90 105 180 210 300 162S520 110 650 168s190 35 290-15"/></g>';
+			const pin = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			pin.setAttribute('class', 'image-slot__pin');
+			pin.setAttribute('viewBox', '0 0 24 24');
+			pin.setAttribute('aria-hidden', 'true');
+			pin.setAttribute('focusable', 'false');
+			pin.innerHTML = '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" fill="var(--dealz-lime)"/><circle cx="12" cy="10" r="2.5" fill="var(--dealz-green)"/>';
+			const footer = document.createElement('div');
+			footer.className = 'image-slot__footer';
+			const mediaTitle = document.createElement('span');
+			mediaTitle.className = 'image-slot__title';
+			mediaTitle.textContent = item.title_snapshot;
+			const mediaStatus = document.createElement('span');
+			mediaStatus.className = 'image-slot__status';
+			mediaStatus.textContent = 'Chưa có ảnh đã xác minh';
+			footer.append(mediaTitle, mediaStatus);
+			media.append(contours, pin, footer);
 			card.append(media);
 		}
 
