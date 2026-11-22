@@ -89,6 +89,12 @@ async function createTripAndDay(page, title) {
   await expect(page.locator('#itinerary-workspace')).toBeVisible();
   await expect(page).toHaveURL(/#route\?trip=/);
   await expectScreenState(page, '#itinerary-workspace', ['.hero-section', '.feature-bento', '.next-step-section.page-container', '.section-heading', '#trip-list', '#create-trip', '#rental-workspace']);
+  const selectedTripId = new URLSearchParams(new URL(page.url()).hash.split('?')[1] || '').get('trip');
+  await page.goto(BASE_URL + '/#route');
+  await expect(page.locator('#itinerary-workspace')).toBeVisible();
+  await expect(page).toHaveURL(/#route$/);
+  await page.goto(BASE_URL + '/#route?trip=' + encodeURIComponent(selectedTripId));
+  await expect(page.locator('#itinerary-workspace')).toBeVisible();
   await page.locator('#create-itinerary-btn').click();
   await expect(page.locator('#itinerary-editor')).toBeVisible();
   await page.locator('#itinerary-day-date').fill('2027-04-01');

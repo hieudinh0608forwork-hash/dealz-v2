@@ -159,3 +159,9 @@ Last reconciled: 2026-11-22 (UTC)
 ## Route QA selector correction (2026-11-22)
 - Browser run [44989906380](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44989906380) on commit `b233cac320e27e8f0d297dd4ed20b68f53920751` completed with 5 passed / 7 failed. All seven failures stopped in the shared route assertion because `.next-step-section` matched both the home next-step section and the distinct rental-next-step section (strict-mode locator ambiguity).
 - Root correction: scope the hidden home section to `.next-step-section.page-container`; the rental route's own `.rental-next-step` remains visible, and CSS no longer hides it as a side effect. Browser test asserts rental-next-step visibility. No test was removed or weakened.
+
+
+## Canonical #route root restoration (2026-11-22)
+- `#route?trip=<uuid>` remains the explicit deep link. The bare `#route` now restores the last selected trip from tab-scoped `sessionStorage`; if no trip has ever been selected, it falls back to the Trips list. The selected trip is stored when opened and when a route URL is resolved.
+- Desktop Browser QA now navigates from the selected route to bare `#route`, verifies the itinerary workspace returns, then restores the explicit deep link before continuing. No session or business data is persisted beyond the browser tab.
+- Pending CI evidence.

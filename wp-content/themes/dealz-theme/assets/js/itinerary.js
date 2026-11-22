@@ -206,6 +206,7 @@
 	async function openTrip(publicId) {
 		if (!publicId) return;
 		const routeHash = '#route?trip=' + encodeURIComponent(publicId);
+		sessionStorage.setItem('dealz:last-trip', publicId);
 		if (window.location.hash !== routeHash) {
 			window.location.hash = routeHash.slice(1);
 			return;
@@ -1207,8 +1208,9 @@
 		const routeMatch = currentHash.match(/^#route(?:\?(.*))?$/);
 		if (routeMatch) {
 			const routeParams = new URLSearchParams(routeMatch[1] || '');
-			const tripId = routeParams.get('trip');
+			const tripId = routeParams.get('trip') || (currentHash === '#route' ? sessionStorage.getItem('dealz:last-trip') : null);
 			if (tripId && /^[a-f0-9-]{36}$/i.test(tripId)) {
+				sessionStorage.setItem('dealz:last-trip', tripId);
 				loadTrip(tripId);
 			} else {
 				showTripsScreen();
