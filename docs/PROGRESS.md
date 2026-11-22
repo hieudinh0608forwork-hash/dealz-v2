@@ -286,3 +286,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Visual inspection of artifact [run 44993280135](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993280135/artifacts) confirmed rental and edit content were visible but the sticky site header was clipped after element-offset scrolling.
 - Changed itinerary edit and rental screenshots to reset scroll to the top of the active route, assert ≥90% of `.site-header` is in viewport, and assert the screen title/summary is in viewport. Home, itinerary and styleguide captures also assert the header is ≥90% visible.
 - Added two extra bento proof screenshots at 360px and 390px, with the rental-card heading and “Sắp có” chip visible. Required 25-screen matrix remains viewport-only; artifact now has 27 images.
+
+
+## Focus computed-style synchronization (2026-11-22)
+- Browser run [44993571495](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993571495) on `a82d208bd0c39963aa78b3edd247ea986a61d53d`: 11/12 passed. PHP/lint [44993571496](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993571496), Integration [44993571535](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993571535), fresh install [44993571494](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44993571494) passed.
+- Recursive diagnostic now confirms the only matching outline declaration is the global `body #primary :focus-visible` rule, marked important; the token resolves correctly, but an immediate synchronous computed-style read still returns width 0px. No competing author outline rule is present in the accessible stylesheets.
+- Replaced the immediate-only sampling with Playwright web-first `toHaveCSS('outline-width', '3px')` and an exact red-color poll for `#item-title`, then retained the subsequent computed-style assertions. This waits for the browser's focus style to settle without fixed sleep and does not relax the requirement.

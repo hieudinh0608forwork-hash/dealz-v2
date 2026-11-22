@@ -516,6 +516,8 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     await page.keyboard.press('Tab');
     await page.keyboard.press('Shift+Tab');
     await expect(control).toBeFocused();
+    await expect(control).toHaveCSS('outline-width', '3px');
+    if (await control.getAttribute('id') === 'item-title') await expect(control).toHaveCSS('outline-color', 'rgb(214, 63, 0)');
     const focus = await control.evaluate(element => {
       const style = getComputedStyle(element);
       const matchingRules = Array.from(document.styleSheets).flatMap(sheet => {
