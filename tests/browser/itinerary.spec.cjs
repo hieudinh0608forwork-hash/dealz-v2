@@ -899,3 +899,30 @@ test('capture home, itinerary, edit panel, rental and styleguide viewport screen
     await page.screenshot({ path: 'artifacts/styleguide-' + width + '-viewport-default.png', fullPage: false });
   }
 });
+
+test.describe('T8 motion evidence', () => {
+  test.use({ video: 'on' });
+
+  test('records the primary CTA hover transition', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await signIn(page);
+    const cta = page.locator('.hero-section__cta');
+    await expect(cta).toBeVisible();
+
+    const transitionDuration = await cta.evaluate(element => getComputedStyle(element).transitionDuration);
+    expect(transitionDuration).toContain('0.16s');
+    const initialTransform = await cta.evaluate(element => getComputedStyle(element).transform);
+    await page.screenshot({ path: 'artifacts/motion-primary-default.png', fullPage: false });
+
+    await cta.hover();
+    await expect.poll(() => cta.evaluate(element => getComputedStyle(element).transform))
+      .not.toBe(initialTransform);
+    await page.waitForTimeout(180);
+    await expect(cta).toHaveCSS('transform', /matrix/);
+    await page.screenshot({ path: 'artifacts/motion-primary-hover.png', fullPage: false });
+
+    await cta.click();
+    await expect(page).toHaveURL(/#create-trip/);
+  });
+});
+

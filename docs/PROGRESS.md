@@ -484,8 +484,8 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 **Tổng 15/20 – chưa đạt ngưỡng ≥16.** Ba điểm yếu nhất: (1) màn hành trình thiếu điểm nhấn; (2) thiếu ảnh thật chất lượng cao; (3) bóng mờ lạ phía sau header ở màn thuê đồ (1280), chưa xác định nguyên nhân.
 
 ## T8 – bổ sung ảnh bằng chứng loading/error (23/11/2026)
-- Luồng Browser QA desktop chụp ba trạng thái thật từ API được giữ/chặn có chủ đích trong test: artifacts/state-loading-items.png, artifacts/state-error-items.png, artifacts/state-retry-success-items.png.
-- Loading có assertion aria-busy=true và nội dung 'Đang tải điểm dừng…'; error có 'Thử tải lại'; sau retry xác nhận nút lỗi biến mất. Không dùng ảnh dựng, không thay đổi logic sản phẩm hoặc bỏ assertion.
+- Luồng Browser QA desktop chụp hai trạng thái bằng chứng từ API được giữ/chặn có chủ đích: artifacts/state-loading-items.png và artifacts/state-error-items.png.
+- Loading có assertion aria-busy=true và nội dung 'Đang tải điểm dừng…'; error có 'Thử tải lại'; sau retry xác nhận nút lỗi biến mất. Ảnh sau retry không tính là success vì vùng thông báo lỗi tổng quát vẫn còn hiển thị. Không dùng ảnh dựng, không thay đổi logic sản phẩm hoặc bỏ assertion.
 
 ## T8 – tăng thứ bậc thị giác màn Hành trình (23/11/2026)
 - Khối danh sách ngày ở rail 4/8 được chuyển thành khối xanh rừng; tiêu đề trắng, ngày đang chọn nền lime/chữ xanh rừng, các ngày còn lại chữ trắng dịu. Không thay đổi lưới 4/8, dữ liệu ngày hoặc CTA.
@@ -503,3 +503,7 @@ Nguồn ảnh: artifact `dealz-browser-qa` (Browser QA 12/12, chạy sau commit 
 - Computed style thật tại 1280px, scrollY=74: header .site-header.is-scrolled, position=sticky, z-index=10, background rgba(255,255,255,0.94), backdrop-filter=blur(14px), box-shadow=none, filter=none; ::before/::after đều content:none.
 - elementsFromPoint xác nhận nội dung nằm dưới header: .rental-back-link ở x=50–310, y=73–98.6 và .workspace-label ở x=1122–1230, y=76.2–95.4. Chúng đúng vị trí các vệt chữ mờ người dùng nhìn thấy. Đây không phải box-shadow; nền header trong suốt 6% kết hợp backdrop blur làm lộ chữ bên dưới.
 - Sửa riêng màn thuê đồ: khi header đã cuộn, nền chuyển sang token cream đặc và tắt backdrop-filter. Giữ nguyên header ở các màn khác. Playwright giữ diagnostic JSON và thêm assertion computed background rgb(251,247,238), backdrop-filter none; không thay assertion sản phẩm, selector/ARIA/data-testid.
+
+## T8 – bằng chứng chuyển động (23/11/2026)
+- Thêm test riêng bật video Playwright cho hover CTA chính trang chủ; test đo transition-duration=0.16s, xác nhận computed transform đổi khi hover, chờ chuyển động kết thúc, chụp trạng thái mặc định/hover và click kiểm tra liên kết #create-trip.
+- Video WebM do Playwright tự ghi nằm trong test-results của artifact dealz-browser-qa; ảnh đối chiếu: artifacts/motion-primary-default.png và artifacts/motion-primary-hover.png. Chỉ Chromium; không tuyên bố kiểm thử Safari/Firefox.
