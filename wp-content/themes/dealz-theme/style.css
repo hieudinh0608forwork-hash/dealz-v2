@@ -118,7 +118,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	letter-spacing: 0.04em;
 }
 .hero-section h1 {
-	max-width: 660px;
+	max-width: 20ch;
+	text-wrap: balance;
 	margin: 0;
 	font-family: var(--dealz-font-heading);
 	font-size: clamp(42px, 5.8vw, 76px);

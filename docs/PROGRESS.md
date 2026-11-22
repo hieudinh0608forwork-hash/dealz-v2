@@ -98,3 +98,9 @@ Last reconciled: 2026-11-22 (UTC)
 - The footer Hỗ trợ/Zalo column now renders only when the sanitized `dealz_zalo_url` option contains an HTTPS URL. With no configured URL, the entire column is absent; the floating button was already conditional and remains absent.
 - Browser test for the clean unauthenticated installation now asserts no footer support column, no floating Zalo action, and no user-facing “cấu hình” or “QA” copy. Existing legal footer links remain.
 - No URL or contact detail was invented. Pending CI evidence.
+
+
+## UI defect C5 – hero heading orphan prevention (2026-11-22)
+- Hero heading now uses a 20ch measure and `text-wrap: balance`; this avoids forcing the final “bạn.” onto a one-word line at desktop widths while preserving the approved wording.
+- The existing six-viewport Playwright matrix now measures word line positions and requires at least two words on the final line at each viewport (360, 390, 768, 1024, 1280, 1536). No screenshot-only judgment substituted for the assertion.
+- Pending CI evidence.
