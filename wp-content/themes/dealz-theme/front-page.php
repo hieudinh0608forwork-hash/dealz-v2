@@ -371,15 +371,9 @@ get_header();
 				<p><?php esc_html_e( 'DealZ chưa có danh sách sản phẩm, phong cách, giá, tình trạng còn hàng hoặc cửa hàng được xác minh để lọc và giới thiệu. Vì vậy, mục này chưa hiển thị sản phẩm hay nhận yêu cầu thuê.', 'dealz-theme' ); ?></p>
 				<p><?php esc_html_e( 'Thông tin điểm dừng được giữ trong liên kết để bạn quay lại đúng ngữ cảnh. Chưa có thao tác đặt thuê hoặc thanh toán.', 'dealz-theme' ); ?></p>
 				<a class="button button--primary rental-empty-state__back" href="#trips"><?php esc_html_e( 'Quay lại điểm dừng', 'dealz-theme' ); ?></a>
-			</div>
-			<aside class="rental-note dz-card dz-card--note">
-				<p class="eyebrow"><?php esc_html_e( 'Gợi ý chung', 'dealz-theme' ); ?></p>
-				<h2><?php esc_html_e( 'Gợi ý chung khi chụp ảnh', 'dealz-theme' ); ?></h2>
-				<ul><li><?php esc_html_e( 'Ưu tiên ánh sáng tự nhiên và tránh ngược sáng gắt.', 'dealz-theme' ); ?></li><li><?php esc_html_e( 'Chọn màu trang phục có độ tương phản vừa đủ với nền.', 'dealz-theme' ); ?></li><li><?php esc_html_e( 'Ưu tiên trang phục thoải mái khi di chuyển bằng xe máy.', 'dealz-theme' ); ?></li></ul>
-				<p class="styleguide-help"><?php esc_html_e( 'Gợi ý chung, chưa dựa trên dữ liệu điểm dừng.', 'dealz-theme' ); ?></p>
 				<?php $zalo_url = dealz_sanitize_zalo_url( get_option( 'dealz_zalo_url', '' ) ); ?>
-				<?php if ( $zalo_url ) : ?><a class="button button--tertiary" href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nhắn Zalo để được báo khi có shop', 'dealz-theme' ); ?> →</a><?php endif; ?>
-			</aside>
+				<?php if ( $zalo_url ) : ?><a class="button button--tertiary rental-empty-state__zalo" href="<?php echo esc_url( $zalo_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nhắn Zalo để được báo khi có shop', 'dealz-theme' ); ?> →</a><?php endif; ?>
+			</div>
 		</div>
 		<section class="next-step-section rental-next-step"><div class="next-step-card"><div><p class="eyebrow"><?php esc_html_e( 'Tiếp theo', 'dealz-theme' ); ?></p><h2><?php esc_html_e( 'Xem toàn bộ hành trình.', 'dealz-theme' ); ?></h2></div><a class="button button--tertiary" href="#trips"><?php esc_html_e( 'Xem toàn bộ hành trình', 'dealz-theme' ); ?> →</a></div></section>
 	</section>

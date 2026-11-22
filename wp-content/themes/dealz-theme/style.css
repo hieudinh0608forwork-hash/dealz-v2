@@ -1103,3 +1103,13 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 
 /* Inline validation for required itinerary title; no disabled-empty submit state. */
 .form-field__error { margin: 6px 0 0; color: var(--dealz-error); font-size: 14px; line-height: 1.45; }
+
+
+/* Review 23/11: rental empty state is the single focus; consistent vertical rhythm. */
+.rental-layout { grid-template-columns: minmax(0, 760px); }
+.rental-empty-state__zalo { margin-top: 12px; }
+.rental-heading { display: grid; justify-items: start; gap: 12px; }
+.rental-heading > * { margin-top: 0; margin-bottom: 0; }
+.rental-heading #rental-context-chip[hidden] { display: none; }
+.workspace-heading.rental-heading { margin-top: 20px; }
+.itinerary-layout { margin-top: 20px; }
