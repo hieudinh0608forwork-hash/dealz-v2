@@ -518,11 +518,28 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     await expect(control).toBeFocused();
     const focus = await control.evaluate(element => {
       const style = getComputedStyle(element);
-      return { visible: element.matches(':focus-visible'), style: style.outlineStyle, width: style.outlineWidth };
+      const matchingRules = Array.from(document.styleSheets).flatMap(sheet => {
+        try {
+          return Array.from(sheet.cssRules).filter(rule => rule.selectorText && rule.selectorText.includes(':focus-visible') && element.matches(rule.selectorText)).map(rule => ({ href: sheet.href, selector: rule.selectorText, cssText: rule.style.cssText }));
+        } catch (error) {
+          return [];
+        }
+      });
+      return {
+        visible: element.matches(':focus-visible'),
+        style: style.outlineStyle,
+        width: style.outlineWidth,
+        color: style.outlineColor,
+        token: getComputedStyle(document.documentElement).getPropertyValue('--dealz-focus-outline').trim(),
+        inPrimary: Boolean(element.closest('#primary')),
+        matchingRules,
+        inlineStyle: element.getAttribute('style'),
+        stylesheets: Array.from(document.styleSheets).map(sheet => sheet.href)
+      };
     });
     expect(focus.visible, 'Control must match :focus-visible: ' + await control.getAttribute('id')).toBe(true);
     expect(focus.style, 'Focus outline style: ' + await control.getAttribute('id')).not.toBe('none');
-    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
+    expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id') + ' ' + JSON.stringify(focus)).toBeGreaterThanOrEqual(3);
     expect(parseFloat(await control.evaluate(element => getComputedStyle(element).outlineOffset)), 'Focus outline offset: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
   }
   const backLink = page.locator('#back-to-trips');

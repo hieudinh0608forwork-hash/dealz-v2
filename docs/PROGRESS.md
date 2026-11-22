@@ -253,3 +253,9 @@ Last reconciled: 2026-11-22 (UTC)
 - Inspected the 25-image artifact from run [44991475239](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44991475239/artifacts). Home and itinerary screenshots were viewport captures; however, rental captures retained the previous scroll position and showed the rental next-step/footer while the rental workspace title was outside the viewport.
 - Corrected the screenshot test to scroll each active screen below the sticky header before capture, assert the screen title is actually in the viewport, and use explicit filenames `screen-width-viewport-state.png`. Edit-panel captures position the selected stop card below the header. All captures remain `fullPage: false`; this is a screenshot-position correction, not a change to product behavior.
 - Required matrix remains 5 widths × 5 states = 25 viewport screenshots: home, itinerary with fixture data, edit open, rental empty and styleguide. Header/nav remain in the viewport; no configured Zalo control is fabricated.
+
+
+## Focus indicator diagnostics – isolate WordPress cascade (2026-11-22)
+- The consolidated global focus rule with `!important` still needs Browser QA confirmation; previous Browser run [44992361334](https://github.com/hieudinh0608forwork-hash/dealz-v2/actions/runs/44992361334) is 11/12 and retains the `#item-title` computed-width failure.
+- Added strict diagnostic output to the existing focus assertion: matching CSS rules, stylesheet URLs, resolved token value, `#primary` ancestry, inline style and computed outline color/width. The width ≥3px assertion remains unchanged.
+- Current viewport screenshot capture commit `7644de68` also moves each screen title into the viewport before taking images. New Browser run is in progress; do not call 12/12 until the diagnostic run passes.
