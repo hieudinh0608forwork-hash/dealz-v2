@@ -565,9 +565,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-size: 14px;
 }
 .finance-form select:focus {
-	border-color: var(--dealz-orange);
-	outline: 0;
-	box-shadow: 0 0 0 3px var(--dealz-focus-shadow);
+	border-color: var(--dealz-input-focus);
+	box-shadow: 0 0 0 4px var(--dealz-focus-halo);
 }
 .finance-form input {
 	min-height: 48px;
@@ -578,9 +577,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 	font-size: 14px;
 }
 .finance-form input:focus {
-	border-color: var(--dealz-orange);
-	outline: 0;
-	box-shadow: 0 0 0 3px var(--dealz-focus-shadow);
+	border-color: var(--dealz-input-focus);
+	box-shadow: 0 0 0 4px var(--dealz-focus-halo);
 }
 @media (max-width: 760px) {
 	.finance-grid { grid-template-columns: 1fr; }
@@ -850,7 +848,9 @@ body.is-rental-view .rental-workspace { min-width: 0; max-width: 100%; }
 	outline-offset: 3px;
 }
 .next-step-card :focus-visible,
-.budget-summary :focus-visible {
+.budget-summary :focus-visible,
+.site-footer :focus-visible,
+.rental-next-step :focus-visible {
 	outline-color: var(--dealz-lime);
 }
 .styleguide-page { padding-block: 48px 88px; }

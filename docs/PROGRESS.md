@@ -165,3 +165,9 @@ Last reconciled: 2026-11-22 (UTC)
 - `#route?trip=<uuid>` remains the explicit deep link. The bare `#route` now restores the last selected trip from tab-scoped `sessionStorage`; if no trip has ever been selected, it falls back to the Trips list. The selected trip is stored when opened and when a route URL is resolved.
 - Desktop Browser QA now navigates from the selected route to bare `#route`, verifies the itinerary workspace returns, then restores the explicit deep link before continuing. No session or business data is persisted beyond the browser tab.
 - Pending CI evidence.
+
+
+## Focus coverage expansion – finance controls and forest surfaces (2026-11-22)
+- Found finance form overrides still using a 3px shadow and `outline: 0`; changed finance inputs/selects to the same `#FD550A` border and 4px halo as other inputs, leaving the global 3px `:focus-visible` outline/3px offset in force.
+- Forest-background links in the site footer and rental next-step card now use the lime focus outline. The focus browser test opens budget/expense details, checks computed `:focus-visible` outline width/offset on all itinerary/finance controls, verifies the finance input border and 4px shadow, and verifies lime outline color on a footer link.
+- No focus assertion removed or relaxed. Pending Browser QA rerun.

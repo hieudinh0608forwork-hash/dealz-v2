@@ -472,7 +472,9 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     await localeContext.close();
   }
   await page.keyboard.press('Tab');
-  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit');
+  await page.locator('.finance-card').first().locator('summary').click();
+  await page.locator('.finance-card').nth(1).locator('summary').click();
+  const focusable = page.locator('#item-title, #item-type, #item-address, #item-start, #item-end, #item-duration, #create-item-submit, #budget-description, #budget-quantity, #budget-unit-amount, #budget-cost-type, #create-budget-submit, #expense-amount, #expense-occurred-at, #expense-note, #create-expense-submit, .workspace-toolbar a');
   for (let index = 0; index < await focusable.count(); index++) {
     const control = focusable.nth(index);
     await control.focus();
@@ -483,7 +485,17 @@ test('reduced motion, 24-hour time, keyboard focus and admin-bar offset', async 
     expect(focus.visible, 'Control must match :focus-visible: ' + await control.getAttribute('id')).toBe(true);
     expect(focus.style, 'Focus outline style: ' + await control.getAttribute('id')).not.toBe('none');
     expect(parseFloat(focus.width), 'Focus outline width: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
+    expect(parseFloat(await control.evaluate(element => getComputedStyle(element).outlineOffset)), 'Focus outline offset: ' + await control.getAttribute('id')).toBeGreaterThanOrEqual(3);
   }
+  const financeInput = page.locator('#expense-amount');
+  await financeInput.focus();
+  const financeFocus = await financeInput.evaluate(element => ({ border: getComputedStyle(element).borderColor, shadow: getComputedStyle(element).boxShadow }));
+  expect(financeFocus.border).toBe('rgb(253, 85, 10)');
+  expect(financeFocus.shadow).toContain('4px');
+  const footerLink = page.locator('.site-footer a').first();
+  await footerLink.focus();
+  const footerFocusColor = await footerLink.evaluate(element => getComputedStyle(element).outlineColor);
+  expect(footerFocusColor).toBe('rgb(224, 243, 84)');
   await page.evaluate(() => window.scrollTo(0, 600));
   const top = await page.locator('.site-header').evaluate(el => el.getBoundingClientRect().top);
   expect(top).toBeGreaterThanOrEqual(0);
